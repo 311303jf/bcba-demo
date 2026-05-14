@@ -399,11 +399,27 @@ function saveStats(){try{pruneStatsHistory(50);localStorage.setItem(STOR_KEY,JSO
 // DEMO LAUNCH
 // ============================================================
 const DEMO_MODE = true;
+const DEMO_PRACTICE_LIMIT = 5;
+const DEMO_PRACTICE_SEQUENCE = ['Positive Reinforcement','Negative Reinforcement','Escape','Avoidance','Reinforcement Contingencies — Mixed Review'];
+
+function demoLearningPath(){
+  return [
+    {domId:'B',idx:0,subIdx:0,finalReview:false},
+    {domId:'B',idx:0,subIdx:1,finalReview:false},
+    {domId:'B',idx:0,subIdx:2,finalReview:false},
+    {domId:'B',idx:0,subIdx:3,finalReview:false},
+    {domId:'B',idx:0,subIdx:null,finalReview:true}
+  ];
+}
+function demoMasteredCount(){
+  return demoLearningPath().filter(x=>isMastered(x.domId,x.idx,x.subIdx,x.finalReview)).length;
+}
 
 function resetDemoProgress(){
   try{
     localStorage.removeItem(STOR_KEY);
     localStorage.removeItem(MASTER_KEY);
+    resetDemoQuestionTracking();
   }catch(e){}
 
   mastered = {};
@@ -452,7 +468,26 @@ async function callAI(prompt,max=1300){
   throw new Error('Content service unavailable.');
 }
 
+function demoGenQuestion(domId,diff='standard'){
+  const answered = state?.practice?.sc?.t || 0;
+  const title = DEMO_PRACTICE_SEQUENCE[answered % DEMO_PRACTICE_SEQUENCE.length];
+  const q=selectDemoQuestions(title,1)[0] || DEMO_QUESTION_BANK[title][0];
+  return {
+    domain:'B',
+    task:title,
+    scenario:q.q,
+    question:'Which behavioral process is best demonstrated?',
+    options:q.options,
+    correct:q.correct,
+    explanation:q.explanation,
+    hint:q.hint || '',
+    demo_question_id:q.id,
+    demo_topic:title
+  };
+}
+
 async function genQuestion(domId,diff='standard'){
+  if (DEMO_MODE) return demoGenQuestion(domId,diff);
   const d=D.find(x=>x.id===domId);
   const task=d.tasks[Math.floor(Math.random()*d.tasks.length)];
   const diffNote=diff==='hard'
@@ -637,6 +672,9 @@ function isConceptComplete(domId,idx){
   return isMastered(domId,idx);
 }
 function getNextConcept(){
+  if(DEMO_MODE){
+    return demoLearningPath().find(x=>!isMastered(x.domId,x.idx,x.subIdx,x.finalReview)) || null;
+  }
   for(const d of D){
     for(let i=0;i<d.tasks.length;i++){
       const subs=getSubconceptsForTask(d.tasks[i]);
@@ -650,6 +688,7 @@ function getNextConcept(){
 }
 
 function buildLearningPath(){
+  if(DEMO_MODE) return demoLearningPath();
   const path=[];
   D.forEach(d=>{
     d.tasks.forEach((task,idx)=>{
@@ -691,10 +730,116 @@ function schedulePreload(fromModule){
 
 
 // ============================================================
-// DEMO CONTENT SAFETY — each module has its own aligned content
+// DEMO CURATED CONTENT ENGINE — stable, aligned, and no repeated questions
 // ============================================================
-function demoModule(title, definition, clinicalExample, hookQ, hookA, strategy, q1, q2){
-  const module={
+const DEMO_USED_Q_KEY = 'bcba-demo-used-question-ids-v1';
+
+function getDemoUsedQuestions(){
+  try { return JSON.parse(sessionStorage.getItem(DEMO_USED_Q_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function saveDemoUsedQuestions(used){
+  try { sessionStorage.setItem(DEMO_USED_Q_KEY, JSON.stringify(used || {})); }
+  catch(e){}
+}
+function resetDemoQuestionTracking(){
+  try { sessionStorage.removeItem(DEMO_USED_Q_KEY); }
+  catch(e){}
+}
+function demoQuestionKey(title){
+  return String(title||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+function shuffleCopy(arr){
+  const a=[...(arr||[])];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function selectDemoQuestions(title,count=2){
+  const key=demoQuestionKey(title);
+  const bank=DEMO_QUESTION_BANK[title] || [];
+  const used=getDemoUsedQuestions();
+  const already=new Set(used[key] || []);
+  let pool=shuffleCopy(bank.filter(q=>!already.has(q.id)));
+
+  // If the learner exhausts a bank inside one browser session, start a fresh cycle.
+  // This prevents dead ends while still avoiding repeats until the bank is exhausted.
+  if(pool.length < count){
+    already.clear();
+    used[key]=[];
+    pool=shuffleCopy(bank);
+  }
+
+  const selected=pool.slice(0,count).map(q=>({...q}));
+  used[key]=[...(used[key]||[]), ...selected.map(q=>q.id)];
+  saveDemoUsedQuestions(used);
+  return selected;
+}
+function demoQuestion(id,q,options,correct,hint,explanation,difficulty='standard'){
+  return {id,q,options,correct,hint,explanation,difficulty};
+}
+
+const DEMO_QUESTION_BANK={
+  'Positive Reinforcement': [
+    demoQuestion('pr-001','A learner independently asks, “Can I have a turn?” The teacher immediately gives access to a preferred game. Across the week, independent requesting increases. Which process is demonstrated?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Response cost',D:'Extinction'},'A','Ask: was something added after the response, and did the behavior increase later?','A is correct because access to the game was added after the request and requesting increased. Negative reinforcement would require removal or prevention of an aversive stimulus.'),
+    demoQuestion('pr-002','During writing instruction, a student completes a sentence and the teacher immediately delivers specific praise. Sentence completion increases during later writing tasks. What is the best interpretation?',{A:'Positive punishment',B:'Positive reinforcement',C:'Negative reinforcement',D:'Stimulus fading'},'B','Look for a consequence delivered after the response that increases future behavior.','B is correct because praise was added after sentence completion and completion increased. Punishment would decrease behavior, and negative reinforcement would involve removal of a stimulus.'),
+    demoQuestion('pr-003','A client says “help please” instead of crying. The therapist immediately provides assistance. Over several sessions, “help please” occurs more often. Which contingency is most likely operating?',{A:'Extinction',B:'Negative punishment',C:'Positive reinforcement',D:'Avoidance'},'C','Identify the communication response, the consequence delivered, and the future effect.','C is correct because assistance was delivered after the communication response and the response increased. Avoidance would involve preventing an aversive event before it occurs.'),
+    demoQuestion('pr-004','A learner earns a token immediately after following a two-step direction. Later, following two-step directions increases. What makes this positive reinforcement?',{A:'A stimulus was added and behavior increased',B:'A stimulus was removed and behavior decreased',C:'A task was avoided before it started',D:'Reinforcement was withheld'},'A','Positive means added; reinforcement means future behavior increases.','A is correct. The token was added after the response, and the future frequency of following directions increased.'),
+    demoQuestion('pr-005','A child shares materials with a peer. The teacher immediately gives social praise and a sticker. Sharing increases over the next few days. Which answer best describes the process?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Response blocking'},'A','Do not choose based on whether the consequence seems pleasant; choose based on add/remove and future effect.','A is correct because praise and a sticker were added after sharing, and sharing increased.'),
+    demoQuestion('pr-006','After a client labels a picture correctly, the RBT provides access to a preferred song. Correct labeling increases across sessions. Which process explains this change?',{A:'Negative punishment',B:'Positive reinforcement',C:'Escape',D:'Extinction'},'B','Find the immediate consequence and whether the response increased in the future.','B is correct because access to a song was delivered after labeling, and labeling increased.'),
+    demoQuestion('pr-007','A student raises her hand before speaking. The teacher calls on her immediately. Hand raising increases during class discussions. What is the most precise interpretation?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Stimulus delta',D:'Extinction burst'},'A','Calling on the student is added after hand raising, and hand raising increases.','A is correct because teacher attention/opportunity to respond was added after the response and the response increased.'),
+    demoQuestion('pr-008','A client completes cleanup and then receives five minutes with a preferred toy. Cleanup increases in later sessions. Which process is demonstrated?',{A:'Positive reinforcement',B:'Escape',C:'Avoidance',D:'Positive punishment'},'A','Something was delivered after cleanup; check whether cleanup increased.','A is correct because toy access was added after cleanup and cleanup increased.')
+  ],
+  'Negative Reinforcement': [
+    demoQuestion('nr-001','During table work, a learner appropriately requests a break. The therapist removes the worksheet for two minutes. Break requests increase across sessions. Which process is demonstrated?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Extinction'},'B','Negative means removal or prevention of a stimulus; reinforcement means behavior increases.','B is correct because the worksheet was removed after the request and break requesting increased.'),
+    demoQuestion('nr-002','A student puts on noise-reducing headphones and the loud classroom noise is reduced. The student uses the headphones more often during noisy activities. What process best explains the increase?',{A:'Negative reinforcement',B:'Positive reinforcement',C:'Response cost',D:'Extinction'},'A','Look for reduction or removal of an aversive stimulus following the response.','A is correct because loud noise was reduced and headphone use increased. The key is removal/reduction of aversive stimulation.'),
+    demoQuestion('nr-003','A client presses “stop” on a tablet when a loud alarm sounds. The alarm stops, and pressing “stop” increases when the alarm occurs again. Which process is operating?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Differential reinforcement of other behavior'},'B','The response turns off an aversive stimulus and increases in the future.','B is correct because the alarm was removed after the response and the response increased.'),
+    demoQuestion('nr-004','A learner asks to move away from a crowded area. The therapist allows the learner to move to a quiet space. Asking to move increases in future crowded settings. Which process is most likely?',{A:'Negative reinforcement',B:'Positive punishment',C:'Stimulus fading',D:'Extinction'},'A','Determine whether an aversive condition was removed or reduced after the response.','A is correct because crowding/noise was reduced or removed after the request, and requesting increased.'),
+    demoQuestion('nr-005','A child says “too hard” during a difficult puzzle. The instructor briefly removes the puzzle and provides an easier task. Saying “too hard” increases during difficult puzzles. What process best fits?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Negative punishment',D:'Respondent extinction'},'B','The behavior increases because the difficult task is removed or reduced.','B is correct because the difficult task was removed/reduced after the response, and the response increased.'),
+    demoQuestion('nr-006','A student completes one problem to end a teacher prompt sequence. Completing the first problem increases when prompts begin. Which process is demonstrated?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Response cost'},'B','If a response increases because it ends prompting or demands, think negative reinforcement.','B is correct because completing the problem terminates the prompt sequence and the response increases.'),
+    demoQuestion('nr-007','A learner closes the classroom door when hallway noise begins. The noise decreases, and door closing increases during noisy hallway periods. What is the process?',{A:'Negative reinforcement',B:'Positive reinforcement',C:'Punishment',D:'Extinction'},'A','The consequence is reduction of aversive noise.','A is correct because closing the door reduces the noise and the behavior increases.'),
+    demoQuestion('nr-008','During grooming, a client says “pause.” The technician stops brushing for 30 seconds. “Pause” requests increase during grooming routines. Which process is occurring?',{A:'Negative reinforcement',B:'Positive reinforcement',C:'Overcorrection',D:'Stimulus generalization'},'A','The response increases because an ongoing aversive event is stopped briefly.','A is correct because brushing is removed or paused after the request and the request increases.')
+  ],
+  'Escape': [
+    demoQuestion('esc-001','A worksheet is already on the desk. The learner pushes it away, and the teacher removes it for one minute. Pushing increases during future worksheet tasks. Which process is most specific?',{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Response cost'},'A','Escape ends or reduces an aversive stimulus that is already present.','A is correct because the worksheet demand was already present and the response terminated it. Avoidance would prevent or postpone the demand before contact.'),
+    demoQuestion('esc-002','During toothbrushing, a client says “break,” and the caregiver stops brushing for 20 seconds. “Break” requests increase during toothbrushing. What is the most precise classification?',{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Negative punishment'},'B','Ask whether the aversive event had already started. If yes and the response ends it, think escape.','B is correct because toothbrushing was ongoing and the request temporarily stopped it.'),
+    demoQuestion('esc-003','A student screams after math demands are presented. The teacher removes the math sheet, and screaming increases during future math tasks. Which contingency is most likely?',{A:'Escape-maintained behavior',B:'Avoidance-maintained behavior',C:'Positive reinforcement by attention',D:'Extinction'},'A','The demand is already present, and the behavior removes it.','A is correct because screaming terminates an existing math demand, so the behavior is escape-maintained.'),
+    demoQuestion('esc-004','A therapist presents a sorting task. The learner signs “all done,” and the therapist removes the task. Signing “all done” increases when tasks are presented. What process is demonstrated?',{A:'Positive punishment',B:'Escape',C:'Avoidance',D:'Response cost'},'B','Look for an ongoing task that is terminated after the response.','B is correct because the sorting task was already present and was removed following the response.'),
+    demoQuestion('esc-005','A child covers his ears after the fire alarm starts. Staff take him to a quiet hallway, and ear covering increases when alarms sound. Which process best describes this?',{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Negative punishment'},'A','The alarm had already started; the response led to termination or reduction of stimulation.','A is correct because ear covering led to escape from an ongoing aversive sound.'),
+    demoQuestion('esc-006','During handwriting, a learner throws the pencil. The instructor removes handwriting materials for two minutes. Pencil throwing increases during handwriting. What is the function suggested by this pattern?',{A:'Escape from task demands',B:'Avoidance of future demands',C:'Access to tangibles',D:'Automatic reinforcement'},'A','The materials were present and removed after the behavior.','A is correct because throwing ends or removes an ongoing handwriting demand.'),
+    demoQuestion('esc-007','A client drops to the floor after being asked to transition to the table. The demand is withdrawn, and dropping increases during transitions. Which answer is most precise?',{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Stimulus control'},'A','The transition demand was already delivered; the response ended the demand.','A is correct because dropping to the floor terminated an already presented transition demand.'),
+    demoQuestion('esc-008','A learner says “too loud” after music begins. The teacher turns the volume down, and saying “too loud” increases during loud music. Which process is shown?',{A:'Escape',B:'Avoidance',C:'Positive punishment',D:'Extinction'},'A','The aversive stimulus was present and the response reduced it.','A is correct because the response reduced loud music that was already occurring.')
+  ],
+  'Avoidance': [
+    demoQuestion('av-001','Before a difficult worksheet is handed out, a student asks to use a break card. The teacher delays the worksheet, and break-card use increases before worksheets. What process is most specific?',{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Extinction'},'B','Avoidance prevents or postpones an aversive event before contact.','B is correct because the response occurred before the worksheet and postponed contact with the demand.'),
+    demoQuestion('av-002','A learner puts on headphones before entering the cafeteria. This prevents contact with loud noise, and headphone use increases before cafeteria transitions. Which process is demonstrated?',{A:'Escape',B:'Avoidance',C:'Positive punishment',D:'Stimulus fading'},'B','Look for prevention of an aversive stimulus, not termination of one already present.','B is correct because the headphones prevent or reduce contact with loud noise before the learner enters the cafeteria.'),
+    demoQuestion('av-003','A client checks a visual schedule and requests “later” before the grooming routine begins. Staff postpone grooming, and “later” requests increase before grooming. What process is most likely?',{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Negative punishment'},'A','The response happens before the aversive activity starts and delays it.','A is correct because the request postpones grooming before the client contacts the grooming demand.'),
+    demoQuestion('av-004','A student completes an online assignment early to prevent a teacher reminder from occurring. Early completion increases across weeks. Which process is demonstrated?',{A:'Positive reinforcement',B:'Escape',C:'Avoidance',D:'Response cost'},'C','Avoidance can involve a response that prevents an aversive event from occurring.','C is correct because completing early prevents the reminder, and early completion increases.'),
+    demoQuestion('av-005','A child moves to a quiet corner before the class sings loudly. This prevents exposure to the loud singing, and moving to the corner increases before singing time. What is this?',{A:'Avoidance',B:'Escape',C:'Extinction',D:'Positive punishment'},'A','The loud singing has not started yet; the response prevents contact.','A is correct because the behavior prevents or reduces contact with a future aversive event.'),
+    demoQuestion('av-006','A learner asks for help before beginning an independent task, preventing errors and corrective feedback. Asking for help increases before difficult tasks. Which process best fits?',{A:'Escape',B:'Avoidance',C:'Positive punishment',D:'Negative punishment'},'B','The response prevents a likely aversive event before it happens.','B is correct because asking for help occurs before errors/corrective feedback and prevents or reduces contact with them.'),
+    demoQuestion('av-007','Before the fire drill alarm is scheduled, a student uses a coping card and is allowed to wait outside. Card use increases before scheduled drills. Which process is most precise?',{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Extinction burst'},'B','Avoidance occurs before the aversive event; escape occurs after it starts.','B is correct because the response prevents contact with the upcoming alarm.'),
+    demoQuestion('av-008','A client closes the door before the blender is turned on, preventing exposure to the loud sound. Door closing increases when staff prepare smoothies. Which process is demonstrated?',{A:'Avoidance',B:'Escape',C:'Response cost',D:'Positive reinforcement'},'A','The behavior prevents exposure before the aversive stimulus starts.','A is correct because closing the door occurs before the blender noise and prevents contact with it.')
+  ],
+  'Reinforcement Contingencies — Mixed Review': [
+    demoQuestion('mix-001','A learner receives a token after correctly answering. Correct answering increases. What is the most precise process?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Escape',D:'Avoidance'},'A','A stimulus was added after the response and behavior increased.','A is correct because the token was added after the response and correct answering increased.'),
+    demoQuestion('mix-002','A learner asks for a break after work begins. The work is removed, and asking for breaks increases during work. What is most precise?',{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Negative punishment'},'B','The task was already present and the response ended it.','B is correct because the response terminated an ongoing demand.'),
+    demoQuestion('mix-003','A student puts on headphones before a fire drill to prevent loud noise. Headphone use increases before drills. What is most precise?',{A:'Escape',B:'Avoidance',C:'Positive punishment',D:'Extinction'},'B','The response happens before the aversive stimulus and prevents contact.','B is correct because the behavior prevents exposure to the alarm before it occurs.'),
+    demoQuestion('mix-004','A client presses “stop” while a loud video is playing. The video stops, and pressing “stop” increases. What process is demonstrated?',{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Response cost'},'A','The aversive stimulus is already occurring and the response ends it.','A is correct because the response terminates an ongoing aversive stimulus.'),
+    demoQuestion('mix-005','A child requests attention, receives teacher attention, and requests attention more often. Which process is demonstrated?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Avoidance',D:'Negative punishment'},'A','Attention was added after the response and the response increased.','A is correct because attention was delivered after the request and requesting increased.'),
+    demoQuestion('mix-006','A learner completes a task to stop repeated verbal prompts. Task completion increases when prompts begin. What process is demonstrated?',{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Extinction'},'B','The behavior increases because an aversive prompt sequence ends.','B is correct because task completion terminates prompting and increases in the future.')
+  ]
+};
+
+function demoModule(title, definition, clinicalExample, hookQ, hookA, strategy, keyPoints=null){
+  const questions=selectDemoQuestions(title,2).map(q=>({
+    ...q,
+    target_domain: 'B',
+    target_concept: 'Positive and negative reinforcement contingencies',
+    target_subconcept: title
+  }));
+  return {
     concept: title,
     main_concept: 'Positive and negative reinforcement contingencies',
     subconcept: title,
@@ -710,107 +855,48 @@ function demoModule(title, definition, clinicalExample, hookQ, hookA, strategy, 
     hook_answer: hookA,
     definition,
     clinical_example: clinicalExample,
-    key_points: [
+    key_points: keyPoints || [
       'Always identify the target behavior first.',
       'Then identify the immediate consequence following the response.',
       'Finally, determine whether the future frequency of the behavior increased.'
     ],
     strategy,
-    questions: [q1, q2].map(q=>({
-      ...q,
-      target_domain: 'B',
-      target_concept: 'Positive and negative reinforcement contingencies',
-      target_subconcept: title
-    }))
+    questions
   };
-  return module;
 }
 
 function demoLearnContent(domId, conceptIdx, subIdx=null, finalReview=false){
-  const qPositive1={
-    q:'A client completes three math problems. The RBT immediately gives access to a preferred tablet. During later sessions, the client completes more math problems. Which process is demonstrated?',
-    options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Extinction'},
-    correct:'A',
-    hint:'Look for whether something was added after the response and whether the behavior increased later.',
-    explanation:'A is correct because access to the tablet was added after completing math problems, and problem completion increased in the future. Negative reinforcement would involve removal of a stimulus. Punishment would decrease behavior. Extinction would involve withholding reinforcement.'
-  };
-  const qPositive2={
-    q:'A learner says, “help please,” and the teacher immediately provides assistance. The learner begins requesting help more often instead of crying. What is the best interpretation?',
-    options:{A:'Response cost',B:'Positive reinforcement',C:'Stimulus fading',D:'Negative punishment'},
-    correct:'B',
-    hint:'Focus on the consequence delivered after the communication response and the future change in that response.',
-    explanation:'B is correct because assistance was delivered after the request and the request increased. The scenario is not describing loss of a reinforcer, fading, or response cost.'
-  };
-  const qNegative1={
-    q:'During work time, a learner asks for a break using a break card. The therapist removes the worksheet for two minutes. Over time, independent break-card use increases. Which process is most directly demonstrated?',
-    options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Stimulus generalization'},
-    correct:'B',
-    hint:'Ask whether something was removed after the response and whether the response increased in the future.',
-    explanation:'B is correct because the worksheet was removed after the break-card response and that response increased. Positive reinforcement would involve adding a stimulus. Punishment would decrease behavior.'
-  };
-  const qNegative2={
-    q:'A student appropriately says “too loud” and the teacher lowers the volume. The student uses this phrase more often during noisy activities. What principle is shown?',
-    options:{A:'Negative reinforcement',B:'Positive reinforcement',C:'Extinction',D:'Response cost'},
-    correct:'A',
-    hint:'The key is removal or reduction of an aversive condition after the response.',
-    explanation:'A is correct because the loud noise was reduced after the student’s communication response, and that response increased. That is negative reinforcement.'
-  };
-  const qEscape1={
-    q:'A learner completes one problem and says “break.” The teacher removes the task immediately. Break requests increase during future task demands. What type of negative reinforcement is this?',
-    options:{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Extinction'},
-    correct:'B',
-    hint:'Escape occurs when the aversive stimulus is already present and the response terminates it.',
-    explanation:'B is correct because the task demand was already present and the response ended or interrupted it. Avoidance would prevent the aversive event before it occurs.'
-  };
-  const qEscape2={
-    q:'A child is presented with handwriting work, pushes it away, and the adult removes the worksheet. Pushing materials away increases. Which relation is most likely?',
-    options:{A:'Escape-maintained behavior',B:'Avoidance-maintained behavior',C:'Positive punishment',D:'Conditioned reinforcement'},
-    correct:'A',
-    hint:'Determine whether the behavior stops an ongoing demand.',
-    explanation:'A is correct because the behavior terminates an existing task demand and increases. That pattern is escape-maintained behavior.'
-  };
-  const qAvoid1={
-    q:'Before math work begins, a student appropriately asks to use a visual checklist. The checklist prevents difficult transitions, and the student continues requesting it before work. What type of negative reinforcement is most relevant?',
-    options:{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Response cost'},
-    correct:'B',
-    hint:'Avoidance occurs when the response prevents or postpones an aversive event before it happens.',
-    explanation:'B is correct because the response occurs before the difficult transition and prevents or reduces the aversive event. Escape would terminate something already occurring.'
-  };
-  const qAvoid2={
-    q:'A learner puts on noise-canceling headphones before entering the cafeteria, preventing exposure to loud noise. Headphone use increases before cafeteria transitions. Which process best fits?',
-    options:{A:'Avoidance',B:'Escape',C:'Positive punishment',D:'Stimulus fading'},
-    correct:'A',
-    hint:'Look for prevention of an aversive stimulus rather than termination of one already present.',
-    explanation:'A is correct because the response prevents contact with loud noise and increases in the future. That is avoidance, a form of negative reinforcement.'
-  };
-
   if(finalReview){
-    return {
-      concept:'Reinforcement Contingencies — Mixed Review',
-      main_concept:'Positive and negative reinforcement contingencies',
-      subconcept:'Final mixed review',
-      target_domain:'B',
-      target_concept:'Positive and negative reinforcement contingencies',
-      target_subconcept:'Final mixed review',
-      quality_check:{is_specific_to_subconcept:true,does_not_teach_parent_generically:true,questions_match_subconcept:true},
-      hook_question:'How do you distinguish positive reinforcement, negative reinforcement, escape, and avoidance in a clinical scenario?',
-      hook_answer:'Ask three questions: What was the behavior? Was a stimulus added or removed? Did the behavior increase in the future? Escape ends an aversive event already present; avoidance prevents or postpones it.',
-      definition:'Reinforcement is a contingency in which a consequence following a response increases the future frequency of that response. Positive reinforcement adds a stimulus; negative reinforcement removes, reduces, or prevents an aversive stimulus.',
-      clinical_example:'A learner may request attention to access praise, request a break to escape work, or use headphones to avoid loud cafeteria noise. Each case requires identifying the response, consequence, and future effect before naming the process.',
-      key_points:['Positive means added; negative means removed or prevented.','Reinforcement always means future behavior increases.','Escape and avoidance are both forms of negative reinforcement.'],
-      strategy:'Never choose based on whether the consequence sounds pleasant or unpleasant. Choose based on add/remove/prevent and the future effect on behavior.',
-      questions:[qNegative1, qAvoid1]
-    };
+    return demoModule(
+      'Reinforcement Contingencies — Mixed Review',
+      'Reinforcement is a contingency in which a consequence following a response increases the future frequency of that response. Positive reinforcement adds a stimulus, while negative reinforcement removes, reduces, or prevents an aversive stimulus.',
+      'A learner may request attention to access praise, request a break to escape work, or use headphones to avoid loud cafeteria noise. The correct classification depends on whether the consequence was added, removed, or prevented and whether the behavior increased.',
+      'How can you quickly distinguish positive reinforcement, escape, and avoidance in a clinical scenario?',
+      'Ask three questions: What behavior occurred? Was a stimulus added, removed, or prevented? Did the behavior increase in the future? Escape ends an aversive event already present; avoidance prevents or postpones it.',
+      'Never choose based on whether the consequence sounds pleasant or unpleasant. Choose based on add/remove/prevent and the future effect on behavior.',
+      ['Positive means added; negative means removed, reduced, or prevented.','Reinforcement always means future behavior increases.','Escape and avoidance are both forms of negative reinforcement but differ by timing.']
+    );
+  }
+  if(subIdx===0){
+    return demoModule(
+      'Positive Reinforcement',
+      'Positive reinforcement occurs when a stimulus is added after a response and the future frequency of that response increases under similar conditions.',
+      'During instruction, a learner independently asks for help and the teacher immediately provides assistance. Across sessions, appropriate help requests increase. The added assistance functions as a reinforcer if it increases future requesting.',
+      'A learner receives praise immediately after raising her hand, and hand raising increases. What tells you this is positive reinforcement?',
+      'A stimulus was added after the response, and the response increased in the future. Positive means added; reinforcement means behavior increases.',
+      'First identify the behavior, then identify what was added after it, and finally confirm that the behavior increased later.',
+      ['Positive does not mean pleasant; it means something was added.','Reinforcement is proven by future increase in behavior.','Praise, tokens, access, or attention only count as reinforcers if behavior increases.']
+    );
   }
   if(subIdx===1){
     return demoModule(
       'Negative Reinforcement',
       'Negative reinforcement occurs when a stimulus is removed, reduced, or prevented after a response, and the future frequency of that response increases under similar conditions.',
-      'During table work, Luis appropriately hands the therapist a break card. The therapist removes the worksheet for two minutes. Across sessions, Luis uses the break card more often instead of engaging in problem behavior.',
+      'During table work, a learner appropriately requests a break and the therapist removes the worksheet for two minutes. If break requesting increases across sessions, the response has been negatively reinforced.',
       'A learner asks for a break and the therapist removes the task. The learner asks for breaks more often in the future. Why is this negative reinforcement?',
-      'The response increases in the future because an aversive stimulus was removed after the response. Negative means removal; reinforcement means the behavior increases.',
-      'First identify what was removed or reduced after the response. Then confirm the response increased later.',
-      qNegative1,qNegative2
+      'The response increased because an aversive stimulus was removed after the response. Negative means removal or prevention; reinforcement means increase.',
+      'Look for removal, reduction, or prevention of an aversive stimulus, then confirm that the response increased later.',
+      ['Negative does not mean bad; it means a stimulus is removed, reduced, or prevented.','Negative reinforcement increases behavior.','Escape and avoidance are specific forms of negative reinforcement.']
     );
   }
   if(subIdx===2){
@@ -821,181 +907,162 @@ function demoLearnContent(domId, conceptIdx, subIdx=null, finalReview=false){
       'A task is already present, the learner requests a break, and the task is removed. What makes this escape?',
       'Escape occurs because the aversive stimulus was already present and the response ended or reduced it.',
       'Look for an ongoing demand or aversive condition that is terminated after the response.',
-      qEscape1,qEscape2
+      ['Escape requires an aversive stimulus already in contact with the learner.','The response terminates or reduces that stimulus.','Do not confuse escape with avoidance; avoidance happens before contact.']
     );
   }
   if(subIdx===3){
     return demoModule(
       'Avoidance',
-      'Avoidance is a form of negative reinforcement in which a response prevents, postpones, or reduces contact with an aversive stimulus before it occurs.',
-      'Before entering a noisy cafeteria, a learner independently requests headphones. The headphones prevent contact with the loud noise, and requesting headphones increases before cafeteria transitions.',
-      'A learner acts before a difficult event happens and prevents contact with it. Why is this avoidance rather than escape?',
-      'Avoidance occurs before the aversive event is contacted. Escape ends an event already present.',
-      'Check whether the aversive stimulus was already happening. If the response prevents it, think avoidance.',
-      qAvoid1,qAvoid2
+      'Avoidance is a form of negative reinforcement in which a response prevents or postpones contact with an aversive stimulus, and the response increases in the future.',
+      'Before cafeteria transition, a learner puts on headphones. This prevents contact with loud cafeteria noise. If headphone use increases before cafeteria transitions, the behavior is avoidance-maintained.',
+      'A learner uses headphones before entering a noisy cafeteria and avoids the loud noise. What makes this avoidance?',
+      'The response occurs before contact with the aversive stimulus and prevents or postpones that contact.',
+      'Look for behavior that happens before the aversive event begins and prevents or delays it.',
+      ['Avoidance occurs before the aversive event starts.','The response prevents or postpones contact with the aversive stimulus.','Do not confuse avoidance with escape; escape ends something already present.']
     );
   }
-  return demoModule(
-    'Positive Reinforcement',
-    'Positive reinforcement occurs when a stimulus is added after a response and the future frequency of that response increases under similar conditions.',
-    'During a clinic session, Maria independently requests a break using her communication card. The therapist immediately provides a two-minute break. Over the next week, Maria uses the card more often instead of engaging in problem behavior.',
-    'A learner begins raising his hand more often after the teacher immediately gives praise and calls on him. What part of the contingency tells you this is reinforcement?',
-    'The behavior increases in the future after a consequence is delivered. Because praise is added after the response and hand raising increases, this is positive reinforcement.',
-    'First identify the behavior, then identify what happened immediately after it, and finally ask whether the behavior increased in the future.',
-    qPositive1,qPositive2
-  );
+  return demoLearnContent(domId,conceptIdx,0,false);
 }
 
+function cloneDemoContent(content){
+  return JSON.parse(JSON.stringify(content));
+}
+function translateOptionsKeepTerms(options){
+  const map={
+    'Positive reinforcement':'Positive reinforcement',
+    'Negative reinforcement':'Negative reinforcement',
+    'Positive punishment':'Positive punishment',
+    'Negative punishment':'Negative punishment',
+    'Response cost':'Response cost',
+    'Extinction':'Extinction',
+    'Escape':'Escape',
+    'Avoidance':'Avoidance',
+    'Escape-maintained behavior':'Escape-maintained behavior',
+    'Avoidance-maintained behavior':'Avoidance-maintained behavior',
+    'Positive reinforcement by attention':'Positive reinforcement by attention',
+    'Differential reinforcement of other behavior':'Differential reinforcement of other behavior',
+    'Stimulus fading':'Stimulus fading',
+    'Response blocking':'Response blocking',
+    'Stimulus delta':'Stimulus delta',
+    'Extinction burst':'Extinction burst',
+    'Punishment':'Punishment',
+    'Stimulus generalization':'Stimulus generalization',
+    'Respondent extinction':'Respondent extinction',
+    'Access to tangibles':'Access to tangibles',
+    'Automatic reinforcement':'Automatic reinforcement',
+    'Overcorrection':'Overcorrection',
+    'Stimulus control':'Stimulus control'
+  };
+  const out={};
+  Object.entries(options||{}).forEach(([k,v])=>out[k]=map[v]||v);
+  return out;
+}
+
+const DEMO_SPANISH_TEACHING={
+  'Positive Reinforcement':{
+    hook_question:'Un learner recibe praise inmediatamente después de levantar la mano, y levantar la mano aumenta. ¿Qué te indica que esto es positive reinforcement?',
+    hook_answer:'Se añadió un stimulus después de la response, y la response aumentó en el futuro. Positive significa añadido; reinforcement significa que el behavior aumenta.',
+    definition:'Positive reinforcement ocurre cuando se añade un stimulus después de una response y la frecuencia futura de esa response aumenta bajo condiciones similares.',
+    clinical_example:'Durante instrucción, un learner pide ayuda de forma independiente y el teacher proporciona asistencia inmediatamente. A través de las sesiones, los requests apropiados de ayuda aumentan. La asistencia añadida funciona como reinforcer si aumenta futuros requests.',
+    key_points:['Positive no significa agradable; significa que algo fue añadido.','Reinforcement se demuestra por aumento futuro del behavior.','Praise, tokens, access o attention solo cuentan como reinforcers si el behavior aumenta.'],
+    strategy:'Primero identifica el behavior, luego qué fue añadido después, y finalmente confirma que el behavior aumentó después.'
+  },
+  'Negative Reinforcement':{
+    hook_question:'Un learner pide un break y el therapist remueve la tarea. El learner pide breaks con más frecuencia en el futuro. ¿Por qué esto es negative reinforcement?',
+    hook_answer:'La response aumentó porque un stimulus aversive fue removido después de la response. Negative significa remover o prevenir; reinforcement significa aumento.',
+    definition:'Negative reinforcement ocurre cuando un stimulus es removido, reducido o prevenido después de una response, y la frecuencia futura de esa response aumenta bajo condiciones similares.',
+    clinical_example:'Durante table work, un learner pide apropiadamente un break y el therapist remueve la worksheet por dos minutos. Si pedir break aumenta a través de sesiones, esa response fue negatively reinforced.',
+    key_points:['Negative no significa malo; significa que un stimulus es removido, reducido o prevenido.','Negative reinforcement aumenta behavior.','Escape y avoidance son formas específicas de negative reinforcement.'],
+    strategy:'Busca removal, reduction o prevention de un stimulus aversive, y luego confirma que la response aumentó después.'
+  },
+  'Escape':{
+    hook_question:'Una tarea ya está presente, el learner pide un break, y la tarea se remueve. ¿Qué hace que esto sea escape?',
+    hook_answer:'Escape ocurre porque el stimulus aversive ya estaba presente y la response lo terminó o redujo.',
+    definition:'Escape es una forma de negative reinforcement en la que una response termina o reduce un stimulus aversive que ya está presente.',
+    clinical_example:'Una worksheet se coloca frente al learner. El learner pide apropiadamente un break y la worksheet se remueve. Si pedir break aumenta durante futuras demandas de trabajo, la response está escape-maintained.',
+    key_points:['Escape requiere un stimulus aversive ya presente.','La response termina o reduce ese stimulus.','No confundas escape con avoidance; avoidance ocurre antes del contacto.'],
+    strategy:'Busca una demanda o condición aversive ongoing que se termina después de la response.'
+  },
+  'Avoidance':{
+    hook_question:'Un learner usa headphones antes de entrar a una cafetería ruidosa y evita el ruido fuerte. ¿Qué hace que esto sea avoidance?',
+    hook_answer:'La response ocurre antes del contacto con el stimulus aversive y previene o pospone ese contacto.',
+    definition:'Avoidance es una forma de negative reinforcement en la que una response previene o pospone el contacto con un stimulus aversive, y la response aumenta en el futuro.',
+    clinical_example:'Antes de la transición a la cafetería, un learner se pone headphones. Esto previene el contacto con el ruido fuerte de la cafetería. Si usar headphones aumenta antes de esas transiciones, el behavior está avoidance-maintained.',
+    key_points:['Avoidance ocurre antes de que el evento aversive comience.','La response previene o pospone el contacto con el stimulus aversive.','No confundas avoidance con escape; escape termina algo que ya está presente.'],
+    strategy:'Busca behavior que ocurre antes de que el evento aversive empiece y lo previene o retrasa.'
+  },
+  'Reinforcement Contingencies — Mixed Review':{
+    hook_question:'¿Cómo puedes distinguir rápidamente positive reinforcement, escape y avoidance en un escenario clínico?',
+    hook_answer:'Haz tres preguntas: ¿qué behavior ocurrió?, ¿se añadió, removió o previno un stimulus?, ¿aumentó el behavior en el futuro? Escape termina un evento aversive ya presente; avoidance lo previene o pospone.',
+    definition:'Reinforcement es una contingencia en la que una consecuencia después de una response aumenta la frecuencia futura de esa response. Positive reinforcement añade un stimulus, mientras negative reinforcement remueve, reduce o previene un stimulus aversive.',
+    clinical_example:'Un learner puede pedir attention para acceder a praise, pedir un break para escapar de trabajo, o usar headphones para evitar ruido fuerte. La clasificación correcta depende de si la consecuencia fue añadida, removida o prevenida y si el behavior aumentó.',
+    key_points:['Positive significa añadido; negative significa removido, reducido o prevenido.','Reinforcement siempre significa que el behavior aumenta en el futuro.','Escape y avoidance son formas de negative reinforcement, pero difieren por el timing.'],
+    strategy:'Nunca elijas basado en si la consecuencia suena agradable o desagradable. Elige basado en add/remove/prevent y el efecto futuro en behavior.'
+  }
+};
+
+const DEMO_SPANISH_QUESTIONS={
+  'pr-001':{q:'Un learner pide independientemente, “Can I have a turn?” El teacher inmediatamente le da acceso a un juego preferido. Durante la semana, los requests independientes aumentan. ¿Qué proceso se demuestra?',hint:'Pregunta: ¿se añadió algo después de la response y el behavior aumentó después?',explanation:'A es correcta porque el acceso al juego fue añadido después del request y el requesting aumentó. Negative reinforcement requeriría removal o prevention de un stimulus aversive.'},
+  'pr-002':{q:'Durante instrucción de escritura, un estudiante completa una oración y el teacher inmediatamente entrega praise específico. Completar oraciones aumenta durante tareas futuras. ¿Cuál es la mejor interpretación?',hint:'Busca una consecuencia entregada después de la response que aumenta futuro behavior.',explanation:'B es correcta porque praise fue añadido después de completar la oración y la completion aumentó. Punishment disminuiría behavior, y negative reinforcement implicaría removal de un stimulus.'},
+  'pr-003':{q:'Un client dice “help please” en lugar de llorar. El therapist inmediatamente proporciona asistencia. En varias sesiones, “help please” ocurre con más frecuencia. ¿Qué contingencia probablemente opera?',hint:'Identifica la communication response, la consecuencia entregada y el efecto futuro.',explanation:'C es correcta porque la asistencia fue entregada después de la communication response y la response aumentó. Avoidance implicaría prevenir un evento aversive antes de que ocurra.'},
+  'pr-004':{q:'Un learner gana un token inmediatamente después de seguir una instrucción de dos pasos. Seguir instrucciones de dos pasos aumenta después. ¿Qué hace que esto sea positive reinforcement?',hint:'Positive significa añadido; reinforcement significa que future behavior aumenta.',explanation:'A es correcta. El token fue añadido después de la response, y la frecuencia futura de seguir instrucciones aumentó.'},
+  'pr-005':{q:'Un niño comparte materiales con un peer. El teacher inmediatamente da social praise y un sticker. Compartir aumenta en los próximos días. ¿Qué proceso describe mejor esto?',hint:'No elijas basado en si la consecuencia parece agradable; usa add/remove y future effect.',explanation:'A es correcta porque praise y sticker fueron añadidos después de compartir, y compartir aumentó.'},
+  'pr-006':{q:'Después de que un client etiqueta correctamente una imagen, el RBT proporciona acceso a una canción preferida. El labeling correcto aumenta. ¿Qué proceso explica este cambio?',hint:'Encuentra la consecuencia inmediata y si la response aumentó en el futuro.',explanation:'B es correcta porque acceso a la canción fue entregado después del labeling, y labeling aumentó.'},
+  'pr-007':{q:'Una estudiante levanta la mano antes de hablar. El teacher la llama inmediatamente. Levantar la mano aumenta durante discusiones. ¿Cuál es la interpretación más precisa?',hint:'Ser llamada ocurre después de levantar la mano, y levantar la mano aumenta.',explanation:'A es correcta porque attention/opportunity to respond fue añadido después de la response y la response aumentó.'},
+  'pr-008':{q:'Un client completa cleanup y luego recibe cinco minutos con un toy preferido. Cleanup aumenta en sesiones futuras. ¿Qué proceso se demuestra?',hint:'Algo fue entregado después de cleanup; verifica si cleanup aumentó.',explanation:'A es correcta porque toy access fue añadido después de cleanup y cleanup aumentó.'},
+  'nr-001':{q:'Durante table work, un learner pide apropiadamente un break. El therapist remueve la worksheet por dos minutos. Los break requests aumentan. ¿Qué proceso se demuestra?',hint:'Negative significa removal o prevention de un stimulus; reinforcement significa behavior aumenta.',explanation:'B es correcta porque la worksheet fue removida después del request y pedir break aumentó.'},
+  'nr-002':{q:'Un estudiante se pone noise-reducing headphones y el ruido fuerte se reduce. El estudiante usa headphones con más frecuencia durante actividades ruidosas. ¿Qué proceso explica el aumento?',hint:'Busca reduction o removal de un stimulus aversive following the response.',explanation:'A es correcta porque el ruido fuerte fue reducido y el uso de headphones aumentó.'},
+  'nr-003':{q:'Un client presiona “stop” en una tablet cuando suena una alarma fuerte. La alarma se detiene, y presionar “stop” aumenta cuando la alarma ocurre otra vez. ¿Qué proceso opera?',hint:'La response apaga un stimulus aversive y aumenta en el futuro.',explanation:'B es correcta porque la alarma fue removida después de la response y la response aumentó.'},
+  'nr-004':{q:'Un learner pide moverse lejos de un área crowded. El therapist permite moverse a un espacio quiet. Pedir moverse aumenta en settings crowded. ¿Qué proceso es más probable?',hint:'Determina si una condición aversive fue removida o reducida después de la response.',explanation:'A es correcta porque crowding/noise fue reducido o removido después del request, y requesting aumentó.'},
+  'nr-005':{q:'Un niño dice “too hard” durante un puzzle difícil. El instructor remueve brevemente el puzzle y da una tarea más fácil. Decir “too hard” aumenta durante puzzles difíciles. ¿Qué proceso encaja mejor?',hint:'El behavior aumenta porque la tarea difícil fue removida o reducida.',explanation:'B es correcta porque la tarea difícil fue removida/reducida después de la response, y la response aumentó.'},
+  'nr-006':{q:'Un estudiante completa un problema para terminar una secuencia de prompts del teacher. Completar el primer problema aumenta cuando comienzan los prompts. ¿Qué proceso se demuestra?',hint:'Si una response aumenta porque termina prompts o demands, piensa en negative reinforcement.',explanation:'B es correcta porque completar el problema termina la prompt sequence y la response aumenta.'},
+  'nr-007':{q:'Un learner cierra la puerta cuando comienza el ruido del pasillo. El ruido disminuye y cerrar la puerta aumenta durante periodos ruidosos. ¿Cuál es el proceso?',hint:'La consecuencia es reduction de ruido aversive.',explanation:'A es correcta porque cerrar la puerta reduce el ruido y el behavior aumenta.'},
+  'nr-008':{q:'Durante grooming, un client dice “pause.” El technician detiene brushing por 30 segundos. Los requests “pause” aumentan durante grooming. ¿Qué ocurre?',hint:'La response aumenta porque un evento aversive ongoing se detiene brevemente.',explanation:'A es correcta porque brushing se remueve o pausa después del request y el request aumenta.'},
+  'esc-001':{q:'Una worksheet ya está en el desk. El learner la empuja, y el teacher la remueve por un minuto. Empujar aumenta durante futuras worksheets. ¿Qué proceso es más específico?',hint:'Escape termina o reduce un stimulus aversive que ya está presente.',explanation:'A es correcta porque la worksheet demand ya estaba presente y la response la terminó.'},
+  'esc-002':{q:'Durante toothbrushing, un client dice “break,” y el caregiver detiene brushing por 20 segundos. Los break requests aumentan durante toothbrushing. ¿Clasificación más precisa?',hint:'Pregunta si el evento aversive ya había comenzado. Si sí y la response lo termina, piensa escape.',explanation:'B es correcta porque toothbrushing estaba ongoing y el request lo detuvo temporalmente.'},
+  'esc-003':{q:'Un estudiante grita después de que se presentan demandas de math. El teacher remueve la math sheet, y gritar aumenta durante futuras math tasks. ¿Qué contingencia es más probable?',hint:'La demanda ya está presente, y el behavior la remueve.',explanation:'A es correcta porque gritar termina una math demand existente, así que el behavior es escape-maintained.'},
+  'esc-004':{q:'Un therapist presenta una sorting task. El learner firma “all done,” y el therapist remueve la tarea. Firmar “all done” aumenta cuando se presentan tareas. ¿Qué se demuestra?',hint:'Busca una tarea ongoing que termina después de la response.',explanation:'B es correcta porque la sorting task ya estaba presente y fue removida following the response.'},
+  'esc-005':{q:'Un niño se cubre los oídos después de que comienza la fire alarm. Staff lo llevan a un hallway quiet, y cubrirse los oídos aumenta cuando suenan alarmas. ¿Qué describe mejor esto?',hint:'La alarma ya había comenzado; la response llevó a termination o reduction de stimulation.',explanation:'A es correcta porque cubrirse los oídos llevó a escape de un sonido aversive ongoing.'},
+  'esc-006':{q:'Durante handwriting, un learner lanza el pencil. El instructor remueve handwriting materials por dos minutos. Lanzar el pencil aumenta durante handwriting. ¿Qué función sugiere este patrón?',hint:'Los materiales estaban presentes y fueron removidos después del behavior.',explanation:'A es correcta porque lanzar termina o remueve una handwriting demand ongoing.'},
+  'esc-007':{q:'Un client se tira al piso después de que se le pide transicionar a la mesa. La demanda se retira, y tirarse al piso aumenta durante transitions. ¿Cuál es la respuesta más precisa?',hint:'La transition demand ya fue presentada; la response terminó la demanda.',explanation:'A es correcta porque tirarse al piso terminó una transition demand ya presentada.'},
+  'esc-008':{q:'Un learner dice “too loud” después de que empieza la música. El teacher baja el volumen, y decir “too loud” aumenta durante música alta. ¿Qué proceso se muestra?',hint:'El stimulus aversive estaba presente y la response lo redujo.',explanation:'A es correcta porque la response redujo música alta que ya estaba ocurriendo.'},
+  'av-001':{q:'Antes de que entreguen una worksheet difícil, un estudiante pide usar break card. El teacher retrasa la worksheet, y el uso de break card aumenta antes de worksheets. ¿Qué proceso es más específico?',hint:'Avoidance previene o pospone un evento aversive antes del contacto.',explanation:'B es correcta porque la response ocurrió antes de la worksheet y pospuso contacto con la demand.'},
+  'av-002':{q:'Un learner se pone headphones antes de entrar a la cafetería. Esto previene contacto con ruido fuerte, y el uso de headphones aumenta antes de cafeteria transitions. ¿Qué se demuestra?',hint:'Busca prevention de un stimulus aversive, no termination de uno ya presente.',explanation:'B es correcta porque headphones previenen o reducen contacto con ruido fuerte antes de entrar a la cafetería.'},
+  'av-003':{q:'Un client revisa un visual schedule y pide “later” antes de que comience grooming. Staff pospone grooming, y requests “later” aumentan antes de grooming. ¿Qué proceso es más probable?',hint:'La response ocurre antes de la actividad aversive y la retrasa.',explanation:'A es correcta porque el request pospone grooming antes de contactar la grooming demand.'},
+  'av-004':{q:'Un estudiante completa una tarea online temprano para prevenir un reminder del teacher. Completar temprano aumenta. ¿Qué proceso se demuestra?',hint:'Avoidance puede implicar una response que previene un evento aversive.',explanation:'C es correcta porque completar temprano previene el reminder, y completion temprano aumenta.'},
+  'av-005':{q:'Un niño se mueve a un quiet corner antes de que la clase cante fuerte. Esto previene exposición al loud singing, y moverse al corner aumenta antes de singing time. ¿Qué es esto?',hint:'El singing fuerte aún no comenzó; la response previene contacto.',explanation:'A es correcta porque el behavior previene o reduce contacto con un futuro evento aversive.'},
+  'av-006':{q:'Un learner pide ayuda antes de comenzar una tarea independiente, previniendo errores y corrective feedback. Pedir ayuda aumenta antes de tareas difíciles. ¿Qué proceso encaja mejor?',hint:'La response previene un posible evento aversive antes de que ocurra.',explanation:'B es correcta porque pedir ayuda ocurre antes de errors/corrective feedback y previene o reduce contacto con ellos.'},
+  'av-007':{q:'Antes de un fire drill programado, un estudiante usa coping card y se le permite esperar afuera. El card use aumenta antes de drills. ¿Qué proceso es más preciso?',hint:'Avoidance ocurre antes del evento aversive; escape ocurre después de que empieza.',explanation:'B es correcta porque la response previene contacto con la alarma próxima.'},
+  'av-008':{q:'Un client cierra la puerta antes de que enciendan la blender, previniendo exposición al sonido fuerte. Cerrar la puerta aumenta cuando staff prepara smoothies. ¿Qué proceso se demuestra?',hint:'El behavior previene exposición antes de que el stimulus aversive empiece.',explanation:'A es correcta porque cerrar la puerta ocurre antes del ruido de blender y previene contacto con él.'},
+  'mix-001':{q:'Un learner recibe un token después de responder correctamente. Responder correctamente aumenta. ¿Cuál es el proceso más preciso?',hint:'Un stimulus fue añadido después de la response y el behavior aumentó.',explanation:'A es correcta porque el token fue añadido después de la response y correct answering aumentó.'},
+  'mix-002':{q:'Un learner pide un break después de que comienza el trabajo. El trabajo se remueve, y pedir breaks aumenta durante trabajo. ¿Qué es más preciso?',hint:'La tarea ya estaba presente y la response la terminó.',explanation:'B es correcta porque la response terminó una demanda ongoing.'},
+  'mix-003':{q:'Un estudiante se pone headphones antes de un fire drill para prevenir ruido fuerte. Headphone use aumenta antes de drills. ¿Qué es más preciso?',hint:'La response ocurre antes del stimulus aversive y previene contacto.',explanation:'B es correcta porque el behavior previene exposición a la alarma antes de que ocurra.'},
+  'mix-004':{q:'Un client presiona “stop” mientras un video fuerte está sonando. El video se detiene, y presionar “stop” aumenta. ¿Qué proceso se demuestra?',hint:'El stimulus aversive ya está ocurriendo y la response lo termina.',explanation:'A es correcta porque la response termina un stimulus aversive ongoing.'},
+  'mix-005':{q:'Un niño pide attention, recibe teacher attention, y pide attention con más frecuencia. ¿Qué proceso se demuestra?',hint:'Attention fue añadida después de la response y la response aumentó.',explanation:'A es correcta porque attention fue entregada después del request y requesting aumentó.'},
+  'mix-006':{q:'Un learner completa una tarea para detener verbal prompts repetidos. Task completion aumenta cuando comienzan los prompts. ¿Qué proceso se demuestra?',hint:'El behavior aumenta porque termina una prompt sequence aversive.',explanation:'B es correcta porque task completion termina prompting y aumenta en el futuro.'}
+};
+
 function demoTranslateContent(content){
-  const c = JSON.parse(JSON.stringify(content));
-  const concept = c.concept;
-
-  const spanishModules = {
-    'Positive Reinforcement': {
-      concept:'Positive Reinforcement',
-      hook_question:'Un learner levanta la mano con más frecuencia después de que la maestra lo elogia inmediatamente y le da participación. ¿Qué parte de la contingencia indica que es reinforcement?',
-      hook_answer:'La conducta aumenta en el futuro después de que se entrega una consecuencia. Como el elogio se añade después de la respuesta y levantar la mano aumenta, esto es positive reinforcement.',
-      definition:'Positive reinforcement ocurre cuando un estímulo se añade después de una respuesta y la frecuencia futura de esa respuesta aumenta bajo condiciones similares.',
-      clinical_example:'Durante una sesión clínica, María solicita ayuda usando una tarjeta de comunicación. El terapeuta le proporciona ayuda inmediatamente. Durante la semana siguiente, María usa la tarjeta con más frecuencia en lugar de llorar.',
-      key_points:[
-        'Positive significa que un estímulo se añade después de la respuesta.',
-        'Reinforcement significa que la conducta aumenta en el futuro.',
-        'No decidas por si la consecuencia “parece agradable”; decide por add + future increase.'
-      ],
-      strategy:'Identifica primero la conducta, luego qué se añadió inmediatamente después, y finalmente confirma si la conducta aumentó en el futuro.'
-    },
-    'Negative Reinforcement': {
-      concept:'Negative Reinforcement',
-      hook_question:'Un learner entrega una tarjeta de break, el terapeuta retira la hoja de trabajo por dos minutos, y el uso de la tarjeta aumenta. ¿Por qué esto es negative reinforcement?',
-      hook_answer:'La conducta aumenta en el futuro porque un estímulo aversivo fue removido después de la respuesta. Negative significa remoción o reducción; reinforcement significa aumento futuro.',
-      definition:'Negative reinforcement ocurre cuando un estímulo aversivo se remueve, reduce o previene después de una respuesta, y la frecuencia futura de esa respuesta aumenta.',
-      clinical_example:'Durante trabajo en mesa, Luis entrega una tarjeta de break. El terapeuta retira la tarea por dos minutos. Con el tiempo, Luis usa la tarjeta más frecuentemente en vez de hacer problem behavior.',
-      key_points:[
-        'Negative no significa castigo; significa que algo se remueve, reduce o previene.',
-        'Reinforcement requiere que la conducta aumente en el futuro.',
-        'Escape y avoidance son formas específicas de negative reinforcement.'
-      ],
-      strategy:'Busca qué estímulo aversivo fue removido, reducido o prevenido después de la respuesta, y verifica que la respuesta aumentó después.'
-    },
-    'Escape': {
-      concept:'Escape',
-      hook_question:'Una demanda de trabajo ya está presente. El learner pide break, la tarea se retira, y pedir break aumenta durante futuras demandas. ¿Qué hace que esto sea escape?',
-      hook_answer:'Es escape porque el estímulo aversivo ya estaba presente y la respuesta lo terminó o redujo. En escape, la persona sale de una condición aversiva que ya está ocurriendo.',
-      definition:'Escape es una forma de negative reinforcement en la que una respuesta termina, reduce o interrumpe un estímulo aversivo que ya está presente.',
-      clinical_example:'Una hoja de trabajo está frente al learner. El learner solicita un break y la hoja se retira. Si pedir break aumenta durante futuras demandas de trabajo, esa respuesta está mantenida por escape.',
-      key_points:[
-        'En escape, el estímulo aversivo ya comenzó o ya está presente.',
-        'La respuesta termina, reduce o interrumpe esa condición aversiva.',
-        'No es avoidance si la demanda ya estaba ocurriendo; avoidance ocurre antes del contacto con el estímulo aversivo.'
-      ],
-      strategy:'Pregunta: ¿la demanda o condición aversiva ya estaba ocurriendo? Si la respuesta la termina y luego aumenta, piensa en escape.'
-    },
-    'Avoidance': {
-      concept:'Avoidance',
-      hook_question:'Antes de entrar a una cafetería ruidosa, un learner pide audífonos y así previene el ruido. Luego pide audífonos con más frecuencia antes de la transición. ¿Por qué esto es avoidance?',
-      hook_answer:'Es avoidance porque la respuesta ocurre antes del contacto con el estímulo aversivo y previene o retrasa ese evento. La conducta aumenta porque evita la condición aversiva.',
-      definition:'Avoidance es una forma de negative reinforcement en la que una respuesta previene, pospone o reduce el contacto con un estímulo aversivo antes de que ocurra.',
-      clinical_example:'Antes de entrar a la cafetería, un learner solicita audífonos. Los audífonos previenen el contacto con el ruido fuerte, y solicitar audífonos aumenta antes de futuras transiciones a la cafetería.',
-      key_points:[
-        'En avoidance, la respuesta ocurre antes de que el estímulo aversivo se contacte.',
-        'La consecuencia es prevenir, posponer o reducir el evento aversivo.',
-        'No es escape si el evento aversivo todavía no estaba ocurriendo.'
-      ],
-      strategy:'Pregunta: ¿la conducta ocurrió antes de que el estímulo aversivo empezara? Si previene o retrasa el evento y aumenta, piensa en avoidance.'
-    },
-    'Reinforcement Contingencies — Mixed Review': {
-      concept:'Contingencias de Reinforcement — Repaso mixto',
-      hook_question:'¿Cómo distingues positive reinforcement, negative reinforcement, escape y avoidance en un escenario clínico?',
-      hook_answer:'Haz tres preguntas: ¿cuál fue la conducta?, ¿la consecuencia añadió, removió o previno algo?, y ¿la conducta aumentó en el futuro?',
-      definition:'Reinforcement es una contingencia en la que una consecuencia después de una respuesta aumenta la frecuencia futura de esa respuesta. Positive añade un estímulo; negative remueve, reduce o previene un estímulo aversivo.',
-      clinical_example:'Un learner puede pedir atención para acceder a elogio, pedir break para escapar de una tarea, o usar audífonos para evitar ruido. Cada caso requiere identificar respuesta, consecuencia y efecto futuro.',
-      key_points:[
-        'Positive = algo se añade después de la respuesta.',
-        'Negative = algo se remueve, reduce o previene.',
-        'Escape termina algo que ya ocurre; avoidance previene algo antes de que ocurra.'
-      ],
-      strategy:'No respondas por intuición. Decide usando add/remove/prevent y confirma que la conducta aumentó en el futuro.'
-    }
-  };
-
-  if (spanishModules[concept]) {
-    Object.assign(c, spanishModules[concept]);
+  const c=cloneDemoContent(content);
+  const t=DEMO_SPANISH_TEACHING[c.concept] || DEMO_SPANISH_TEACHING[c.target_subconcept];
+  if(t){
+    c.hook_question=t.hook_question;
+    c.hook_answer=t.hook_answer;
+    c.definition=t.definition;
+    c.clinical_example=t.clinical_example;
+    c.key_points=t.key_points;
+    c.strategy=t.strategy;
   }
-
-  const translatedQuestions = {
-    'Positive Reinforcement': [
-      {
-        q:'Un cliente completa tres problemas de matemática. El RBT inmediatamente le da acceso a una tablet preferida. En sesiones posteriores, el cliente completa más problemas. ¿Qué proceso se demuestra?',
-        options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Extinction'},
-        correct:'A',
-        hint:'Busca si algo fue añadido después de la respuesta y si la conducta aumentó después.',
-        explanation:'A es correcta porque el acceso a la tablet fue añadido después de completar los problemas, y completar problemas aumentó en el futuro. Negative reinforcement implicaría remover un estímulo. Punishment disminuiría la conducta.'
-      },
-      {
-        q:'Un learner dice “help please” y la maestra inmediatamente le da ayuda. El learner empieza a pedir ayuda con más frecuencia en lugar de llorar. ¿Cuál es la mejor interpretación?',
-        options:{A:'Response cost',B:'Positive reinforcement',C:'Stimulus fading',D:'Negative punishment'},
-        correct:'B',
-        hint:'Enfócate en la consecuencia entregada después de la respuesta comunicativa y el cambio futuro en esa respuesta.',
-        explanation:'B es correcta porque la ayuda fue entregada después de la petición y la petición aumentó. No se describe pérdida de un reinforcer, fading ni response cost.'
-      }
-    ],
-    'Negative Reinforcement': [
-      {
-        q:'Durante trabajo en mesa, un learner pide un break usando una tarjeta. El terapeuta retira la hoja por dos minutos. Con el tiempo, el uso independiente de la tarjeta aumenta. ¿Qué proceso se demuestra?',
-        options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Stimulus generalization'},
-        correct:'B',
-        hint:'Pregunta si algo fue removido después de la respuesta y si la respuesta aumentó en el futuro.',
-        explanation:'B es correcta porque la hoja fue removida después de la respuesta con la tarjeta, y esa respuesta aumentó. Positive reinforcement implicaría añadir un estímulo. Punishment disminuiría la conducta.'
-      },
-      {
-        q:'Un estudiante dice apropiadamente “too loud” y la maestra baja el volumen. El estudiante usa esa frase con más frecuencia durante actividades ruidosas. ¿Qué principio se muestra?',
-        options:{A:'Negative reinforcement',B:'Positive reinforcement',C:'Extinction',D:'Response cost'},
-        correct:'A',
-        hint:'La clave es la remoción o reducción de una condición aversiva después de la respuesta.',
-        explanation:'A es correcta porque el ruido fue reducido después de la respuesta comunicativa, y esa respuesta aumentó. Eso es negative reinforcement.'
-      }
-    ],
-    'Escape': [
-      {
-        q:'Un learner completa un problema y dice “break”. La maestra retira la tarea inmediatamente. Las peticiones de break aumentan durante futuras demandas. ¿Qué tipo de negative reinforcement es?',
-        options:{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Extinction'},
-        correct:'B',
-        hint:'Escape ocurre cuando el estímulo aversivo ya está presente y la respuesta lo termina o reduce.',
-        explanation:'B es correcta porque la demanda ya estaba presente y la respuesta la terminó o interrumpió. Avoidance prevendría el evento aversivo antes de que ocurra.'
-      },
-      {
-        q:'A un niño se le presenta una tarea de escritura, empuja la hoja, y el adulto retira la hoja. Empujar materiales aumenta. ¿Qué relación es más probable?',
-        options:{A:'Escape-maintained behavior',B:'Avoidance-maintained behavior',C:'Positive punishment',D:'Conditioned reinforcement'},
-        correct:'A',
-        hint:'Determina si la conducta detiene una demanda que ya estaba ocurriendo.',
-        explanation:'A es correcta porque la conducta termina una demanda existente y aumenta. Ese patrón indica behavior mantenido por escape.'
-      }
-    ],
-    'Avoidance': [
-      {
-        q:'Antes de comenzar matemática, un estudiante pide usar un checklist visual. El checklist previene transiciones difíciles, y el estudiante continúa pidiéndolo antes del trabajo. ¿Qué tipo de negative reinforcement es más relevante?',
-        options:{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Response cost'},
-        correct:'B',
-        hint:'Avoidance ocurre cuando la respuesta previene o pospone un evento aversivo antes de que pase.',
-        explanation:'B es correcta porque la respuesta ocurre antes de la transición difícil y previene o reduce el evento aversivo. Escape terminaría algo que ya está ocurriendo.'
-      },
-      {
-        q:'Un learner se pone audífonos antes de entrar a la cafetería, evitando exposición a ruido fuerte. El uso de audífonos aumenta antes de transiciones a la cafetería. ¿Qué proceso encaja mejor?',
-        options:{A:'Avoidance',B:'Escape',C:'Positive punishment',D:'Stimulus fading'},
-        correct:'A',
-        hint:'Busca prevención de un estímulo aversivo, no terminación de uno que ya está presente.',
-        explanation:'A es correcta porque la respuesta previene el contacto con ruido fuerte y aumenta en el futuro. Eso es avoidance, una forma de negative reinforcement.'
-      }
-    ],
-    'Reinforcement Contingencies — Mixed Review': null
-  };
-
-  if (translatedQuestions[concept]) {
-    c.questions = translatedQuestions[concept];
-  } else if (concept === 'Reinforcement Contingencies — Mixed Review') {
-    c.questions = translatedQuestions['Negative Reinforcement'].slice(0,1).concat(translatedQuestions['Avoidance'].slice(0,1));
-  }
-
+  c.questions=(c.questions||[]).map(q=>{
+    const sq=DEMO_SPANISH_QUESTIONS[q.id] || {};
+    return {
+      ...q,
+      q: sq.q || q.q,
+      options: translateOptionsKeepTerms(q.options),
+      hint: sq.hint || q.hint,
+      explanation: sq.explanation || q.explanation
+    };
+  });
   return c;
 }
 
@@ -1095,9 +1162,39 @@ async function startLearnConcept(domId,idx,subIdx=null,finalReview=false){
     schedulePreload(requested);
   }catch(e){
     if(!sameModule(requested,state.learn)) return;
-    state.learn.loading=false;
-    state.learn.err='This module did not pass the internal quality check. Please try again.';
-    render();
+    console.warn('Module generation failed after retries:', e?.message || e);
+
+    // Commercial/demo UX: never expose internal quality-gate errors to learners.
+    // If the requested demo module cannot be produced, move to the next valid demo step
+    // or finish the demo gracefully instead of showing a technical error.
+    if(DEMO_MODE){
+      const following=getFollowingConcept(requested);
+      state.learn.loading=false;
+      if(following){
+        startLearnConcept(following.domId,following.idx,following.subIdx,following.finalReview);
+      }else{
+        state.learn.phase='complete';
+        state.learn.err=null;
+        render();
+      }
+      return;
+    }
+
+    // Full version: silently try again once more before showing a learner-friendly message.
+    try{
+      const content=await genLearnContentValidated(domId,idx,subIdx,finalReview,5);
+      if(!sameModule(requested,state.learn)) return;
+      state.learn.content=content;
+      state.learn.loading=false;
+      state.learn.err=null;
+      render();
+      schedulePreload(requested);
+      return;
+    }catch(finalError){
+      state.learn.loading=false;
+      state.learn.err='We are preparing a stronger version of this module. Please try again.';
+      render();
+    }
   }
 }
 
@@ -1110,22 +1207,56 @@ async function startLearnAuto(){
 async function toggleLang(){
   const lx=state.learn;
   const current={domId:lx.domId,idx:lx.conceptIdx,subIdx:lx.subIdx,finalReview:lx.finalReview};
-  if(lx.lang==='en'&&!lx.contentEs){
-    state.learn.translating=true;render();
-    try{
-      const translated=await translateContent(lx.content);
-      if(sameModule(current,state.learn)) state.learn.contentEs=translated;
-    }catch{}
-    state.learn.translating=false;
+
+  // Switch back to English immediately.
+  if(lx.lang==='es'){
+    state.learn.lang='en';
+    render();
+
+    // Keep memory light: clear Spanish copy after 30 seconds if user stays in English.
+    setTimeout(()=>{
+      if(sameModule(current,state.learn) && state.learn.lang==='en' && state.learn.contentEs){
+        state.learn.contentEs=null;
+      }
+    },30000);
+    return;
   }
-  state.learn.lang=lx.lang==='en'?'es':'en';
+
+  // Do not switch to Spanish until a valid Spanish copy exists.
+  if(!state.learn.content){
+    alert('This module is still loading. Please try again in a moment.');
+    return;
+  }
+
+  state.learn.translating=true;
   render();
-  // Translation doubles memory. If the learner returns to English, clear Spanish copy after 30 seconds.
-  setTimeout(()=>{
-    if(sameModule(current,state.learn) && state.learn.lang==='en' && state.learn.contentEs){
-      state.learn.contentEs=null;
+
+  try{
+    if(!state.learn.contentEs){
+      const translated=await translateContent(state.learn.content);
+
+      if(!translated || !translated.questions || !Array.isArray(translated.questions)){
+        throw new Error('Invalid Spanish translation payload');
+      }
+
+      if(sameModule(current,state.learn)){
+        state.learn.contentEs=translated;
+      }
     }
-  },30000);
+
+    if(sameModule(current,state.learn) && state.learn.contentEs){
+      state.learn.lang='es';
+    }
+  }catch(e){
+    console.error('Spanish translation failed:', e);
+    if(sameModule(current,state.learn)){
+      state.learn.lang='en';
+      alert('Spanish version is not ready for this module. Please try again.');
+    }
+  }
+
+  state.learn.translating=false;
+  render();
 }
 
 function handleLearnAnswer(letter){
@@ -1161,7 +1292,7 @@ function retryLearn(){startLearnConcept(state.learn.domId,state.learn.conceptIdx
 function renderLangButtons(lx){return `<div style="display:flex;gap:6px;align-items:center;">
   ${lx.translating?`<span style="font-size:11px;color:#888;">Traduciendo...</span>`:''}
   <button class="lang-btn ${lx.lang==='en'?'active':''}" onclick="if(state.learn.lang!=='en'){state.learn.lang='en';render();}">English</button>
-  <button class="lang-btn ${lx.lang==='es'?'active':''}" onclick="toggleLang()">Español</button>
+  <button class="lang-btn ${lx.lang==='es'?'active':''}" ${lx.translating?'disabled':''} onclick="toggleLang()">${lx.translating?'Traduciendo...':'Español'}</button>
 </div>`;}
 
 function renderLearnHeader(d,lx,totalMastered,totalConcepts){
@@ -1182,8 +1313,8 @@ function renderLearnHeader(d,lx,totalMastered,totalConcepts){
 
 function renderLearn(el){
   const lx=state.learn;
-  const totalConcepts=D.reduce((s,d)=>s+d.tasks.length,0);
-  const totalMastered=D.reduce((s,d)=>s+masteredCount(d.id),0);
+  const totalConcepts=DEMO_MODE ? demoLearningPath().length : D.reduce((s,d)=>s+d.tasks.length,0);
+  const totalMastered=DEMO_MODE ? demoMasteredCount() : D.reduce((s,d)=>s+masteredCount(d.id),0);
 
   if(lx.phase==='overview'||lx.phase==='domains'){
     const next=getNextConcept();
@@ -1229,9 +1360,9 @@ function renderLearn(el){
 
   if(lx.phase==='complete'){
     el.innerHTML=`<div style="text-align:center;padding:4rem;"><div style="font-size:48px;margin-bottom:1rem;">🎓</div>
-      <h2 style="font-size:21px;font-weight:600;margin-bottom:.5rem;">¡Todos los conceptos dominados!</h2>
-      <p style="color:#888;margin-bottom:1.5rem;">Has completado los conceptos del TCO 6ª Edición.</p>
-      <button class="btn-primary" onclick="setView('practice')"><i class="ti ti-brain"></i>Ir a Practicar</button></div>`;return;
+      <h2 style="font-size:21px;font-weight:600;margin-bottom:.5rem;">Demo completado</h2>
+      <p style="color:#888;margin-bottom:1.5rem;">Has completado el recorrido demo de reinforcement contingencies.</p>
+      <button class="btn-primary" onclick="startDemoPractice()"><i class="ti ti-brain"></i>Start guided demo practice</button></div>`;return;
   }
 
   const d=D.find(x=>x.id===lx.domId);
@@ -1341,7 +1472,7 @@ function renderDash(el){
       <div style="font-size:14px;font-weight:500;">${weak.length>0?`Reforzar: Dom. ${recomm.id} — ${recomm.short}`:`Empezar con Dom. B — Concepts and Principles`}</div>
       <div style="font-size:12px;color:#555;margin-top:2px;">${weak.length>0?'Área con menor desempeño en tu historial':'Mayor peso del examen (14%)'}</div>
     </div>
-    <button class="btn-primary" style="background:#185FA5;" onclick="startPractice('${recomm.id}')">Practicar →</button>
+    <button class="btn-primary" style="background:#185FA5;" onclick="startDemoPractice(true)">Start Demo Practice →</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;">`;
 
@@ -1375,7 +1506,7 @@ function renderDash(el){
         <div class="prog-track"><div class="prog-fill" style="width:${dp}%;background:${dp>=70?'#639922':dp>=50?'#EF9F27':'#D85A30'};"></div></div>
       </div>`:''}
       <button style="width:100%;padding:6px;background:${d.bg};color:${d.color};border:1px solid ${d.border};border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;"
-        onclick="startPractice('${d.id}')">${dp!==null?`Continuar (${dp}%) →`:'Comenzar →'}</button>
+        onclick="${DEMO_MODE?`startDemoPractice(true)`: `startPractice('${d.id}')`}">${DEMO_MODE?'Demo Practice →':(dp!==null?`Continuar (${dp}%) →`:'Comenzar →')}</button>
     </div>`;
   });
   html+='</div>';
@@ -1386,36 +1517,68 @@ function renderDash(el){
 // PRACTICE
 // ============================================================
 function renderPractice(el){
+  if(DEMO_MODE && !state.practice.domId){renderDemoPracticeLanding(el);return;}
   if(!state.practice.domId){renderDomainPicker(el);return;}
-  const d=D.find(x=>x.id===state.practice.domId);
+  const d=D.find(x=>x.id===state.practice.domId) || D.find(x=>x.id==='B');
   const p=state.practice;
   const sc=p.sc;
+  const limit=DEMO_MODE?DEMO_PRACTICE_LIMIT:null;
+  const answered=sc.t||0;
   const scPct=sc.t>0?Math.round((sc.c/sc.t)*100):null;
 
+  if(DEMO_MODE && p.demoDone){
+    const pct=sc.t>0?Math.round((sc.c/sc.t)*100):0;
+    el.innerHTML=`<div style="max-width:720px;margin:0 auto;padding:2rem 0;">
+      <div style="background:#fff;border:1px solid #e5e5e3;border-radius:14px;padding:2rem;text-align:center;">
+        <div style="font-size:42px;margin-bottom:.75rem;">🎯</div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:.35rem;">Demo Practice Complete</h2>
+        <p style="font-size:13px;color:#666;margin-bottom:1rem;">You completed ${DEMO_PRACTICE_LIMIT} curated demo questions aligned with reinforcement contingencies.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:1rem auto;max-width:420px;">
+          <div class="metric"><div class="metric-val" style="color:${pctColor(pct)};">${pct}%</div><div class="metric-label">Score</div></div>
+          <div class="metric"><div class="metric-val">${sc.c}/${sc.t}</div><div class="metric-label">Correct</div></div>
+          <div class="metric"><div class="metric-val">5</div><div class="metric-label">Demo Questions</div></div>
+        </div>
+        <div style="background:#f9f9f8;border-left:3px solid #0F6E56;border-radius:10px;padding:1rem;text-align:left;margin:1rem 0;">
+          <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Full Version Includes</div>
+          <div style="font-size:13px;line-height:1.8;color:#444;">🔒 Full practice bank by domain and subconcept<br>🔒 Complete mock exams<br>🔒 Progress tracking and weak-area targeting<br>🔒 Unlimited mastery paths across the full 6th Edition TCO</div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="startDemoPractice(true)"><i class="ti ti-refresh"></i>Restart Demo Practice</button>
+          <button class="btn-secondary" onclick="state.learn.phase='overview';state.view='learn';render();"><i class="ti ti-school"></i>Back to Learn Demo</button>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+
+  const currentNum = DEMO_MODE ? Math.min(limit, (p.selAns ? answered : answered+1)) : answered+1;
   let html=`
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap;">
-    <button class="btn-secondary" style="padding:5px 10px;font-size:12px;" onclick="state.practice.domId=null;state.practice.q=null;render();">
-      <i class="ti ti-arrow-left"></i> Cambiar dominio
-    </button>
-    <span class="pill" style="background:${d.bg};color:${d.color};">Dom. ${d.id}: ${d.short}</span>
-    <div style="margin-left:auto;font-size:12px;color:#888;">Sesión: ${sc.c}/${sc.t}</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap;">
+    ${DEMO_MODE?`<span class="pill" style="background:#E1F5EE;color:#0F6E56;font-weight:700;">Demo Access</span>`:`<button class="btn-secondary" style="padding:5px 10px;font-size:12px;" onclick="state.practice.domId=null;state.practice.q=null;render();"><i class="ti ti-arrow-left"></i> Cambiar dominio</button>`}
+    <span class="pill" style="background:${d.bg};color:${d.color};">Guided Practice · Reinforcement Contingencies</span>
+    <div style="margin-left:auto;font-size:12px;color:#555;font-weight:600;">${DEMO_MODE?`Question ${currentNum} of ${limit}`:`Sesión: ${sc.c}/${sc.t}`}</div>
     ${scPct!==null?`<span class="pill" style="background:${pctBg(scPct)};color:${pctColor(scPct)};">${scPct}%</span>`:''}
-  </div>`;
+  </div>
+  ${DEMO_MODE?`<div style="background:#fff;border:1px solid #e5e5e3;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div style="font-size:11px;color:#666;flex:1;min-width:200px;"><strong>Demo Practice:</strong> 5 curated questions. Full practice bank is available in the premium version.</div>
+    <div style="height:6px;background:#e5e5e3;border-radius:6px;width:160px;overflow:hidden;"><div style="height:100%;width:${Math.round((answered/limit)*100)}%;background:#0F6E56;border-radius:6px;"></div></div>
+    <div style="font-size:11px;color:#888;">${answered}/${limit} completed</div>
+  </div>`:''}`;
 
   if(p.loading){
-    html+=`<div class="loading"><i class="ti ti-brain"></i><div style="font-size:14px;">Generando escenario clínico...</div></div>`;
+    html+=`<div class="loading"><i class="ti ti-brain"></i><div style="font-size:14px;">Loading curated demo question...</div></div>`;
   } else if(p.err){
     html+=`<div style="background:#FCEBEB;border:1px solid #F09595;border-radius:8px;padding:1rem;color:#A32D2D;display:flex;align-items:center;gap:12px;margin-bottom:1rem;font-size:13px;">
-      ${p.err} <button onclick="nextPractice()" style="color:#A32D2D;text-decoration:underline;background:none;border:none;cursor:pointer;">Reintentar</button></div>`;
+      ${p.err} <button onclick="nextPractice()" style="color:#A32D2D;text-decoration:underline;background:none;border:none;cursor:pointer;">Try again</button></div>`;
   } else if(p.q){
     const q=p.q;
     html+=`
     <div style="display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center;">
-      <span class="pill" style="background:${d.bg};color:${d.color};font-size:10px;">Dom. ${q.domain}</span>
-      <span style="font-size:11px;color:#888;">${q.task}</span>
+      <span class="pill" style="background:${d.bg};color:${d.color};font-size:10px;">${q.demo_topic||q.task}</span>
+      ${DEMO_MODE?`<span style="font-size:11px;color:#888;">No repeated questions within this demo session</span>`:`<span style="font-size:11px;color:#888;">${q.task}</span>`}
     </div>
     <div class="scenario" style="border-left:3px solid ${d.border};">
-      <div class="scenario-label">Escenario clínico</div>
+      <div class="scenario-label">Clinical Scenario</div>
       <p style="margin:0;font-size:13px;line-height:1.75;">${q.scenario}</p>
     </div>
     <p style="font-size:14px;font-weight:600;margin-bottom:.875rem;line-height:1.55;">${q.question}</p>
@@ -1430,8 +1593,7 @@ function renderPractice(el){
       }
       const checkX=p.selAns&&letter===q.correct?'<i class="ti ti-check" style="color:#3B6D11;margin-left:auto;flex-shrink:0;"></i>':
         p.selAns&&letter===p.selAns&&letter!==q.correct?'<i class="ti ti-x" style="color:#A32D2D;margin-left:auto;flex-shrink:0;"></i>':'';
-      html+=`<button class="opt-btn" style="background:${bg};border-color:${border};color:${tc};" 
-        ${p.selAns?'disabled':''} onclick="handlePracticeAnswer('${letter}')">
+      html+=`<button class="opt-btn" style="background:${bg};border-color:${border};color:${tc};" ${p.selAns?'disabled':''} onclick="handlePracticeAnswer('${letter}')">
         <span style="font-weight:600;min-width:18px;font-size:14px;flex-shrink:0;">${letter}.</span>
         <span style="font-size:14px;line-height:1.65;flex:1;">${text}</span>${checkX}</button>`;
     });
@@ -1442,23 +1604,43 @@ function renderPractice(el){
       const ok=p.selAns===q.correct;
       html+=`<div class="explain" style="background:${ok?'#EAF3DE':'#FAECE7'};border:1px solid ${ok?'#97C459':'#F0997B'};">
         <div style="font-size:12px;font-weight:600;color:${ok?'#3B6D11':'#993C1D'};margin-bottom:6px;display:flex;align-items:center;gap:6px;">
-          <i class="ti ti-${ok?'check':'x'}"></i>${ok?'¡Correcto!':` Incorrecto — Respuesta: ${q.correct}`}</div>
+          <i class="ti ti-${ok?'check':'x'}"></i>${ok?'Correct!':` Incorrect — Correct answer: ${q.correct}`}</div>
         <p style="margin:0;font-size:13px;line-height:1.75;">${q.explanation}</p>
       </div>`;
     }
 
     if(p.selAns){
-      const dominated=scPct>=70&&sc.t>3;
+      const lastDemoQuestion = DEMO_MODE && sc.t >= limit;
       html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-primary" onclick="nextPractice()"><i class="ti ti-arrow-right"></i>${dominated?'¡Dominado! Siguiente →':'Siguiente →'}</button>
-        ${p.selAns!==q.correct?`<button class="btn-secondary" style="color:#185FA5;border-color:#85B7EB;" onclick="studyTopic('${state.practice.domId}','${q.task.replace(/'/g,"\\'")}')">
-          <i class="ti ti-book"></i>Estudiar este tema</button>`:''}
+        <button class="btn-primary" onclick="nextPractice()"><i class="ti ti-arrow-right"></i>${lastDemoQuestion?'Finish Demo Practice':'Next Question →'}</button>
+        ${!DEMO_MODE && p.selAns!==q.correct?`<button class="btn-secondary" style="color:#185FA5;border-color:#85B7EB;" onclick="studyTopic('${state.practice.domId}','${q.task.replace(/'/g,"\\'")}')"><i class="ti ti-book"></i>Estudiar este tema</button>`:''}
       </div>`;
     } else {
-      html+=`<button class="btn-secondary" onclick="nextPractice()"><i class="ti ti-refresh"></i>Nueva pregunta</button>`;
+      html+=DEMO_MODE?`<div style="font-size:11px;color:#888;">Answer this question to continue the guided demo.</div>`:`<button class="btn-secondary" onclick="nextPractice()"><i class="ti ti-refresh"></i>Nueva pregunta</button>`;
     }
   }
   el.innerHTML=html;
+}
+
+function renderDemoPracticeLanding(el){
+  el.innerHTML=`<div style="max-width:720px;margin:0 auto;padding:2rem 0;">
+    <div style="background:#fff;border:1px solid #e5e5e3;border-radius:14px;padding:2rem;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+        <div style="background:#E1F5EE;border-radius:12px;padding:12px;"><i class="ti ti-brain" style="font-size:24px;color:#0F6E56;"></i></div>
+        <div><h2 style="font-size:22px;font-weight:700;margin:0 0 4px;">Guided Demo Practice</h2><p style="font-size:13px;color:#666;margin:0;">A short curated sample from the reinforcement contingencies practice bank.</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:1rem 0;">
+        <div class="metric"><div class="metric-val">5</div><div class="metric-label">Curated Questions</div></div>
+        <div class="metric"><div class="metric-val">0</div><div class="metric-label">Repeated Questions</div></div>
+        <div class="metric"><div class="metric-val">B</div><div class="metric-label">Demo Domain</div></div>
+      </div>
+      <div style="background:#f9f9f8;border-left:3px solid #0F6E56;border-radius:10px;padding:1rem;margin-bottom:1rem;font-size:13px;line-height:1.75;color:#444;">
+        <strong>Included in this demo:</strong><br>
+        ✓ Positive reinforcement<br>✓ Negative reinforcement<br>✓ Escape vs avoidance discrimination<br>✓ Detailed rationales and exam strategy
+      </div>
+      <button class="btn-primary" onclick="startDemoPractice(true)"><i class="ti ti-player-play"></i>Start 5-Question Demo</button>
+    </div>
+  </div>`;
 }
 
 function renderDomainPicker(el){
@@ -1481,11 +1663,24 @@ function renderDomainPicker(el){
   el.innerHTML=html;
 }
 
+function startDemoPractice(reset=false){
+  if(reset){
+    resetDemoQuestionTracking();
+    state.practice.sc={c:0,t:0};
+  }
+  startPractice('B','standard');
+}
+
 async function startPractice(domId,diff){
-  state.practice={...state.practice,domId,q:null,loading:true,selAns:null,showExp:false,err:null};
+  if(DEMO_MODE){domId='B';}
+  state.practice={...state.practice,domId,q:null,loading:true,selAns:null,showExp:false,err:null,demoDone:false};
   state.view='practice';
   render();
-  try{const q=await genQuestion(domId,diff||'standard');state.practice.q=q;state.practice.loading=false;}
+  try{
+    const q=await genQuestion(domId,diff||'standard');
+    state.practice.q=q;
+    state.practice.loading=false;
+  }
   catch(e){state.practice.loading=false;state.practice.err='Question could not be loaded. Please try again.';}
   render();
 }
@@ -1508,14 +1703,21 @@ async function handlePracticeAnswer(letter){
 }
 
 async function nextPractice(){
-  const domId=state.practice.domId;
+  const domId=DEMO_MODE?'B':state.practice.domId;
+
+  if(DEMO_MODE && (state.practice.sc?.t || 0) >= DEMO_PRACTICE_LIMIT){
+    state.practice={...state.practice,domId:'B',q:null,loading:false,selAns:null,showExp:false,err:null,demoDone:true};
+    render();
+    return;
+  }
+
   const ds=state.stats.byDomain[domId];
   const p=ds?.total>4?Math.round((ds.correct/ds.total)*100):50;
   const diff=p>=70?'hard':'standard';
-  state.practice={...state.practice,q:null,loading:true,selAns:null,showExp:false,err:null};
+  state.practice={...state.practice,domId,q:null,loading:true,selAns:null,showExp:false,err:null,demoDone:false};
   render();
   try{const q=await genQuestion(domId,diff);state.practice.q=q;state.practice.loading=false;}
-  catch(e){state.practice.loading=false;state.practice.err='Error. Intenta de nuevo.';}
+  catch(e){state.practice.loading=false;state.practice.err='Error. Try again.';}
   render();
 }
 
