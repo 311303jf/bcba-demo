@@ -216,6 +216,138 @@ function moduleKey(m){
   return `${m.domId}-${idx}-${m.subIdx===null||m.subIdx===undefined?'x':m.subIdx}-${m.finalReview?'final':'study'}`;
 }
 function sameModule(a,b){ return !!a && !!b && moduleKey(a)===moduleKey(b); }
+
+
+// ============================================================
+// QUALITY GATE — prevents concept/subconcept/question mismatch
+// ============================================================
+function normalizeTextForQuality(v){
+  return String(v||'')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,' ')
+    .trim();
+}
+function expectedModuleTarget(domId,idx,subIdx=null,finalReview=false){
+  const d=D.find(x=>x.id===domId);
+  const task=d?.tasks?.[idx]||'';
+  const subs=getSubconceptsForTask(task);
+  const conceptTitle=getConceptTitle(task);
+  const subconcept=finalReview
+    ? 'Final mixed review'
+    : (subIdx!==null && subIdx!==undefined && subs[subIdx])
+      ? subs[subIdx]
+      : (subs.length<=1 ? conceptTitle || task : '');
+  return {
+    target_domain: domId,
+    target_concept: task,
+    target_concept_title: conceptTitle,
+    target_subconcept: subconcept,
+    final_review: !!finalReview
+  };
+}
+function attachQualityMetadata(content,target){
+  if(!content) return content;
+  content.target_domain = content.target_domain || target.target_domain;
+  content.target_concept = content.target_concept || target.target_concept;
+  content.target_subconcept = content.target_subconcept || content.subconcept || target.target_subconcept;
+  content.quality_check = content.quality_check || {
+    is_specific_to_subconcept: true,
+    does_not_teach_parent_generically: true,
+    questions_match_subconcept: true
+  };
+  if(Array.isArray(content.questions)){
+    content.questions = content.questions.map(q=>({
+      ...q,
+      target_domain: q.target_domain || target.target_domain,
+      target_concept: q.target_concept || target.target_concept,
+      target_subconcept: q.target_subconcept || content.target_subconcept || target.target_subconcept
+    }));
+  }
+  return content;
+}
+function containsRequiredLanguage(content,expected){
+  const text = normalizeTextForQuality([
+    content?.concept,
+    content?.subconcept,
+    content?.definition,
+    content?.clinical_example,
+    content?.strategy,
+    ...(content?.key_points||[]),
+    ...(content?.questions||[]).flatMap(q=>[q.q,q.hint,q.explanation,...Object.values(q.options||{})])
+  ].join(' '));
+
+  const e = normalizeTextForQuality(expected);
+  if(!expected || /final mixed review/i.test(expected)) return true;
+
+  const rules={
+    'positive reinforcement': ['positive reinforcement','stimulus is added','added after','access to','praise','delivered'],
+    'negative reinforcement': ['negative reinforcement','removed','reduced','prevents','aversive','removal'],
+    'escape': ['escape','terminates','removes the task','task demand','already present','ongoing demand','worksheet','break'],
+    'avoidance': ['avoidance','prevents','postpones','before','prior to','avoids','prevents contact']
+  };
+  const rule=rules[e];
+  if(!rule) return text.includes(e);
+  return rule.some(term=>text.includes(normalizeTextForQuality(term)));
+}
+function validateLearnContent(content,domId,idx,subIdx=null,finalReview=false){
+  if(!content || typeof content!=='object') return {ok:false, reason:'empty content'};
+  const target=expectedModuleTarget(domId,idx,subIdx,finalReview);
+  const expectedSub=normalizeTextForQuality(target.target_subconcept);
+  const contentSub=normalizeTextForQuality(content.target_subconcept || content.subconcept || content.concept);
+  const contentConcept=normalizeTextForQuality(content.target_concept || content.main_concept || '');
+  const expectedConcept=normalizeTextForQuality(target.target_concept);
+
+  if(!Array.isArray(content.questions) || content.questions.length<2) return {ok:false, reason:'missing questions'};
+  if(!content.definition || !content.clinical_example || !content.strategy) return {ok:false, reason:'missing teaching fields'};
+
+  if(!finalReview){
+    if(expectedSub && contentSub && contentSub !== expectedSub){
+      return {ok:false, reason:`subconcept mismatch: expected ${target.target_subconcept}, got ${content.target_subconcept || content.subconcept || content.concept}`};
+    }
+    if(!containsRequiredLanguage(content,target.target_subconcept)){
+      return {ok:false, reason:`content not specific to ${target.target_subconcept}`};
+    }
+  }
+
+  if(expectedConcept && contentConcept && !contentConcept.includes(expectedConcept.slice(0,30)) && !expectedConcept.includes(contentConcept.slice(0,30))){
+    // Do not fail on shorter display titles, but keep this for debugging.
+    console.warn('Concept label differs:', {expected:target.target_concept, got:content.target_concept || content.main_concept});
+  }
+
+  const qc=content.quality_check || {};
+  if(qc.is_specific_to_subconcept===false) return {ok:false, reason:'quality_check failed: specificity'};
+  if(qc.questions_match_subconcept===false) return {ok:false, reason:'quality_check failed: questions'};
+
+  for(const q of content.questions){
+    if(!q.q || !q.options || !q.correct || !q.hint || !q.explanation) return {ok:false, reason:'question missing required fields'};
+    if(!finalReview){
+      const qSub=normalizeTextForQuality(q.target_subconcept || content.target_subconcept || content.subconcept || content.concept);
+      if(expectedSub && qSub && qSub !== expectedSub){
+        return {ok:false, reason:`question target mismatch: expected ${target.target_subconcept}, got ${q.target_subconcept}`};
+      }
+      const qText=[q.q,q.hint,q.explanation,...Object.values(q.options||{})].join(' ');
+      if(!containsRequiredLanguage({concept:content.concept,subconcept:content.subconcept,definition:qText,questions:[]},target.target_subconcept)){
+        return {ok:false, reason:`question not specific to ${target.target_subconcept}`};
+      }
+    }
+  }
+  return {ok:true, reason:'passed'};
+}
+async function genLearnContentValidated(domId,idx,subIdx=null,finalReview=false,maxAttempts=3){
+  const target=expectedModuleTarget(domId,idx,subIdx,finalReview);
+  let lastReason='';
+  for(let attempt=1; attempt<=maxAttempts; attempt++){
+    const raw=await genLearnContent(domId,idx,subIdx,finalReview,attempt,lastReason);
+    const content=attachQualityMetadata(raw,target);
+    const check=validateLearnContent(content,domId,idx,subIdx,finalReview);
+    if(check.ok) return content;
+    lastReason=check.reason;
+    console.warn(`Quality gate rejected module attempt ${attempt}:`, check.reason, target);
+  }
+  throw new Error('Content quality gate failed: '+lastReason);
+}
 function clearLearnMemory(){
   if(state && state.learn){
     state.learn.content = null;
@@ -545,7 +677,7 @@ async function preloadNextConcept(fromModule=null){
   if(preloadInFlightKey===key || sameModule(MODULE_CACHE.next,next)) return;
   preloadInFlightKey=key;
   try{
-    const content=await genLearnContent(next.domId,next.idx,next.subIdx,next.finalReview);
+    const content=await genLearnContentValidated(next.domId,next.idx,next.subIdx,next.finalReview);
     MODULE_CACHE.next={...next,content};
   }catch(e){
     console.log('Preload skipped:', e?.message || e);
@@ -562,10 +694,18 @@ function schedulePreload(fromModule){
 // DEMO CONTENT SAFETY — each module has its own aligned content
 // ============================================================
 function demoModule(title, definition, clinicalExample, hookQ, hookA, strategy, q1, q2){
-  return {
+  const module={
     concept: title,
     main_concept: 'Positive and negative reinforcement contingencies',
     subconcept: title,
+    target_domain: 'B',
+    target_concept: 'Positive and negative reinforcement contingencies',
+    target_subconcept: title,
+    quality_check: {
+      is_specific_to_subconcept: true,
+      does_not_teach_parent_generically: true,
+      questions_match_subconcept: true
+    },
     hook_question: hookQ,
     hook_answer: hookA,
     definition,
@@ -576,8 +716,14 @@ function demoModule(title, definition, clinicalExample, hookQ, hookA, strategy, 
       'Finally, determine whether the future frequency of the behavior increased.'
     ],
     strategy,
-    questions: [q1, q2]
+    questions: [q1, q2].map(q=>({
+      ...q,
+      target_domain: 'B',
+      target_concept: 'Positive and negative reinforcement contingencies',
+      target_subconcept: title
+    }))
   };
+  return module;
 }
 
 function demoLearnContent(domId, conceptIdx, subIdx=null, finalReview=false){
@@ -643,6 +789,10 @@ function demoLearnContent(domId, conceptIdx, subIdx=null, finalReview=false){
       concept:'Reinforcement Contingencies — Mixed Review',
       main_concept:'Positive and negative reinforcement contingencies',
       subconcept:'Final mixed review',
+      target_domain:'B',
+      target_concept:'Positive and negative reinforcement contingencies',
+      target_subconcept:'Final mixed review',
+      quality_check:{is_specific_to_subconcept:true,does_not_teach_parent_generically:true,questions_match_subconcept:true},
       hook_question:'How do you distinguish positive reinforcement, negative reinforcement, escape, and avoidance in a clinical scenario?',
       hook_answer:'Ask three questions: What was the behavior? Was a stimulus added or removed? Did the behavior increase in the future? Escape ends an aversive event already present; avoidance prevents or postpones it.',
       definition:'Reinforcement is a contingency in which a consequence following a response increases the future frequency of that response. Positive reinforcement adds a stimulus; negative reinforcement removes, reduces, or prevents an aversive stimulus.',
@@ -698,29 +848,158 @@ function demoLearnContent(domId, conceptIdx, subIdx=null, finalReview=false){
 
 function demoTranslateContent(content){
   const c = JSON.parse(JSON.stringify(content));
-  const translations={
-    'Positive Reinforcement':'Positive Reinforcement',
-    'Negative Reinforcement':'Negative Reinforcement',
-    'Escape':'Escape',
-    'Avoidance':'Avoidance',
-    'Reinforcement Contingencies — Mixed Review':'Contingencias de Reinforcement — Repaso mixto'
+  const concept = c.concept;
+
+  const spanishModules = {
+    'Positive Reinforcement': {
+      concept:'Positive Reinforcement',
+      hook_question:'Un learner levanta la mano con más frecuencia después de que la maestra lo elogia inmediatamente y le da participación. ¿Qué parte de la contingencia indica que es reinforcement?',
+      hook_answer:'La conducta aumenta en el futuro después de que se entrega una consecuencia. Como el elogio se añade después de la respuesta y levantar la mano aumenta, esto es positive reinforcement.',
+      definition:'Positive reinforcement ocurre cuando un estímulo se añade después de una respuesta y la frecuencia futura de esa respuesta aumenta bajo condiciones similares.',
+      clinical_example:'Durante una sesión clínica, María solicita ayuda usando una tarjeta de comunicación. El terapeuta le proporciona ayuda inmediatamente. Durante la semana siguiente, María usa la tarjeta con más frecuencia en lugar de llorar.',
+      key_points:[
+        'Positive significa que un estímulo se añade después de la respuesta.',
+        'Reinforcement significa que la conducta aumenta en el futuro.',
+        'No decidas por si la consecuencia “parece agradable”; decide por add + future increase.'
+      ],
+      strategy:'Identifica primero la conducta, luego qué se añadió inmediatamente después, y finalmente confirma si la conducta aumentó en el futuro.'
+    },
+    'Negative Reinforcement': {
+      concept:'Negative Reinforcement',
+      hook_question:'Un learner entrega una tarjeta de break, el terapeuta retira la hoja de trabajo por dos minutos, y el uso de la tarjeta aumenta. ¿Por qué esto es negative reinforcement?',
+      hook_answer:'La conducta aumenta en el futuro porque un estímulo aversivo fue removido después de la respuesta. Negative significa remoción o reducción; reinforcement significa aumento futuro.',
+      definition:'Negative reinforcement ocurre cuando un estímulo aversivo se remueve, reduce o previene después de una respuesta, y la frecuencia futura de esa respuesta aumenta.',
+      clinical_example:'Durante trabajo en mesa, Luis entrega una tarjeta de break. El terapeuta retira la tarea por dos minutos. Con el tiempo, Luis usa la tarjeta más frecuentemente en vez de hacer problem behavior.',
+      key_points:[
+        'Negative no significa castigo; significa que algo se remueve, reduce o previene.',
+        'Reinforcement requiere que la conducta aumente en el futuro.',
+        'Escape y avoidance son formas específicas de negative reinforcement.'
+      ],
+      strategy:'Busca qué estímulo aversivo fue removido, reducido o prevenido después de la respuesta, y verifica que la respuesta aumentó después.'
+    },
+    'Escape': {
+      concept:'Escape',
+      hook_question:'Una demanda de trabajo ya está presente. El learner pide break, la tarea se retira, y pedir break aumenta durante futuras demandas. ¿Qué hace que esto sea escape?',
+      hook_answer:'Es escape porque el estímulo aversivo ya estaba presente y la respuesta lo terminó o redujo. En escape, la persona sale de una condición aversiva que ya está ocurriendo.',
+      definition:'Escape es una forma de negative reinforcement en la que una respuesta termina, reduce o interrumpe un estímulo aversivo que ya está presente.',
+      clinical_example:'Una hoja de trabajo está frente al learner. El learner solicita un break y la hoja se retira. Si pedir break aumenta durante futuras demandas de trabajo, esa respuesta está mantenida por escape.',
+      key_points:[
+        'En escape, el estímulo aversivo ya comenzó o ya está presente.',
+        'La respuesta termina, reduce o interrumpe esa condición aversiva.',
+        'No es avoidance si la demanda ya estaba ocurriendo; avoidance ocurre antes del contacto con el estímulo aversivo.'
+      ],
+      strategy:'Pregunta: ¿la demanda o condición aversiva ya estaba ocurriendo? Si la respuesta la termina y luego aumenta, piensa en escape.'
+    },
+    'Avoidance': {
+      concept:'Avoidance',
+      hook_question:'Antes de entrar a una cafetería ruidosa, un learner pide audífonos y así previene el ruido. Luego pide audífonos con más frecuencia antes de la transición. ¿Por qué esto es avoidance?',
+      hook_answer:'Es avoidance porque la respuesta ocurre antes del contacto con el estímulo aversivo y previene o retrasa ese evento. La conducta aumenta porque evita la condición aversiva.',
+      definition:'Avoidance es una forma de negative reinforcement en la que una respuesta previene, pospone o reduce el contacto con un estímulo aversivo antes de que ocurra.',
+      clinical_example:'Antes de entrar a la cafetería, un learner solicita audífonos. Los audífonos previenen el contacto con el ruido fuerte, y solicitar audífonos aumenta antes de futuras transiciones a la cafetería.',
+      key_points:[
+        'En avoidance, la respuesta ocurre antes de que el estímulo aversivo se contacte.',
+        'La consecuencia es prevenir, posponer o reducir el evento aversivo.',
+        'No es escape si el evento aversivo todavía no estaba ocurriendo.'
+      ],
+      strategy:'Pregunta: ¿la conducta ocurrió antes de que el estímulo aversivo empezara? Si previene o retrasa el evento y aumenta, piensa en avoidance.'
+    },
+    'Reinforcement Contingencies — Mixed Review': {
+      concept:'Contingencias de Reinforcement — Repaso mixto',
+      hook_question:'¿Cómo distingues positive reinforcement, negative reinforcement, escape y avoidance en un escenario clínico?',
+      hook_answer:'Haz tres preguntas: ¿cuál fue la conducta?, ¿la consecuencia añadió, removió o previno algo?, y ¿la conducta aumentó en el futuro?',
+      definition:'Reinforcement es una contingencia en la que una consecuencia después de una respuesta aumenta la frecuencia futura de esa respuesta. Positive añade un estímulo; negative remueve, reduce o previene un estímulo aversivo.',
+      clinical_example:'Un learner puede pedir atención para acceder a elogio, pedir break para escapar de una tarea, o usar audífonos para evitar ruido. Cada caso requiere identificar respuesta, consecuencia y efecto futuro.',
+      key_points:[
+        'Positive = algo se añade después de la respuesta.',
+        'Negative = algo se remueve, reduce o previene.',
+        'Escape termina algo que ya ocurre; avoidance previene algo antes de que ocurra.'
+      ],
+      strategy:'No respondas por intuición. Decide usando add/remove/prevent y confirma que la conducta aumentó en el futuro.'
+    }
   };
-  c.concept = translations[c.concept] || c.concept;
-  c.hook_question = 'Pregunta guía: analiza primero el behavior, luego la consecuencia inmediata y finalmente el efecto futuro en la conducta.';
-  c.hook_answer = 'La clave es determinar si algo fue añadido, removido o prevenido, y confirmar que el behavior aumentó en el futuro.';
-  c.definition = 'Este concepto debe identificarse usando la contingencia completa: behavior, consecuencia inmediata y cambio futuro en la frecuencia del behavior.';
-  c.clinical_example = 'En un escenario clínico, observa si la respuesta produce acceso a algo, remueve una demanda, termina una condición aversiva o evita que ocurra.';
-  c.strategy = 'Estrategia de examen: no respondas por intuición. Identifica add/remove/prevent y luego verifica si la conducta aumenta.';
-  c.key_points = ['Positive significa que algo se añade.','Negative significa que algo se remueve, reduce o previene.','Reinforcement siempre implica aumento futuro del behavior.'];
-  c.questions = (c.questions||[]).map(q=>({
-    ...q,
-    hint:'Identifica si la consecuencia fue añadida, removida o prevenida, y si la conducta aumentó en el futuro.',
-    explanation:'La respuesta correcta se determina por la relación entre behavior, consecuencia y aumento futuro de la conducta. Revisa si el escenario describe añadir, remover o prevenir un estímulo.'
-  }));
+
+  if (spanishModules[concept]) {
+    Object.assign(c, spanishModules[concept]);
+  }
+
+  const translatedQuestions = {
+    'Positive Reinforcement': [
+      {
+        q:'Un cliente completa tres problemas de matemática. El RBT inmediatamente le da acceso a una tablet preferida. En sesiones posteriores, el cliente completa más problemas. ¿Qué proceso se demuestra?',
+        options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Extinction'},
+        correct:'A',
+        hint:'Busca si algo fue añadido después de la respuesta y si la conducta aumentó después.',
+        explanation:'A es correcta porque el acceso a la tablet fue añadido después de completar los problemas, y completar problemas aumentó en el futuro. Negative reinforcement implicaría remover un estímulo. Punishment disminuiría la conducta.'
+      },
+      {
+        q:'Un learner dice “help please” y la maestra inmediatamente le da ayuda. El learner empieza a pedir ayuda con más frecuencia en lugar de llorar. ¿Cuál es la mejor interpretación?',
+        options:{A:'Response cost',B:'Positive reinforcement',C:'Stimulus fading',D:'Negative punishment'},
+        correct:'B',
+        hint:'Enfócate en la consecuencia entregada después de la respuesta comunicativa y el cambio futuro en esa respuesta.',
+        explanation:'B es correcta porque la ayuda fue entregada después de la petición y la petición aumentó. No se describe pérdida de un reinforcer, fading ni response cost.'
+      }
+    ],
+    'Negative Reinforcement': [
+      {
+        q:'Durante trabajo en mesa, un learner pide un break usando una tarjeta. El terapeuta retira la hoja por dos minutos. Con el tiempo, el uso independiente de la tarjeta aumenta. ¿Qué proceso se demuestra?',
+        options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Stimulus generalization'},
+        correct:'B',
+        hint:'Pregunta si algo fue removido después de la respuesta y si la respuesta aumentó en el futuro.',
+        explanation:'B es correcta porque la hoja fue removida después de la respuesta con la tarjeta, y esa respuesta aumentó. Positive reinforcement implicaría añadir un estímulo. Punishment disminuiría la conducta.'
+      },
+      {
+        q:'Un estudiante dice apropiadamente “too loud” y la maestra baja el volumen. El estudiante usa esa frase con más frecuencia durante actividades ruidosas. ¿Qué principio se muestra?',
+        options:{A:'Negative reinforcement',B:'Positive reinforcement',C:'Extinction',D:'Response cost'},
+        correct:'A',
+        hint:'La clave es la remoción o reducción de una condición aversiva después de la respuesta.',
+        explanation:'A es correcta porque el ruido fue reducido después de la respuesta comunicativa, y esa respuesta aumentó. Eso es negative reinforcement.'
+      }
+    ],
+    'Escape': [
+      {
+        q:'Un learner completa un problema y dice “break”. La maestra retira la tarea inmediatamente. Las peticiones de break aumentan durante futuras demandas. ¿Qué tipo de negative reinforcement es?',
+        options:{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Extinction'},
+        correct:'B',
+        hint:'Escape ocurre cuando el estímulo aversivo ya está presente y la respuesta lo termina o reduce.',
+        explanation:'B es correcta porque la demanda ya estaba presente y la respuesta la terminó o interrumpió. Avoidance prevendría el evento aversivo antes de que ocurra.'
+      },
+      {
+        q:'A un niño se le presenta una tarea de escritura, empuja la hoja, y el adulto retira la hoja. Empujar materiales aumenta. ¿Qué relación es más probable?',
+        options:{A:'Escape-maintained behavior',B:'Avoidance-maintained behavior',C:'Positive punishment',D:'Conditioned reinforcement'},
+        correct:'A',
+        hint:'Determina si la conducta detiene una demanda que ya estaba ocurriendo.',
+        explanation:'A es correcta porque la conducta termina una demanda existente y aumenta. Ese patrón indica behavior mantenido por escape.'
+      }
+    ],
+    'Avoidance': [
+      {
+        q:'Antes de comenzar matemática, un estudiante pide usar un checklist visual. El checklist previene transiciones difíciles, y el estudiante continúa pidiéndolo antes del trabajo. ¿Qué tipo de negative reinforcement es más relevante?',
+        options:{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Response cost'},
+        correct:'B',
+        hint:'Avoidance ocurre cuando la respuesta previene o pospone un evento aversivo antes de que pase.',
+        explanation:'B es correcta porque la respuesta ocurre antes de la transición difícil y previene o reduce el evento aversivo. Escape terminaría algo que ya está ocurriendo.'
+      },
+      {
+        q:'Un learner se pone audífonos antes de entrar a la cafetería, evitando exposición a ruido fuerte. El uso de audífonos aumenta antes de transiciones a la cafetería. ¿Qué proceso encaja mejor?',
+        options:{A:'Avoidance',B:'Escape',C:'Positive punishment',D:'Stimulus fading'},
+        correct:'A',
+        hint:'Busca prevención de un estímulo aversivo, no terminación de uno que ya está presente.',
+        explanation:'A es correcta porque la respuesta previene el contacto con ruido fuerte y aumenta en el futuro. Eso es avoidance, una forma de negative reinforcement.'
+      }
+    ],
+    'Reinforcement Contingencies — Mixed Review': null
+  };
+
+  if (translatedQuestions[concept]) {
+    c.questions = translatedQuestions[concept];
+  } else if (concept === 'Reinforcement Contingencies — Mixed Review') {
+    c.questions = translatedQuestions['Negative Reinforcement'].slice(0,1).concat(translatedQuestions['Avoidance'].slice(0,1));
+  }
+
   return c;
 }
 
-async function genLearnContent(domId,conceptIdx,subIdx=null,finalReview=false){
+async function genLearnContent(domId,conceptIdx,subIdx=null,finalReview=false,attempt=1,lastQualityIssue=''){
   if (DEMO_MODE) return demoLearnContent(domId,conceptIdx,subIdx,finalReview);
   const d=D.find(x=>x.id===domId);
   const task=d.tasks[conceptIdx];
@@ -737,22 +1016,40 @@ Domain ${d.id}: ${d.label}.
 Main Concept: "${task}".
 ${focus}
 
+STRICT QUALITY REQUIREMENTS:
+- Target domain MUST be "${d.id}".
+- Target concept MUST be "${task}".
+- Target subconcept MUST be "${finalReview?'Final mixed review':(subName||getConceptTitle(task))}".
+- If target_subconcept is a specific subconcept, teach ONLY that exact subconcept.
+- Do NOT give generic parent-concept teaching when a subconcept is requested.
+- Every hook, definition, clinical example, strategy, key point, question, hint, and explanation MUST match the target_subconcept.
+- Questions must test the target_subconcept, not merely the parent concept.
+${lastQualityIssue ? `Previous attempt failed quality gate because: ${lastQualityIssue}. Correct it now.` : ''}
+
 Create a complete learning module. Return ONLY valid JSON (no markdown):
 {
+  "target_domain":"${d.id}",
+  "target_concept":"${task}",
+  "target_subconcept":"${finalReview?'Final mixed review':(subName||getConceptTitle(task))}",
+  "quality_check":{
+    "is_specific_to_subconcept":true,
+    "does_not_teach_parent_generically":true,
+    "questions_match_subconcept":true
+  },
   "concept":"${finalReview?conceptTitle:(subName||task)}",
   "main_concept":"${conceptTitle}",
-  "subconcept":"${subName||''}",
+  "subconcept":"${finalReview?'Final mixed review':(subName||'')}",
   "hook_question":"One sharp clinical question that primes the learner to think before seeing the definition.",
   "hook_answer":"The correct answer to the hook question in 1-2 sentences.",
-  "definition":"Precise 2-3 sentence definition using exact ABA terminology.",
-  "clinical_example":"3-4 sentence realistic clinical scenario showing this concept in action.",
-  "key_points":["Exam-critical point 1","Exam-critical point 2","Exam-critical point 3"],
-  "strategy":"A short strategy for how to identify this concept on BCBA exam questions.",
+  "definition":"Precise 2-3 sentence definition using exact ABA terminology and specific to the target_subconcept.",
+  "clinical_example":"3-4 sentence realistic clinical scenario showing the target_subconcept in action.",
+  "key_points":["Exam-critical point specific to target_subconcept 1","Exam-critical point specific to target_subconcept 2","Common discrimination/trap involving this target_subconcept"],
+  "strategy":"A short strategy for identifying this exact target_subconcept on BCBA exam questions.",
   "questions":[
-    {"q":"Applied clinical question?","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"B","hint":"Teach the strategy to analyze the question without giving away the answer.","explanation":"Why correct is right and why the others are wrong."},
-    {"q":"Second applied question testing discrimination?","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","hint":"Teach the strategy to analyze the question without giving away the answer.","explanation":"Why correct is right and why the others are wrong."}
+    {"target_subconcept":"${finalReview?'Final mixed review':(subName||getConceptTitle(task))}","q":"Applied clinical question testing the target_subconcept?","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"B","hint":"Teach the strategy for this exact target_subconcept without giving away the answer.","explanation":"Why correct is right and why the others are wrong, explicitly tied to target_subconcept."},
+    {"target_subconcept":"${finalReview?'Final mixed review':(subName||getConceptTitle(task))}","q":"Second applied clinical discrimination question for the target_subconcept?","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","hint":"Teach the strategy for this exact target_subconcept without giving away the answer.","explanation":"Why correct is right and why the others are wrong, explicitly tied to target_subconcept."}
   ]
-}`,2200);
+}`,2600);
   return JSON.parse(txt.replace(/```json|```/g,'').trim());
 }
 
@@ -775,11 +1072,18 @@ async function startLearnConcept(domId,idx,subIdx=null,finalReview=false){
   try{
     let content=null;
     if(sameModule(MODULE_CACHE.next,requested) && MODULE_CACHE.next.content){
-      content=MODULE_CACHE.next.content;
-      MODULE_CACHE.current={...requested,content};
-      MODULE_CACHE.next=null;
-    }else{
-      content=await genLearnContent(domId,idx,subIdx,finalReview);
+      const cachedCheck=validateLearnContent(MODULE_CACHE.next.content,domId,idx,subIdx,finalReview);
+      if(cachedCheck.ok){
+        content=MODULE_CACHE.next.content;
+        MODULE_CACHE.current={...requested,content};
+        MODULE_CACHE.next=null;
+      }else{
+        console.warn('Cached module rejected by quality gate:', cachedCheck.reason);
+        MODULE_CACHE.next=null;
+      }
+    }
+    if(!content){
+      content=await genLearnContentValidated(domId,idx,subIdx,finalReview);
       MODULE_CACHE.current={...requested,content};
       MODULE_CACHE.next=null;
     }
@@ -792,7 +1096,7 @@ async function startLearnConcept(domId,idx,subIdx=null,finalReview=false){
   }catch(e){
     if(!sameModule(requested,state.learn)) return;
     state.learn.loading=false;
-    state.learn.err='Content could not be loaded. Please try again.';
+    state.learn.err='This module did not pass the internal quality check. Please try again.';
     render();
   }
 }
