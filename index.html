@@ -100,6 +100,7 @@
   .dot.active{background:#0F6E56;transform:scale(1.3);}
   .dot.wrong{background:#E24B4A;}
 
+  .demo-locked-nav span{color:#888;}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
 </head>
@@ -526,7 +527,9 @@ function render(){
   updateNav();
   updateSidebar();
   const main=document.getElementById('main-content');
-  const views={dash:renderDash,learn:renderLearn,practice:renderPractice,exam:renderExam,notes:renderNotes,analytics:renderAnalytics};
+  const views=DEMO_MODE
+    ? {dash:renderDash,learn:renderLearn,practice:renderPractice,exam:renderLockedFeature,notes:renderLockedFeature,analytics:renderLockedFeature}
+    : {dash:renderDash,learn:renderLearn,practice:renderPractice,exam:renderExam,notes:renderNotes,analytics:renderAnalytics};
   if(main) main.replaceChildren();
   (views[state.view]||renderDash)(main);
 }
@@ -537,12 +540,12 @@ function updateNav(){
     {id:'dash',label:'Dashboard',icon:'ti-layout-dashboard'},
     {id:'learn',label:'Aprender',icon:'ti-school'},
     {id:'practice',label:'Practicar',icon:'ti-brain'},
-    {id:'exam',label:'Examen Simulado',icon:'ti-clock'},
-    {id:'notes',label:'Study Notes',icon:'ti-book'},
-    {id:'analytics',label:'Analíticas',icon:'ti-chart-bar'},
+    {id:'exam',label:DEMO_MODE?'Examen Simulado 🔒':'Examen Simulado',icon:'ti-clock',locked:DEMO_MODE},
+    {id:'notes',label:DEMO_MODE?'Study Notes 🔒':'Study Notes',icon:'ti-book',locked:DEMO_MODE},
+    {id:'analytics',label:DEMO_MODE?'Analíticas 🔒':'Analíticas',icon:'ti-chart-bar',locked:DEMO_MODE},
   ];
   nav.innerHTML=items.map(it=>`
-    <button class="nav-btn${state.view===it.id?' active':''}" onclick="setView('${it.id}')">
+    <button class="nav-btn${state.view===it.id?' active':''}${it.locked?' demo-locked-nav':''}" onclick="setView('${it.id}')">
       <i class="ti ${it.icon}"></i><span>${it.label}</span>
     </button>`).join('');
 }
@@ -1448,10 +1451,101 @@ function renderLearn(el){
   }
 }
 
+
+function renderLockedFeature(el){
+  const featureNames={
+    exam:'Full Mock Exams',
+    notes:'Complete Study Notes',
+    analytics:'Progress Analytics'
+  };
+  const title=featureNames[state.view]||'Premium Feature';
+  el.innerHTML=`<div style="max-width:760px;margin:0 auto;padding:2rem 0;">
+    <div style="background:#fff;border:1px solid #e5e5e3;border-radius:14px;padding:2rem;text-align:center;">
+      <div style="width:54px;height:54px;border-radius:16px;background:#F1EFE8;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;"><i class="ti ti-lock" style="font-size:28px;color:#444441;"></i></div>
+      <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Premium Preview</div>
+      <h2 style="font-size:22px;font-weight:700;margin-bottom:.5rem;">${title}</h2>
+      <p style="font-size:13px;color:#666;line-height:1.7;margin:0 auto 1.25rem;max-width:520px;">This public demo gives access to one guided learning path and a 5-question curated practice sample. The complete version unlocks all domains, full mock exams, analytics, and complete study notes.</p>
+      <div style="background:#f9f9f8;border-left:3px solid #0F6E56;border-radius:10px;padding:1rem;text-align:left;margin:1rem auto;max-width:520px;font-size:13px;line-height:1.8;color:#444;">
+        <strong>Full Version Includes:</strong><br>
+        🔒 All 9 BCBA domains<br>
+        🔒 Full practice bank by concept and subconcept<br>
+        🔒 Complete mock exams<br>
+        🔒 Adaptive weak-area targeting<br>
+        🔒 Detailed performance analytics
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="state.learn.phase='overview';state.view='learn';render();"><i class="ti ti-school"></i>Continue Demo Learning</button>
+        <button class="btn-secondary" onclick="startDemoPractice(true)"><i class="ti ti-brain"></i>Try Demo Practice</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDemoDashboard(el){
+  const d=D.find(x=>x.id==='B');
+  const locked=D.filter(x=>x.id!=='B');
+  const learned=demoMasteredCount();
+  const total=demoLearningPath().length;
+  const pct=total>0?Math.round((learned/total)*100):0;
+  let html=`
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;">
+    <div>
+      <h1 style="font-size:21px;font-weight:700;margin-bottom:3px;">BCBA Study Hub Demo</h1>
+      <p style="font-size:12px;color:#888;">Questions aligned with the BCBA 6th Edition Test Content Outline.</p>
+    </div>
+    <span class="pill" style="background:#E1F5EE;color:#0F6E56;font-weight:700;padding:6px 12px;">Demo Access</span>
+  </div>
+
+  <div style="background:#E6F1FB;border:1px solid #85B7EB;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#185FA5;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Guided Demo Path</div>
+      <div style="font-size:15px;font-weight:700;">Domain B — Concepts and Principles</div>
+      <div style="font-size:12px;color:#555;margin-top:2px;">Reinforcement contingencies sample path · ${learned}/${total} modules completed</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div style="height:6px;background:#dceaf8;border-radius:6px;width:110px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:#185FA5;border-radius:6px;"></div></div>
+      <button class="btn-primary" style="background:#185FA5;" onclick="state.learn.phase='overview';state.view='learn';render();"><i class="ti ti-school"></i>Start Learning Demo</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-bottom:1.25rem;">
+    <div class="domain-card" style="border-left:4px solid ${d.border};border-color:${d.border};">
+      <div style="display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;">
+        <div style="background:${d.bg};border-radius:8px;padding:7px;display:flex;"><i class="ti ${d.icon}" style="font-size:18px;color:${d.color};"></i></div>
+        <div style="flex:1;"><div style="font-size:10px;font-weight:700;color:${d.color};letter-spacing:.06em;">AVAILABLE IN DEMO</div><div style="font-size:14px;font-weight:700;line-height:1.3;">Dom. B — Concepts</div><div style="font-size:11px;color:#888;margin-top:2px;">14% exam weight · reinforcement sample</div></div>
+      </div>
+      <button style="width:100%;padding:8px;background:${d.bg};color:${d.color};border:1px solid ${d.border};border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;" onclick="state.learn.phase='overview';state.view='learn';render();">Continue Demo Path →</button>
+    </div>
+    <div class="domain-card" style="border-left:4px solid #0F6E56;">
+      <div style="display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;">
+        <div style="background:#E1F5EE;border-radius:8px;padding:7px;display:flex;"><i class="ti ti-brain" style="font-size:18px;color:#0F6E56;"></i></div>
+        <div style="flex:1;"><div style="font-size:10px;font-weight:700;color:#0F6E56;letter-spacing:.06em;">GUIDED PRACTICE</div><div style="font-size:14px;font-weight:700;line-height:1.3;">5 Curated Questions</div><div style="font-size:11px;color:#888;margin-top:2px;">No repetition within the demo session</div></div>
+      </div>
+      <button style="width:100%;padding:8px;background:#E1F5EE;color:#0F6E56;border:1px solid #5DCAA5;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;" onclick="startDemoPractice(true)">Start Demo Practice →</button>
+    </div>
+  </div>
+
+  <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Locked in Public Demo</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;">`;
+  locked.forEach(ld=>{
+    html+=`<div class="domain-card" style="opacity:.62;border-left:3px solid #d1d5db;position:relative;">
+      <div style="position:absolute;top:8px;right:8px;font-size:13px;color:#888;">🔒</div>
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;">
+        <div style="background:#f5f5f4;border-radius:6px;padding:5px;display:flex;"><i class="ti ${ld.icon}" style="font-size:14px;color:#888;"></i></div>
+        <div><div style="font-size:9px;font-weight:700;color:#888;letter-spacing:.06em;">DOM. ${ld.id}</div><div style="font-size:12px;font-weight:600;line-height:1.3;">${ld.short}</div></div>
+      </div>
+      <button disabled style="width:100%;padding:6px;background:#f5f5f4;color:#888;border:1px solid #e5e5e3;border-radius:7px;font-size:11px;font-weight:700;cursor:not-allowed;">Premium</button>
+    </div>`;
+  });
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
 // ============================================================
 // DASHBOARD
 // ============================================================
 function renderDash(el){
+  if(DEMO_MODE){renderDemoDashboard(el);return;}
   const weak=weakDomains();
   const recomm=weak.length>0?weak[0]:D[1];
   const allPct=state.stats.allTime.total>0?Math.round((state.stats.allTime.correct/state.stats.allTime.total)*100):0;
