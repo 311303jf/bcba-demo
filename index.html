@@ -284,6 +284,9 @@ function resetDemoProgress(){
 
 function launchDemo(){
   resetDemoProgress();
+  MODULE_CACHE.current = null;
+  MODULE_CACHE.next = null;
+  preloadInFlightKey = null;
 
   document.getElementById('setup').classList.remove('active');
   document.getElementById('app').classList.add('active');
@@ -554,7 +557,171 @@ function schedulePreload(fromModule){
   setTimeout(()=>preloadNextConcept(fromModule),400);
 }
 
+
+// ============================================================
+// DEMO CONTENT SAFETY — each module has its own aligned content
+// ============================================================
+function demoModule(title, definition, clinicalExample, hookQ, hookA, strategy, q1, q2){
+  return {
+    concept: title,
+    main_concept: 'Positive and negative reinforcement contingencies',
+    subconcept: title,
+    hook_question: hookQ,
+    hook_answer: hookA,
+    definition,
+    clinical_example: clinicalExample,
+    key_points: [
+      'Always identify the target behavior first.',
+      'Then identify the immediate consequence following the response.',
+      'Finally, determine whether the future frequency of the behavior increased.'
+    ],
+    strategy,
+    questions: [q1, q2]
+  };
+}
+
+function demoLearnContent(domId, conceptIdx, subIdx=null, finalReview=false){
+  const qPositive1={
+    q:'A client completes three math problems. The RBT immediately gives access to a preferred tablet. During later sessions, the client completes more math problems. Which process is demonstrated?',
+    options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Extinction'},
+    correct:'A',
+    hint:'Look for whether something was added after the response and whether the behavior increased later.',
+    explanation:'A is correct because access to the tablet was added after completing math problems, and problem completion increased in the future. Negative reinforcement would involve removal of a stimulus. Punishment would decrease behavior. Extinction would involve withholding reinforcement.'
+  };
+  const qPositive2={
+    q:'A learner says, “help please,” and the teacher immediately provides assistance. The learner begins requesting help more often instead of crying. What is the best interpretation?',
+    options:{A:'Response cost',B:'Positive reinforcement',C:'Stimulus fading',D:'Negative punishment'},
+    correct:'B',
+    hint:'Focus on the consequence delivered after the communication response and the future change in that response.',
+    explanation:'B is correct because assistance was delivered after the request and the request increased. The scenario is not describing loss of a reinforcer, fading, or response cost.'
+  };
+  const qNegative1={
+    q:'During work time, a learner asks for a break using a break card. The therapist removes the worksheet for two minutes. Over time, independent break-card use increases. Which process is most directly demonstrated?',
+    options:{A:'Positive reinforcement',B:'Negative reinforcement',C:'Positive punishment',D:'Stimulus generalization'},
+    correct:'B',
+    hint:'Ask whether something was removed after the response and whether the response increased in the future.',
+    explanation:'B is correct because the worksheet was removed after the break-card response and that response increased. Positive reinforcement would involve adding a stimulus. Punishment would decrease behavior.'
+  };
+  const qNegative2={
+    q:'A student appropriately says “too loud” and the teacher lowers the volume. The student uses this phrase more often during noisy activities. What principle is shown?',
+    options:{A:'Negative reinforcement',B:'Positive reinforcement',C:'Extinction',D:'Response cost'},
+    correct:'A',
+    hint:'The key is removal or reduction of an aversive condition after the response.',
+    explanation:'A is correct because the loud noise was reduced after the student’s communication response, and that response increased. That is negative reinforcement.'
+  };
+  const qEscape1={
+    q:'A learner completes one problem and says “break.” The teacher removes the task immediately. Break requests increase during future task demands. What type of negative reinforcement is this?',
+    options:{A:'Avoidance',B:'Escape',C:'Positive reinforcement',D:'Extinction'},
+    correct:'B',
+    hint:'Escape occurs when the aversive stimulus is already present and the response terminates it.',
+    explanation:'B is correct because the task demand was already present and the response ended or interrupted it. Avoidance would prevent the aversive event before it occurs.'
+  };
+  const qEscape2={
+    q:'A child is presented with handwriting work, pushes it away, and the adult removes the worksheet. Pushing materials away increases. Which relation is most likely?',
+    options:{A:'Escape-maintained behavior',B:'Avoidance-maintained behavior',C:'Positive punishment',D:'Conditioned reinforcement'},
+    correct:'A',
+    hint:'Determine whether the behavior stops an ongoing demand.',
+    explanation:'A is correct because the behavior terminates an existing task demand and increases. That pattern is escape-maintained behavior.'
+  };
+  const qAvoid1={
+    q:'Before math work begins, a student appropriately asks to use a visual checklist. The checklist prevents difficult transitions, and the student continues requesting it before work. What type of negative reinforcement is most relevant?',
+    options:{A:'Escape',B:'Avoidance',C:'Positive reinforcement',D:'Response cost'},
+    correct:'B',
+    hint:'Avoidance occurs when the response prevents or postpones an aversive event before it happens.',
+    explanation:'B is correct because the response occurs before the difficult transition and prevents or reduces the aversive event. Escape would terminate something already occurring.'
+  };
+  const qAvoid2={
+    q:'A learner puts on noise-canceling headphones before entering the cafeteria, preventing exposure to loud noise. Headphone use increases before cafeteria transitions. Which process best fits?',
+    options:{A:'Avoidance',B:'Escape',C:'Positive punishment',D:'Stimulus fading'},
+    correct:'A',
+    hint:'Look for prevention of an aversive stimulus rather than termination of one already present.',
+    explanation:'A is correct because the response prevents contact with loud noise and increases in the future. That is avoidance, a form of negative reinforcement.'
+  };
+
+  if(finalReview){
+    return {
+      concept:'Reinforcement Contingencies — Mixed Review',
+      main_concept:'Positive and negative reinforcement contingencies',
+      subconcept:'Final mixed review',
+      hook_question:'How do you distinguish positive reinforcement, negative reinforcement, escape, and avoidance in a clinical scenario?',
+      hook_answer:'Ask three questions: What was the behavior? Was a stimulus added or removed? Did the behavior increase in the future? Escape ends an aversive event already present; avoidance prevents or postpones it.',
+      definition:'Reinforcement is a contingency in which a consequence following a response increases the future frequency of that response. Positive reinforcement adds a stimulus; negative reinforcement removes, reduces, or prevents an aversive stimulus.',
+      clinical_example:'A learner may request attention to access praise, request a break to escape work, or use headphones to avoid loud cafeteria noise. Each case requires identifying the response, consequence, and future effect before naming the process.',
+      key_points:['Positive means added; negative means removed or prevented.','Reinforcement always means future behavior increases.','Escape and avoidance are both forms of negative reinforcement.'],
+      strategy:'Never choose based on whether the consequence sounds pleasant or unpleasant. Choose based on add/remove/prevent and the future effect on behavior.',
+      questions:[qNegative1, qAvoid1]
+    };
+  }
+  if(subIdx===1){
+    return demoModule(
+      'Negative Reinforcement',
+      'Negative reinforcement occurs when a stimulus is removed, reduced, or prevented after a response, and the future frequency of that response increases under similar conditions.',
+      'During table work, Luis appropriately hands the therapist a break card. The therapist removes the worksheet for two minutes. Across sessions, Luis uses the break card more often instead of engaging in problem behavior.',
+      'A learner asks for a break and the therapist removes the task. The learner asks for breaks more often in the future. Why is this negative reinforcement?',
+      'The response increases in the future because an aversive stimulus was removed after the response. Negative means removal; reinforcement means the behavior increases.',
+      'First identify what was removed or reduced after the response. Then confirm the response increased later.',
+      qNegative1,qNegative2
+    );
+  }
+  if(subIdx===2){
+    return demoModule(
+      'Escape',
+      'Escape is a form of negative reinforcement in which a response terminates or reduces an aversive stimulus that is already present.',
+      'A worksheet is placed in front of a learner. The learner appropriately requests a break, and the worksheet is removed. If break requesting increases during future work demands, the response is escape-maintained.',
+      'A task is already present, the learner requests a break, and the task is removed. What makes this escape?',
+      'Escape occurs because the aversive stimulus was already present and the response ended or reduced it.',
+      'Look for an ongoing demand or aversive condition that is terminated after the response.',
+      qEscape1,qEscape2
+    );
+  }
+  if(subIdx===3){
+    return demoModule(
+      'Avoidance',
+      'Avoidance is a form of negative reinforcement in which a response prevents, postpones, or reduces contact with an aversive stimulus before it occurs.',
+      'Before entering a noisy cafeteria, a learner independently requests headphones. The headphones prevent contact with the loud noise, and requesting headphones increases before cafeteria transitions.',
+      'A learner acts before a difficult event happens and prevents contact with it. Why is this avoidance rather than escape?',
+      'Avoidance occurs before the aversive event is contacted. Escape ends an event already present.',
+      'Check whether the aversive stimulus was already happening. If the response prevents it, think avoidance.',
+      qAvoid1,qAvoid2
+    );
+  }
+  return demoModule(
+    'Positive Reinforcement',
+    'Positive reinforcement occurs when a stimulus is added after a response and the future frequency of that response increases under similar conditions.',
+    'During a clinic session, Maria independently requests a break using her communication card. The therapist immediately provides a two-minute break. Over the next week, Maria uses the card more often instead of engaging in problem behavior.',
+    'A learner begins raising his hand more often after the teacher immediately gives praise and calls on him. What part of the contingency tells you this is reinforcement?',
+    'The behavior increases in the future after a consequence is delivered. Because praise is added after the response and hand raising increases, this is positive reinforcement.',
+    'First identify the behavior, then identify what happened immediately after it, and finally ask whether the behavior increased in the future.',
+    qPositive1,qPositive2
+  );
+}
+
+function demoTranslateContent(content){
+  const c = JSON.parse(JSON.stringify(content));
+  const translations={
+    'Positive Reinforcement':'Positive Reinforcement',
+    'Negative Reinforcement':'Negative Reinforcement',
+    'Escape':'Escape',
+    'Avoidance':'Avoidance',
+    'Reinforcement Contingencies — Mixed Review':'Contingencias de Reinforcement — Repaso mixto'
+  };
+  c.concept = translations[c.concept] || c.concept;
+  c.hook_question = 'Pregunta guía: analiza primero el behavior, luego la consecuencia inmediata y finalmente el efecto futuro en la conducta.';
+  c.hook_answer = 'La clave es determinar si algo fue añadido, removido o prevenido, y confirmar que el behavior aumentó en el futuro.';
+  c.definition = 'Este concepto debe identificarse usando la contingencia completa: behavior, consecuencia inmediata y cambio futuro en la frecuencia del behavior.';
+  c.clinical_example = 'En un escenario clínico, observa si la respuesta produce acceso a algo, remueve una demanda, termina una condición aversiva o evita que ocurra.';
+  c.strategy = 'Estrategia de examen: no respondas por intuición. Identifica add/remove/prevent y luego verifica si la conducta aumenta.';
+  c.key_points = ['Positive significa que algo se añade.','Negative significa que algo se remueve, reduce o previene.','Reinforcement siempre implica aumento futuro del behavior.'];
+  c.questions = (c.questions||[]).map(q=>({
+    ...q,
+    hint:'Identifica si la consecuencia fue añadida, removida o prevenida, y si la conducta aumentó en el futuro.',
+    explanation:'La respuesta correcta se determina por la relación entre behavior, consecuencia y aumento futuro de la conducta. Revisa si el escenario describe añadir, remover o prevenir un estímulo.'
+  }));
+  return c;
+}
+
 async function genLearnContent(domId,conceptIdx,subIdx=null,finalReview=false){
+  if (DEMO_MODE) return demoLearnContent(domId,conceptIdx,subIdx,finalReview);
   const d=D.find(x=>x.id===domId);
   const task=d.tasks[conceptIdx];
   const subs=getSubconceptsForTask(task);
@@ -590,6 +757,7 @@ Create a complete learning module. Return ONLY valid JSON (no markdown):
 }
 
 async function translateContent(content){
+  if (DEMO_MODE) return demoTranslateContent(content);
   const txt=await callAI(`Translate this BCBA study content to Spanish. Keep all ABA technical terms in English (e.g. reinforcement, extinction, MO, SD, FBA, VB-MAPP, DTT, etc.) but translate all other text. Return ONLY valid JSON with the same structure:
 ${JSON.stringify(content)}`,1800);
   return JSON.parse(txt.replace(/```json|```/g,'').trim());
