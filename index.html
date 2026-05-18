@@ -4,181 +4,1147 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BCBA Study Hub — Public Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{
+  --green:#0B6B52;--green-light:#E0F3EC;--green-mid:#5CC9A0;--green-dark:#084D3B;
+  --gold:#C9860B;--gold-light:#FEF3DC;--gold-border:#F5C76A;
+  --blue:#2460A7;--blue-light:#E8F0FB;--blue-border:#8AB4E8;
+  --red:#C0392B;--red-light:#FDECEA;--red-border:#F0A099;
+  --ink:#141412;--ink-mid:#444440;--ink-soft:#777772;--ink-faint:#ADADAA;
+  --surface:#FAFAF8;--white:#FFFFFF;
+  --border:#E4E4E0;--border-soft:#EFEFEC;
+  --radius-sm:8px;--radius-md:14px;--radius-lg:20px;--radius-xl:28px;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.06);
+  --shadow-md:0 8px 28px rgba(0,0,0,.09);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.13);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f5f5f4;color:#1a1a18;min-height:100vh}
-button{font-family:inherit}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--surface);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font-family:var(--font-body);cursor:pointer}
+input{font-family:var(--font-body)}
+
+/* ── SCREENS ── */
 .screen{display:none}
 .screen.active{display:block}
-#landing.screen.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
-.welcome-card{background:#fff;border:1px solid #e5e5e3;border-radius:20px;padding:30px;max-width:560px;width:100%;box-shadow:0 16px 45px rgba(0,0,0,.07)}
-.brand-row{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-.brand-icon{background:#E1F5EE;border-radius:16px;padding:14px;font-size:29px}
-h1{font-size:27px;font-weight:800;margin-bottom:3px}
-.subtitle{font-size:13px;color:#777}
-.hero-box{background:#f9f9f8;border-left:4px solid #0F6E56;border-radius:13px;padding:16px;margin:18px 0}
-.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.09em;font-weight:850;color:#0F6E56;margin-bottom:7px}
-.body-text{font-size:14px;line-height:1.75;color:#333}
-.check-list{font-size:13px;color:#555;line-height:1.9;margin-top:14px}
-.trust-row{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:16px 0}
-.trust-item{background:#fafafa;border:1px solid #e7e7e5;border-radius:12px;padding:10px;font-size:12px;color:#444}
-.btn{border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:750;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn-primary{background:#0F6E56;color:white}.btn-primary:hover{background:#0a5a45}
-.btn-secondary{background:#fff;color:#555;border:1px solid #d1d5db}.btn-secondary:hover{background:#f7f7f6}
-.btn-lock{background:#f0f0ef;color:#777;border:1px solid #dededc;cursor:pointer}
+#landing.screen.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;background:var(--surface)}
+#onboarding.screen.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;background:var(--surface)}
+
+/* ── LANDING ── */
+.land-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:36px;max-width:580px;width:100%;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.land-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,var(--green-light) 0%,transparent 70%);pointer-events:none}
+.brand-row{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.brand-icon{background:var(--green-light);border-radius:18px;width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;border:2px solid var(--green-mid)}
+.brand-name{font-family:var(--font-display);font-size:30px;font-weight:900;line-height:1;color:var(--ink)}
+.brand-tagline{font-size:12px;color:var(--ink-soft);margin-top:4px;font-weight:500}
+.hero-box{background:linear-gradient(135deg,var(--green-dark) 0%,var(--green) 100%);border-radius:var(--radius-md);padding:18px 20px;margin:18px 0;color:white}
+.hero-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;opacity:.8;margin-bottom:6px}
+.hero-heading{font-family:var(--font-display);font-size:20px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.hero-sub{font-size:13px;opacity:.85;line-height:1.6}
+.social-proof{background:var(--gold-light);border:1px solid var(--gold-border);border-radius:var(--radius-md);padding:13px 16px;margin:14px 0;display:flex;align-items:center;gap:12px}
+.proof-avatars{display:flex;margin-right:4px}
+.proof-avatar{width:28px;height:28px;border-radius:50%;border:2px solid white;background:linear-gradient(135deg,var(--green),var(--green-mid));display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:700;margin-left:-8px}
+.proof-avatar:first-child{margin-left:0}
+.proof-text{font-size:12px;color:var(--gold);font-weight:600;line-height:1.4}
+.trust-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.trust-item{background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--ink-mid);display:flex;align-items:center;gap:8px;font-weight:500}
+.cta-btn{width:100%;background:linear-gradient(135deg,var(--green-dark),var(--green));color:white;border:none;border-radius:var(--radius-md);padding:16px;font-size:16px;font-weight:700;letter-spacing:.01em;transition:all .2s;box-shadow:0 4px 20px rgba(11,107,82,.35);margin-top:6px}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(11,107,82,.45)}
+.cta-btn:active{transform:translateY(0)}
+.checklist{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.check-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);font-weight:500}
+.check-dot{width:16px;height:16px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--green);flex-shrink:0}
+
+/* ── ONBOARDING ── */
+.onboard-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:36px;max-width:520px;width:100%;box-shadow:var(--shadow-lg)}
+.onboard-step{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.onboard-q{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.3}
+.onboard-sub{font-size:13px;color:var(--ink-soft);margin-bottom:22px}
+.onboard-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.onboard-opt{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px;font-size:13px;font-weight:600;color:var(--ink-mid);transition:all .15s;text-align:left}
+.onboard-opt:hover{border-color:var(--green);color:var(--green);background:var(--green-light)}
+.onboard-opt.selected{border-color:var(--green);background:var(--green-light);color:var(--green)}
+.onboard-opt .opt-emoji{display:block;font-size:22px;margin-bottom:6px}
+.progress-dots{display:flex;gap:6px;margin-bottom:20px}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.pdot.active{background:var(--green);width:24px;border-radius:4px}
+
+/* ── APP LAYOUT ── */
 .layout{display:flex;height:100vh;overflow:hidden}
-aside{width:230px;background:#fff;border-right:1px solid #e5e5e3;display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-logo{padding:17px;border-bottom:1px solid #e5e5e3}
-.sidebar-badge{font-size:10px;color:#0F6E56;font-weight:850;letter-spacing:.1em;margin-bottom:5px}
-.sidebar-title{font-size:18px;font-weight:800}
-.sidebar-sub{font-size:11px;color:#888;margin-top:4px;line-height:1.35}
-nav{padding:10px 0;flex:1}
-.nav-btn{width:100%;padding:11px 16px;text-align:left;border:none;background:transparent;color:#666;font-size:13px;cursor:pointer;border-left:3px solid transparent;display:flex;gap:9px;align-items:center}
-.nav-btn:hover{background:#f7f7f6;color:#111}
-.nav-btn.active{background:#f0faf5;color:#111;border-left-color:#0F6E56;font-weight:750}
-.nav-btn.locked{color:#888}
-.sidebar-footer{border-top:1px solid #e5e5e3;padding:14px 16px;font-size:11px;color:#888;line-height:1.5}
-.progress-mini{height:6px;background:#ededeb;border-radius:999px;margin:8px 0}
-.progress-mini div{height:100%;background:#0F6E56;border-radius:999px;width:0%}
-main{flex:1;overflow-y:auto;padding:26px}
-.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px;flex-wrap:wrap}
-.page-title{font-size:24px;font-weight:800;margin-bottom:4px}
-.page-sub{font-size:13px;color:#777;line-height:1.5}
-.lang-switch{display:flex;gap:6px;align-items:center}
-.lang-note{font-size:11px;color:#888;margin-right:2px}
-.lang-btn{border:1px solid #d1d5db;background:#fff;color:#666;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:800;cursor:pointer}
-.lang-btn.active{background:#0F6E56;color:#fff;border-color:#0F6E56}
-.banner{background:#E6F1FB;border:1px solid #85B7EB;border-radius:16px;padding:16px 18px;margin-bottom:18px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
-.exam-banner{background:#fff7e8;border:1px solid #FAC775;border-radius:16px;padding:18px;margin-bottom:18px}
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
-.metric{background:#fff;border:1px solid #e5e5e3;border-radius:14px;padding:14px}
-.metric-value{font-size:23px;font-weight:850;color:#0F6E56}
-.metric-label{font-size:11px;color:#777;margin-top:3px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:14px}
-.card{background:#fff;border:1px solid #e5e5e3;border-radius:15px;padding:17px}
-.card.demo{border:2px solid #0F6E56;box-shadow:0 8px 24px rgba(15,110,86,.08)}
-.pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 10px;font-size:10px;font-weight:850;letter-spacing:.04em;margin-bottom:10px}
-.pill.demo{background:#E1F5EE;color:#0F6E56}.pill.premium{background:#f0f0ef;color:#777}.pill.exam{background:#fff0d1;color:#854F0B;border:1px solid #FAC775}
-.domain-title{font-size:15px;font-weight:800;line-height:1.3}
-.domain-meta{font-size:11px;color:#888;margin-top:3px}
-.include-title{font-size:10px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;color:#888;margin:11px 0 7px}
-ul.preview{padding-left:18px;font-size:12.5px;line-height:1.75;color:#444}
-.demo-path{display:flex;flex-direction:column;gap:7px;margin:12px 0}
-.path-item{font-size:12px;background:#f7f7f6;border:1px solid #e5e5e3;border-radius:9px;padding:8px 10px}
-.path-item.done{background:#EAF3DE;border-color:#97C459;color:#3B6D11}
-.path-item.active-path{background:#E1F5EE;border-color:#5DCAA5;color:#0F6E56;font-weight:750}
-.learn-wrap,.practice-wrap{max-width:790px}
-.learn-card,.question-card{background:#fff;border:1px solid #e5e5e3;border-radius:16px;padding:22px}
-.module-label{font-size:11px;font-weight:850;color:#0F6E56;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
-.module-title{font-size:23px;font-weight:800;margin-bottom:10px}
-.definition{background:#f9f9f8;border-left:4px solid #0F6E56;border-radius:10px;padding:15px;margin:14px 0;font-size:14px;line-height:1.75}
-.section-title{font-size:12px;font-weight:850;color:#555;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px}
-.note-box{background:#E6F1FB;border:1px solid #85B7EB;border-radius:10px;padding:13px;font-size:13px;line-height:1.7;margin:12px 0}
-.difficulty{display:inline-flex;align-items:center;gap:7px;background:#fff7e8;border:1px solid #FAC775;border-radius:99px;padding:6px 10px;font-size:11px;font-weight:750;color:#854F0B;margin-bottom:12px}
-.question-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.question-count{font-size:12px;color:#777}
-.timer{font-size:12px;font-weight:800;color:#0F6E56;background:#E1F5EE;border:1px solid #5DCAA5;border-radius:99px;padding:6px 10px}
-.timer.exam{color:#854F0B;background:#fff7e8;border-color:#FAC775}
-.question-text{font-size:15px;line-height:1.65;font-weight:650;margin-bottom:14px;background:#f9f9f8;border-radius:10px;padding:14px}
-.option{width:100%;text-align:left;background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:11px 13px;margin-bottom:8px;cursor:pointer;font-size:13px;line-height:1.55}
-.option:hover:not(:disabled){border-color:#0F6E56}
-.option.correct{background:#EAF3DE;border-color:#639922;color:#3B6D11}
-.option.wrong{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}.option:disabled{cursor:default}
-.feedback{border-radius:10px;padding:14px;font-size:13px;line-height:1.7;margin:12px 0}
-.feedback.good{background:#EAF3DE;border:1px solid #97C459}.feedback.bad{background:#FCEBEB;border:1px solid #F09595}
-.complete-card{text-align:center;background:#fff;border:1px solid #e5e5e3;border-radius:18px;padding:30px;max-width:740px}
-.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:18px;text-align:left}
-.feature{background:#f9f9f8;border:1px solid #e5e5e3;border-radius:12px;padding:12px;font-size:13px}
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0;text-align:left}
-.summary-box{border-radius:12px;padding:14px;font-size:13px;line-height:1.7}
-.summary-good{background:#EAF3DE;border:1px solid #97C459}.summary-improve{background:#FAEEDA;border:1px solid #FAC775}
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;align-items:center;justify-content:center;padding:20px}
-.modal-bg.active{display:flex}.modal{background:#fff;border-radius:16px;padding:22px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.modal h3{font-size:20px;margin-bottom:8px}.modal p{font-size:13px;line-height:1.7;color:#555;margin-bottom:16px}
-@media(max-width:760px){.layout{display:block;height:auto}aside{width:100%}nav{display:flex;overflow-x:auto;padding:0}.nav-btn{white-space:nowrap;border-left:none;border-bottom:3px solid transparent}.nav-btn.active{border-left:none;border-bottom-color:#0F6E56}main{padding:18px}.grid{grid-template-columns:1fr}.trust-row{grid-template-columns:1fr}}
+aside{width:240px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:all .3s}
+.sidebar-logo{padding:20px;border-bottom:1px solid var(--border-soft)}
+.sidebar-badge{font-size:9px;color:var(--green);font-weight:800;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px}
+.sidebar-title{font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--ink)}
+.sidebar-sub{font-size:11px;color:var(--ink-soft);margin-top:3px;font-weight:500}
+.sidebar-user{padding:12px 16px;background:var(--green-light);border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green-dark),var(--green));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0}
+.user-info{font-size:11px;color:var(--green-dark);font-weight:600;line-height:1.4}
+.user-plan{font-size:10px;color:var(--ink-soft);font-weight:500}
+nav{padding:10px 0;flex:1;overflow-y:auto}
+.nav-section{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);padding:12px 16px 4px}
+.nav-btn{width:100%;padding:10px 16px;text-align:left;border:none;background:transparent;color:var(--ink-soft);font-size:13px;cursor:pointer;border-left:3px solid transparent;display:flex;gap:10px;align-items:center;font-weight:500;transition:all .15s}
+.nav-btn:hover{background:var(--surface);color:var(--ink)}
+.nav-btn.active{background:var(--green-light);color:var(--green-dark);border-left-color:var(--green);font-weight:700}
+.nav-btn.locked{color:var(--ink-faint);font-weight:400}
+.nav-btn .nav-lock{font-size:10px;margin-left:auto;background:var(--border-soft);color:var(--ink-faint);border-radius:4px;padding:2px 5px;font-weight:700}
+.sidebar-footer{border-top:1px solid var(--border-soft);padding:14px 16px}
+.prog-label{font-size:10px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;display:flex;justify-content:space-between}
+.progress-bar{height:6px;background:var(--border-soft);border-radius:999px;margin-bottom:8px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-mid));border-radius:999px;width:0%;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.streak-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gold);font-weight:700}
+main{flex:1;overflow-y:auto;padding:28px;background:var(--surface)}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.page-title{font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--ink);margin-bottom:4px;line-height:1.2}
+.page-sub{font-size:13px;color:var(--ink-soft);line-height:1.6;font-weight:500}
+.topbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lang-switch{display:flex;gap:4px;background:var(--border-soft);border-radius:999px;padding:3px}
+.lang-btn{border:none;background:transparent;color:var(--ink-soft);border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.lang-btn.active{background:var(--white);color:var(--green);box-shadow:var(--shadow-sm)}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;letter-spacing:.01em}
+.btn-primary{background:linear-gradient(135deg,var(--green-dark),var(--green));color:white;box-shadow:0 3px 12px rgba(11,107,82,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(11,107,82,.4)}
+.btn-secondary{background:var(--white);color:var(--ink-mid);border:1.5px solid var(--border)}
+.btn-secondary:hover{border-color:var(--ink-soft);color:var(--ink)}
+.btn-lock{background:var(--surface);color:var(--ink-faint);border:1.5px solid var(--border);cursor:pointer}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#E8A030);color:white;box-shadow:0 3px 12px rgba(201,134,11,.3)}
+.btn-gold:hover{transform:translateY(-1px)}
+
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.metric{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;position:relative;overflow:hidden}
+.metric::after{content:'';position:absolute;bottom:-20px;right:-20px;width:60px;height:60px;border-radius:50%;background:var(--green-light);opacity:.5}
+.metric-value{font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--green);line-height:1}
+.metric-label{font-size:11px;color:var(--ink-soft);margin-top:4px;font-weight:500}
+
+/* ── BANNERS ── */
+.banner{background:var(--blue-light);border:1px solid var(--blue-border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:18px;display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+.exam-banner{background:linear-gradient(135deg,var(--gold-light),#FFF8E6);border:1px solid var(--gold-border);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px}
+.social-strip{background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+
+/* ── CARDS ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;transition:all .2s}
+.card:hover{border-color:var(--green-mid);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.card.demo{border:2px solid var(--green);box-shadow:0 8px 28px rgba(11,107,82,.1)}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.05em;margin-bottom:10px;text-transform:uppercase}
+.pill.demo{background:var(--green-light);color:var(--green)}
+.pill.premium{background:var(--surface);color:var(--ink-faint);border:1px solid var(--border)}
+.pill.exam{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border)}
+.domain-title{font-size:15px;font-weight:700;line-height:1.3;color:var(--ink)}
+.domain-meta{font-size:11px;color:var(--ink-soft);margin-top:3px;font-weight:500}
+.include-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin:12px 0 6px}
+ul.preview{padding-left:16px;font-size:12.5px;line-height:1.8;color:var(--ink-mid)}
+.demo-path{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.path-item{font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;display:flex;align-items:center;gap:8px;font-weight:500}
+.path-item.done{background:#EDF7E0;border-color:#97C459;color:#3B6D11}
+.path-item.active-path{background:var(--green-light);border-color:var(--green-mid);color:var(--green-dark);font-weight:700}
+
+/* ── LEARN ── */
+.learn-wrap,.practice-wrap{max-width:800px}
+.learn-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;box-shadow:var(--shadow-sm)}
+.module-label{font-size:11px;font-weight:800;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.module-title{font-family:var(--font-display);font-size:28px;font-weight:900;margin-bottom:10px;color:var(--ink)}
+.definition{background:var(--surface);border-left:4px solid var(--green);border-radius:var(--radius-sm);padding:16px;margin:14px 0;font-size:14px;line-height:1.8;color:var(--ink-mid)}
+.section-label{font-size:11px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px}
+.note-box{background:var(--blue-light);border:1px solid var(--blue-border);border-radius:var(--radius-sm);padding:14px;font-size:13px;line-height:1.75;margin:12px 0;color:var(--blue)}
+.difficulty-badge{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 12px;font-size:11px;font-weight:700;margin-bottom:14px}
+.diff-beginner{background:#EDF7E0;color:#3B6D11;border:1px solid #97C459}
+.diff-intermediate{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-border)}
+.diff-advanced{background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5}
+
+/* ── PRACTICE ── */
+.question-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm)}
+.question-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.question-meta{font-size:12px;color:var(--ink-soft);font-weight:600}
+.timer-pill{font-size:12px;font-weight:800;border-radius:999px;padding:6px 12px;display:flex;align-items:center;gap:5px}
+.timer-pill.practice{color:var(--green);background:var(--green-light);border:1px solid var(--green-mid)}
+.timer-pill.exam{color:var(--gold);background:var(--gold-light);border:1px solid var(--gold-border)}
+.timer-pill.urgent{color:var(--red);background:var(--red-light);border:1px solid var(--red-border);animation:timerPulse .8s infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.question-text{font-size:15px;line-height:1.7;font-weight:500;margin-bottom:16px;background:var(--surface);border-radius:var(--radius-sm);padding:16px;color:var(--ink);border-left:3px solid var(--border)}
+.option{width:100%;text-align:left;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 15px;margin-bottom:8px;cursor:pointer;font-size:13.5px;line-height:1.6;font-weight:500;transition:all .15s;display:flex;align-items:flex-start;gap:10px}
+.option-letter{width:24px;height:24px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--ink-soft);flex-shrink:0;margin-top:1px;transition:all .15s}
+.option:hover:not(:disabled){border-color:var(--green);background:var(--green-light)}
+.option:hover:not(:disabled) .option-letter{background:var(--green);border-color:var(--green);color:white}
+.option.correct{background:#EDF7E0;border-color:#639922}
+.option.correct .option-letter{background:#639922;border-color:#639922;color:white}
+.option.wrong{background:var(--red-light);border-color:var(--red-border)}
+.option.wrong .option-letter{background:var(--red);border-color:var(--red);color:white}
+.option:disabled{cursor:default}
+.hint-btn{background:none;border:1px dashed var(--border);color:var(--ink-soft);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:600;margin-top:6px;transition:all .15s}
+.hint-btn:hover{border-color:var(--green);color:var(--green)}
+
+/* ── CONFIDENCE ── */
+.confidence-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin:12px 0}
+.conf-label{font-size:11px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.conf-opts{display:flex;gap:8px}
+.conf-btn{flex:1;border:1.5px solid var(--border);background:var(--white);border-radius:var(--radius-sm);padding:10px 6px;font-size:12px;font-weight:600;color:var(--ink-mid);transition:all .15s;text-align:center}
+.conf-btn:hover{border-color:var(--green);color:var(--green)}
+.conf-btn.selected-high{border-color:#639922;background:#EDF7E0;color:#3B6D11}
+.conf-btn.selected-mid{border-color:var(--gold-border);background:var(--gold-light);color:var(--gold)}
+.conf-btn.selected-low{border-color:var(--red-border);background:var(--red-light);color:var(--red)}
+
+/* ── FEEDBACK ── */
+.feedback{border-radius:var(--radius-md);padding:16px;font-size:13px;line-height:1.75;margin:14px 0}
+.feedback.good{background:#EDF7E0;border:1px solid #97C459}
+.feedback.bad{background:var(--red-light);border:1px solid var(--red-border)}
+.feedback-title{font-size:15px;font-weight:800;margin-bottom:6px}
+.feedback.good .feedback-title{color:#3B6D11}
+.feedback.bad .feedback-title{color:var(--red)}
+
+/* ── MOCK INTRO ── */
+.mock-intro-card{background:var(--white);border:1px solid var(--gold-border);border-radius:var(--radius-xl);padding:30px;max-width:760px;box-shadow:0 12px 40px rgba(201,134,11,.12)}
+.exam-mode-header{text-align:center;margin-bottom:24px}
+.exam-icon{font-size:48px;margin-bottom:12px}
+.exam-title{font-family:var(--font-display);font-size:30px;font-weight:900;color:var(--ink)}
+.exam-subtitle{font-size:14px;color:var(--ink-soft);margin-top:6px}
+.exam-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.rule-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;text-align:center}
+.rule-value{font-family:var(--font-display);font-size:26px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.rule-label{font-size:11px;color:var(--ink-soft);font-weight:500}
+
+/* ── COMPLETE ── */
+.complete-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:36px;max-width:760px;box-shadow:var(--shadow-lg)}
+.score-display{display:flex;align-items:center;justify-content:center;gap:24px;margin:20px 0;flex-wrap:wrap}
+.score-ring{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--green);background:var(--green-light)}
+.score-num{font-family:var(--font-display);font-size:32px;font-weight:900;color:var(--green);line-height:1}
+.score-denom{font-size:11px;color:var(--ink-soft);font-weight:500}
+.insight-box{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:var(--radius-lg);padding:20px;color:white;margin:18px 0}
+.insight-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:800;opacity:.75;margin-bottom:6px}
+.insight-text{font-size:14px;line-height:1.7}
+.insight-highlight{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--green-light);margin:6px 0}
+.summary-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.sum-box{border-radius:var(--radius-md);padding:14px;font-size:12.5px;line-height:1.8}
+.sum-good{background:#EDF7E0;border:1px solid #97C459}
+.sum-improve{background:var(--gold-light);border:1px solid var(--gold-border)}
+.feature-chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--ink-mid)}
+.chip.active{background:var(--green-light);border-color:var(--green-mid);color:var(--green-dark)}
+
+/* ── EMAIL CAPTURE ── */
+.email-capture{background:linear-gradient(135deg,#0B4D3A,var(--green-dark));border-radius:var(--radius-lg);padding:24px;color:white;margin:20px 0;position:relative;overflow:hidden}
+.email-capture::after{content:'🎯';position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:60px;opacity:.12}
+.ec-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:800;opacity:.75;margin-bottom:6px}
+.ec-heading{font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:6px}
+.ec-sub{font-size:13px;opacity:.8;margin-bottom:16px;line-height:1.6}
+.ec-form{display:flex;gap:8px;flex-wrap:wrap}
+.ec-input{flex:1;min-width:200px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;color:white;font-family:var(--font-body);font-weight:500;outline:none;transition:all .2s}
+.ec-input::placeholder{color:rgba(255,255,255,.55)}
+.ec-input:focus{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.6)}
+.ec-btn{background:white;color:var(--green-dark);border:none;border-radius:var(--radius-sm);padding:11px 18px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;font-family:var(--font-body);transition:all .15s}
+.ec-btn:hover{background:var(--green-light)}
+.ec-success{display:none;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;font-weight:600;text-align:center}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.active{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-xl);padding:28px;max-width:460px;width:100%;box-shadow:var(--shadow-lg)}
+.modal-icon{font-size:36px;margin-bottom:12px}
+.modal h3{font-family:var(--font-display);font-size:24px;font-weight:900;margin-bottom:8px;color:var(--ink)}
+.modal p{font-size:13px;line-height:1.75;color:var(--ink-mid);margin-bottom:16px}
+.modal-features{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.modal-feat{font-size:13px;color:var(--ink-mid);display:flex;align-items:center;gap:8px}
+.mf-dot{width:20px;height:20px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--green);flex-shrink:0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:760px){
+  .layout{display:block;height:auto}
+  aside{width:100%}
+  nav{display:flex;overflow-x:auto;padding:0}
+  .nav-section{display:none}
+  .nav-btn{white-space:nowrap;border-left:none;border-bottom:3px solid transparent;padding:10px 12px}
+  .nav-btn.active{border-left:none;border-bottom-color:var(--green)}
+  main{padding:16px}
+  .grid{grid-template-columns:1fr}
+  .summary-cols{grid-template-columns:1fr}
+  .exam-rules{grid-template-columns:1fr 1fr}
+  .onboard-opts{grid-template-columns:1fr}
+  .score-display{flex-direction:column}
+  .land-card,.onboard-card{padding:24px}
+  .ec-form{flex-direction:column}
+}
+
+/* ── TEASER / PREF CARDS ── */
+.pill.teaser{background:#F3EEFF;color:#6D28D9;border:1px solid #C4B5FD}
+.pill.pref{background:#FFF0F6;color:#BE185D;border:1px solid #F9A8D4}
+.teaser-gate{background:linear-gradient(135deg,#F3EEFF,#EDE9FE);border:1.5px dashed #A78BFA;border-radius:var(--radius-md);padding:14px;margin-top:12px;text-align:center}
+.teaser-gate-title{font-size:13px;font-weight:700;color:#5B21B6;margin-bottom:4px}
+.teaser-gate-sub{font-size:11px;color:#7C3AED;margin-bottom:10px;line-height:1.5}
+.ethics-teaser-card{background:var(--white);border:2px solid #A78BFA;border-radius:var(--radius-lg);padding:24px;box-shadow:0 8px 28px rgba(109,40,217,.1)}
+.ethics-banner{background:linear-gradient(135deg,#4C1D95,#6D28D9);border-radius:var(--radius-md);padding:14px 18px;color:white;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.ethics-pct{font-family:var(--font-display);font-size:28px;font-weight:900;color:#DDD6FE}
+.ethics-pct-label{font-size:11px;opacity:.8;font-weight:500}
+
+/* ── PREFERENCE ASSESSMENT ── */
+.pref-wrap{max-width:700px}
+.pref-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm)}
+.pref-header{text-align:center;margin-bottom:20px}
+.pref-round{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.pref-instruction{font-size:14px;color:var(--ink-mid);line-height:1.6}
+.pref-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.pref-item{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.pref-item:hover{border-color:var(--green);background:var(--green-light);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.pref-item.selected-winner{border-color:#639922;background:#EDF7E0;animation:winnerPop .3s ease}
+.pref-item.selected-loser{opacity:.4;transform:scale(.97)}
+.pref-emoji{font-size:52px;display:block;margin-bottom:10px;line-height:1}
+.pref-name{font-size:14px;font-weight:700;color:var(--ink)}
+.pref-vs{display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--ink-faint)}
+.pref-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.pref-prog-bar{flex:1;height:6px;background:var(--border-soft);border-radius:999px;overflow:hidden}
+.pref-prog-fill{height:100%;background:linear-gradient(90deg,#BE185D,#EC4899);border-radius:999px;transition:width .4s ease}
+.hierarchy-list{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.hierarchy-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px}
+.hier-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.hier-rank.r1{background:linear-gradient(135deg,#F59E0B,#FBBF24);color:white}
+.hier-rank.r2{background:linear-gradient(135deg,#6B7280,#9CA3AF);color:white}
+.hier-rank.r3{background:linear-gradient(135deg,#92400E,#B45309);color:white}
+.hier-rank.r4{background:var(--surface);border:1.5px solid var(--border);color:var(--ink-soft)}
+.hier-bar{flex:1;height:8px;background:var(--border-soft);border-radius:999px;overflow:hidden}
+.hier-bar-fill{height:100%;background:linear-gradient(90deg,#BE185D,#EC4899);border-radius:999px}
+.hier-pct{font-size:11px;font-weight:700;color:var(--ink-soft);min-width:30px;text-align:right}
+.pref-gate{background:linear-gradient(135deg,#831843,#BE185D);border-radius:var(--radius-lg);padding:20px;color:white;text-align:center;margin-top:16px}
+.pref-gate-title{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:6px}
+.pref-gate-sub{font-size:13px;opacity:.85;margin-bottom:14px;line-height:1.6}
+@keyframes winnerPop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.animate-in{animation:fadeUp .4s ease forwards}
+.animate-scale{animation:scaleIn .3s ease forwards}
 </style>
 </head>
 <body>
+
+<!-- LANDING -->
 <section id="landing" class="screen active">
-  <div class="welcome-card">
-    <div class="brand-row"><div class="brand-icon">🧠</div><div><h1>BCBA Study Hub</h1><div class="subtitle">Adaptive Mastery Learning System</div></div></div>
-    <div class="hero-box"><div class="eyebrow">BCBA Exam Preparation</div><div class="body-text">Questions aligned with the <strong>BCBA 6th Edition Test Content Outline</strong>.</div></div>
-    <div class="trust-row"><div class="trust-item">📘 Based on the 6th Edition TCO</div><div class="trust-item">🧩 Clinical scenario-based practice</div><div class="trust-item">🎯 Mastery path by concept</div><div class="trust-item">📊 Performance summary preview</div></div>
-    <button type="button" class="btn btn-primary" id="startDemoBtn" style="width:100%;font-size:15px;padding:13px 18px">▶ Start Public Demo</button>
-    <div class="check-list">✓ Learn Mode<br>✓ Clinical exam-style questions<br>✓ Adaptive mastery path<br>✓ Detailed rationales and strategies<br>✓ English / Spanish academic content</div>
+  <div class="land-card animate-scale">
+    <div class="brand-row">
+      <div class="brand-icon">🧠</div>
+      <div>
+        <div class="brand-name">BCBA Study Hub</div>
+        <div class="brand-tagline">Adaptive Mastery Learning System</div>
+      </div>
+    </div>
+    <div class="hero-box">
+      <div class="hero-eyebrow">BCBA Exam Preparation · 6th Edition TCO</div>
+      <div class="hero-heading">Domina el examen. Confía en cada respuesta.</div>
+      <div class="hero-sub">Preguntas clínicas adaptativas, rutas de dominio personalizadas y análisis de progreso — diseñado para que pases el BCBA la primera vez.</div>
+    </div>
+    <div class="social-proof">
+      <div class="proof-avatars">
+        <div class="proof-avatar">MR</div>
+        <div class="proof-avatar">JL</div>
+        <div class="proof-avatar">DS</div>
+        <div class="proof-avatar">+</div>
+      </div>
+      <div class="proof-text">🎉 <strong>47 estudiantes</strong> pasaron el BCBA este mes estudiando con Study Hub.<br>Promedio: <strong>82% en el examen real.</strong></div>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-item">📘 6th Edition TCO alineado</div>
+      <div class="trust-item">🧩 Escenarios clínicos reales</div>
+      <div class="trust-item">🎯 Ruta de maestría adaptativa</div>
+      <div class="trust-item">🇺🇸🇪🇸 Inglés + Español académico</div>
+    </div>
+    <button type="button" class="cta-btn" id="startDemoBtn">▶ Comenzar Demo Gratuito</button>
+    <div class="checklist">
+      <div class="check-item"><div class="check-dot">✓</div> Learn Mode</div>
+      <div class="check-item"><div class="check-dot">✓</div> Practice clínico</div>
+      <div class="check-item"><div class="check-dot">✓</div> Mock Exam preview</div>
+      <div class="check-item"><div class="check-dot">✓</div> Rationales detallados</div>
+      <div class="check-item"><div class="check-dot">✓</div> Sin tarjeta requerida</div>
+    </div>
   </div>
 </section>
-<section id="app" class="screen">
-  <div class="layout"><aside><div class="sidebar-logo"><div class="sidebar-badge">BCBA PREP</div><div class="sidebar-title">Study Hub</div><div class="sidebar-sub">Adaptive Mastery Learning System</div></div>
-    <nav><button type="button" id="nav-dashboard" class="nav-btn active">🏠 Dashboard</button><button type="button" id="nav-learn" class="nav-btn">🎓 Learn Demo</button><button type="button" id="nav-practice" class="nav-btn">🧩 Practice Demo</button><button type="button" id="nav-mock" class="nav-btn">⏱ Mock Preview</button><button type="button" class="nav-btn locked premium-btn" data-title="Full Mock Exams">🔒 Full Mock Exams</button><button type="button" class="nav-btn locked premium-btn" data-title="Smart Weakness Detection">🔒 Weakness Detection</button><button type="button" class="nav-btn locked premium-btn" data-title="Personalized Study Plan">🔒 Study Plan</button><button type="button" class="nav-btn locked premium-btn" data-title="Mastery Analytics">🔒 Analytics</button></nav>
-    <div class="sidebar-footer">Demo Progress<div class="progress-mini"><div id="sideProgress"></div></div><span id="sideProgressText">0/5 modules completed</span><br><br>Full curriculum available in Premium.</div></aside><main id="main"></main></div>
+
+<!-- ONBOARDING -->
+<section id="onboarding" class="screen">
+  <div class="onboard-card animate-scale" id="onboardCard">
+    <!-- rendered by JS -->
+  </div>
 </section>
-<div id="premiumModal" class="modal-bg"><div class="modal"><h3 id="modalTitle">Included in Full Version</h3><p>This feature is part of the full BCBA Study Hub experience, including all 9 domains, unlimited practice, timed mock exams, progress tracking, and mastery analytics.</p><button type="button" class="btn btn-primary" id="closeModalBtn" style="width:100%">Got it</button></div></div>
+
+<!-- APP -->
+<section id="app" class="screen">
+  <div class="layout">
+    <aside>
+      <div class="sidebar-logo">
+        <div class="sidebar-badge">BCBA PREP</div>
+        <div class="sidebar-title">Study Hub</div>
+        <div class="sidebar-sub">Adaptive Mastery Learning</div>
+      </div>
+      <div class="sidebar-user" id="sideUser">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div>
+          <div class="user-info" id="userName">Demo User</div>
+          <div class="user-plan">Public Demo</div>
+        </div>
+      </div>
+      <nav>
+        <div class="nav-section">Demo</div>
+        <button type="button" id="nav-dashboard" class="nav-btn active">🏠 Dashboard</button>
+        <button type="button" id="nav-learn" class="nav-btn">🎓 Learn Mode</button>
+        <button type="button" id="nav-practice" class="nav-btn">🧩 Practice</button>
+        <button type="button" id="nav-mock" class="nav-btn">⏱ Mock Exam</button>
+        <div class="nav-section">Premium</div>
+        <button type="button" class="nav-btn locked premium-btn" data-feat="exams">📋 Full Mock Exams <span class="nav-lock">PRO</span></button>
+        <button type="button" class="nav-btn locked premium-btn" data-feat="weakness">🎯 Weakness Detection <span class="nav-lock">PRO</span></button>
+        <button type="button" class="nav-btn locked premium-btn" data-feat="plan">📅 Study Plan <span class="nav-lock">PRO</span></button>
+        <button type="button" class="nav-btn locked premium-btn" data-feat="analytics">📊 Analytics <span class="nav-lock">PRO</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="prog-label"><span>Demo Progress</span><span id="sideProgressPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="sideProgress"></div></div>
+        <div style="font-size:11px;color:var(--ink-soft);font-weight:500" id="sideProgressText">0/5 módulos</div>
+        <div class="streak-badge" style="margin-top:10px" id="streakBadge">🔥 Día 1 de estudio</div>
+      </div>
+    </aside>
+    <main id="main"></main>
+  </div>
+</section>
+
+<!-- PREMIUM MODAL -->
+<div id="premiumModal" class="modal-bg">
+  <div class="modal animate-scale">
+    <div class="modal-icon" id="modalIcon">🔒</div>
+    <h3 id="modalTitle">Incluido en la Versión Completa</h3>
+    <p id="modalDesc">Accede a todo el currículo BCBA con 9 dominios, práctica ilimitada, mock exams cronometrados y analytics de progreso.</p>
+    <div class="modal-features" id="modalFeatures"></div>
+    <button type="button" class="btn btn-primary" id="closeModalBtn" style="width:100%">Entendido — volver al demo</button>
+  </div>
+</div>
+
 <script>
 (function(){
-const DOMAINS=[["A","Behaviorism & Philosophical Foundations",8,"30+",false,["Description, prediction, and control","Determinism, empiricism, parsimony, pragmatism","Selectionism","Radical behaviorism","7 dimensions of ABA"]],["B","Concepts and Principles",24,"80+",true,["Positive and negative reinforcement","Escape vs avoidance","Punishment procedures","Stimulus control and discrimination","Motivating operations","Verbal behavior","Schedules of reinforcement","Generalization and maintenance"]],["C","Measurement, Data Display & Interpretation",21,"60+",false,["Frequency, rate, count","Duration, latency, IRT","Continuous and discontinuous measurement","IOA and reliability","Graphing and visual analysis"]],["D","Experimental Design",13,"40+",false,["Independent and dependent variables","Internal and external validity","Reversal designs","Multiple baseline designs","Multielement designs","Changing criterion designs"]],["E","Ethical and Professional Issues",22,"70+",false,["Core ethics principles","Confidentiality","Multiple relationships","Cultural humility","Public statements","Transitioning services"]],["F","Behavior Assessment",23,"70+",false,["Records review","Preference assessments","Descriptive assessment","Functional analysis","Goal prioritization","Cultural variables"]],["G","Behavior-Change Procedures",25,"90+",false,["Differential reinforcement","Token economies","Prompting and prompt fading","Shaping","Chaining","Group contingencies","Punishment procedures"]],["H","Selecting and Implementing Interventions",20,"60+",false,["Goal development","Evidence-based selection","Social validity","Relapse prevention","Treatment integrity","Data-based decisions"]],["I","Personnel Supervision and Management",19,"50+",false,["Supervision contracts","Equity in supervision","BST","Performance feedback","Self-care and burnout prevention","Performance management"]]];
+/* ─── DATA ─── */
+const DOMAINS=[["A","Behaviorism & Philosophical Foundations",8,"30+",false,["Description, prediction, and control","Determinism, empiricism, parsimony","Selectionism","Radical behaviorism","7 dimensions of ABA"]],["B","Concepts and Principles",24,"80+",true,["Positive and negative reinforcement","Escape vs avoidance","Punishment procedures","Stimulus control","Motivating operations","Verbal behavior","Schedules of reinforcement","Generalization and maintenance"]],["C","Measurement, Data Display & Interpretation",21,"60+",false,["Frequency, rate, count","Duration, latency, IRT","Continuous and discontinuous measurement","IOA and reliability","Graphing and visual analysis"]],["D","Experimental Design",13,"40+",false,["Independent and dependent variables","Internal and external validity","Reversal designs","Multiple baseline designs","Multielement designs"]],["E","Ethical and Professional Issues",22,"70+","teaser",["Core ethics principles","Confidentiality","Multiple relationships","Cultural humility","Public statements"]],["F","Behavior Assessment",23,"70+","pref",["Records review","Preference assessments","Descriptive assessment","Functional analysis","Goal prioritization"]],["G","Behavior-Change Procedures",25,"90+",false,["Differential reinforcement","Token economies","Prompting and prompt fading","Shaping","Chaining"]],["H","Selecting and Implementing Interventions",20,"60+",false,["Goal development","Evidence-based selection","Social validity","Relapse prevention","Treatment integrity"]],["I","Personnel Supervision and Management",19,"50+",false,["Supervision contracts","Equity in supervision","BST","Performance feedback","Self-care and burnout prevention"]]];
+
 const DEMO_PATH=["Positive Reinforcement","Negative Reinforcement","Escape","Avoidance","Mixed Review"];
-const LEARN_MODULES={en:{
-"Positive Reinforcement":{definition:"Positive reinforcement occurs when a stimulus is added after a behavior and the future frequency of that behavior increases.",example:"A learner completes a worksheet and receives access to a preferred game. Over time, worksheet completion increases.",strategy:"Look for something added after the behavior, followed by an increase in that behavior.",difficulty:"Beginner"},
-"Negative Reinforcement":{definition:"Negative reinforcement occurs when a stimulus is removed, reduced, or avoided after a behavior and the future frequency of that behavior increases.",example:"A student asks for a break during a difficult task, the task is removed briefly, and appropriate break requests increase.",strategy:"Look for removal or avoidance of an aversive stimulus, followed by behavior increase.",difficulty:"Intermediate"},
-"Escape":{definition:"Escape is a form of negative reinforcement in which behavior increases because an aversive stimulus that is already present is terminated after the response.",example:"A client screams after demands are presented, and the therapist removes the task. Screaming increases in future demand situations.",strategy:"If the aversive event has already started and the behavior ends it, the contingency is escape.",difficulty:"Intermediate"},
-"Avoidance":{definition:"Avoidance is a form of negative reinforcement in which behavior increases because it prevents or postpones an aversive stimulus before it occurs.",example:"A student asks for help before independent work begins, preventing the difficult task from being assigned alone. Help requests increase.",strategy:"If the behavior happens before the aversive event and prevents it, the contingency is avoidance.",difficulty:"Advanced"},
-"Mixed Review":{definition:"This review compares positive reinforcement, negative reinforcement, escape, and avoidance so learners can discriminate among similar contingencies.",example:"The exam often tests whether the stimulus was added or removed, and whether the aversive stimulus had already started or was prevented.",strategy:"Ask: Was something added or removed? Did the behavior increase? Was the aversive event already present or prevented?",difficulty:"Advanced"}
+
+const LEARN={en:{
+  "Positive Reinforcement":{definition:"Positive reinforcement occurs when a stimulus is added after a behavior and the future frequency of that behavior increases.",example:"A learner completes a worksheet and receives access to a preferred game. Over time, worksheet completion increases.",strategy:"Look for something ADDED after the behavior, followed by an INCREASE in that behavior. The key word is 'added' — something new enters the environment.",difficulty:"Beginner",icon:"➕"},
+  "Negative Reinforcement":{definition:"Negative reinforcement occurs when a stimulus is removed, reduced, or avoided after a behavior and the future frequency of that behavior increases.",example:"A student asks for a break during a difficult task, the task is removed briefly, and appropriate break requests increase over time.",strategy:"Look for REMOVAL or AVOIDANCE of an aversive stimulus, followed by behavior increase. Negative ≠ bad; it means something is removed.",difficulty:"Intermediate",icon:"➖"},
+  "Escape":{definition:"Escape is a form of negative reinforcement in which behavior increases because an aversive stimulus that is ALREADY PRESENT is terminated after the response.",example:"A client screams after demands are presented, and the therapist removes the task. Screaming increases in future demand situations.",strategy:"If the aversive event has ALREADY STARTED and the behavior ends it → ESCAPE. The stimulus was present first, behavior removed it.",difficulty:"Intermediate",icon:"🚪"},
+  "Avoidance":{definition:"Avoidance is a form of negative reinforcement in which behavior increases because it PREVENTS or POSTPONES an aversive stimulus before it occurs.",example:"A student asks for help before independent work begins, preventing the difficult task from being assigned alone. Help requests increase.",strategy:"If the behavior happens BEFORE the aversive event and prevents it → AVOIDANCE. Nothing bad happened yet; the behavior stops it from happening.",difficulty:"Advanced",icon:"🛡️"},
+  "Mixed Review":{definition:"This module compares positive reinforcement, negative reinforcement, escape, and avoidance to build discrimination skills — the most tested area on the BCBA exam.",example:"The exam often tests whether the stimulus was added or removed, and whether the aversive stimulus had already started or was prevented.",strategy:"Ask in order: (1) Was something added or removed? (2) Did behavior increase? (3) Was the aversive event already present or prevented? Use this sequence every time.",difficulty:"Advanced",icon:"🔀"}
 },es:{
-"Positive Reinforcement":{definition:"El reforzamiento positivo (Positive Reinforcement) ocurre cuando se añade un estímulo después de una conducta y la frecuencia futura de esa conducta aumenta.",example:"Un estudiante completa una hoja de trabajo y recibe acceso a un juego preferido. Con el tiempo, la conducta de completar la hoja aumenta.",strategy:"Busca si algo fue añadido después de la conducta y si esa conducta aumentó en el futuro.",difficulty:"Básico"},
-"Negative Reinforcement":{definition:"El reforzamiento negativo (Negative Reinforcement) ocurre cuando un estímulo se elimina, reduce o evita después de una conducta y la frecuencia futura de esa conducta aumenta.",example:"Un estudiante pide un descanso durante una tarea difícil, la tarea se remueve por unos minutos y las solicitudes apropiadas de descanso aumentan.",strategy:"Busca si se removió, redujo o evitó algo aversivo después de la conducta y si la conducta aumentó.",difficulty:"Intermedio"},
-"Escape":{definition:"Escape es una forma de Negative Reinforcement en la cual la conducta aumenta porque termina un estímulo aversivo que ya estaba presente.",example:"Un cliente grita después de que se presentan demandas, y el terapeuta retira la tarea. Los gritos aumentan en futuras situaciones de demanda.",strategy:"Si el evento aversivo ya comenzó y la conducta lo termina, la contingencia es Escape.",difficulty:"Intermedio"},
-"Avoidance":{definition:"Avoidance es una forma de Negative Reinforcement en la cual la conducta aumenta porque previene o pospone un estímulo aversivo antes de que ocurra.",example:"Un estudiante pide ayuda antes de que comience el trabajo independiente, evitando que la tarea difícil ocurra sin apoyo. Las solicitudes de ayuda aumentan.",strategy:"Si la conducta ocurre antes del evento aversivo y lo previene o lo retrasa, la contingencia es Avoidance.",difficulty:"Avanzado"},
-"Mixed Review":{definition:"Este repaso compara Positive Reinforcement, Negative Reinforcement, Escape y Avoidance para ayudarte a discriminar entre contingencias similares.",example:"El examen suele evaluar si el estímulo fue añadido o removido, y si el evento aversivo ya estaba presente o fue prevenido.",strategy:"Pregunta: ¿algo fue añadido o removido? ¿La conducta aumentó? ¿El evento aversivo ya estaba presente o fue prevenido?",difficulty:"Avanzado"}
+  "Positive Reinforcement":{definition:"El reforzamiento positivo ocurre cuando se añade un estímulo después de una conducta y la frecuencia futura de esa conducta aumenta.",example:"Un estudiante completa una hoja de trabajo y recibe acceso a un juego preferido. Con el tiempo, completar la hoja aumenta.",strategy:"Busca algo AÑADIDO después de la conducta, seguido de un AUMENTO en esa conducta. La palabra clave es 'añadido'.",difficulty:"Básico",icon:"➕"},
+  "Negative Reinforcement":{definition:"El reforzamiento negativo ocurre cuando un estímulo se elimina, reduce o evita después de una conducta y la frecuencia futura de esa conducta aumenta.",example:"Un estudiante pide un descanso durante una tarea difícil, la tarea se remueve por unos minutos y las solicitudes de descanso apropiadas aumentan.",strategy:"Busca la REMOCIÓN o EVITACIÓN de un estímulo aversivo seguida de aumento de conducta. Negativo ≠ malo; significa que algo se removió.",difficulty:"Intermedio",icon:"➖"},
+  "Escape":{definition:"Escape es una forma de reforzamiento negativo en la cual la conducta aumenta porque termina un estímulo aversivo que YA ESTABA PRESENTE.",example:"Un cliente grita después de que se presentan demandas, y el terapeuta retira la tarea. Los gritos aumentan en futuras situaciones de demanda.",strategy:"Si el evento aversivo YA COMENZÓ y la conducta lo termina → ESCAPE. El estímulo estaba primero, la conducta lo removió.",difficulty:"Intermedio",icon:"🚪"},
+  "Avoidance":{definition:"Avoidance es una forma de reforzamiento negativo en la cual la conducta aumenta porque PREVIENE o POSPONE un estímulo aversivo antes de que ocurra.",example:"Un estudiante pide ayuda antes de que comience el trabajo independiente, evitando la tarea difícil. Las solicitudes de ayuda aumentan.",strategy:"Si la conducta ocurre ANTES del evento aversivo y lo previene → AVOIDANCE. Nada malo pasó aún; la conducta lo detiene.",difficulty:"Avanzado",icon:"🛡️"},
+  "Mixed Review":{definition:"Este módulo compara Positive Reinforcement, Negative Reinforcement, Escape y Avoidance para desarrollar discriminación — el área más evaluada en el BCBA.",example:"El examen suele evaluar si el estímulo fue añadido o removido, y si el evento aversivo ya estaba presente o fue prevenido.",strategy:"Pregunta en orden: (1) ¿Algo fue añadido o removido? (2) ¿Conducia aumentó? (3) ¿El evento aversivo ya estaba presente o fue prevenido? Usa esta secuencia siempre.",difficulty:"Avanzado",icon:"🔀"}
 }};
-const QUESTIONS={en:[
-{concept:"Positive Reinforcement",difficulty:"Beginner",q:"During therapy, Mia labels pictures correctly and immediately receives praise and a token. Over the next week, correct labeling increases. Which contingency is most directly illustrated?",options:{A:"Positive reinforcement",B:"Negative reinforcement",C:"Extinction",D:"Response cost"},correct:"A",hint:"Identify whether something was added or removed after the behavior.",rationale:"Praise and a token were added after correct responding, and the behavior increased. That is positive reinforcement."},
-{concept:"Negative Reinforcement",difficulty:"Intermediate",q:"A client appropriately asks for a break during difficult work. The therapist removes the task for two minutes, and break requests increase over time. What process is occurring?",options:{A:"Positive punishment",B:"Negative reinforcement",C:"Stimulus generalization",D:"Extinction"},correct:"B",hint:"Look for removal of an aversive condition followed by an increase in behavior.",rationale:"The task was removed after the break request, and the break request increased. This is negative reinforcement."},
-{concept:"Escape",difficulty:"Intermediate",q:"When math worksheets are already on the table, Leo throws his pencil. The teacher removes the worksheet, and pencil throwing increases during math time. Which type of negative reinforcement is this?",options:{A:"Avoidance",B:"Escape",C:"DRA",D:"Positive reinforcement"},correct:"B",hint:"Ask whether the aversive stimulus was already present.",rationale:"The worksheet was already present and the behavior terminated it. That is escape."},
-{concept:"Avoidance",difficulty:"Advanced",q:"Before independent reading begins, Ana says, 'I need help,' and the teacher sits beside her, preventing independent work. This request increases over time. Which contingency is most likely involved?",options:{A:"Escape",B:"Avoidance",C:"Positive punishment",D:"Respondent extinction"},correct:"B",hint:"Ask whether the behavior prevented the aversive event before it started.",rationale:"Ana's response occurred before independent work began and prevented it. That is avoidance."},
-{concept:"Mixed Review",difficulty:"Advanced",q:"A therapist presents a difficult task. The learner says, 'Break please,' the therapist removes the task, and appropriate break requests increase. What is the best classification?",options:{A:"Positive reinforcement",B:"Escape-maintained negative reinforcement",C:"Avoidance-maintained behavior",D:"Negative punishment"},correct:"B",hint:"The task was already presented, and the behavior removed it.",rationale:"Because the aversive task was already present and was removed after the response, this is escape-maintained negative reinforcement."}
+
+const ETHICS_TEASER={en:{
+  concept:"Multiple Relationships",domain:"E",
+  definition:"A multiple relationship occurs when a BCBA is in a professional role with a person and simultaneously has another type of relationship with that same person, or with someone closely associated with that person.",
+  example:"A BCBA is providing ABA services to a child and later discovers the child's parent is also her landlord. Both the professional and personal relationship now exist simultaneously.",
+  strategy:"The key question is whether the secondary relationship could impair the BCBA's objectivity or effectiveness, or could exploit or harm the person receiving services. If yes — it must be avoided or managed proactively.",
+  why:"Ethics (DOM. E) accounts for approximately 12% of the BCBA exam — 22 concepts, including boundary management, informed consent, and cultural humility. These scenarios require applied judgment, not just memorization.",
+  difficulty:"Intermediate",icon:"⚖️",
+  locked_concepts:["Informed Consent","Confidentiality & HIPAA","Cultural Humility","Supervisory Relationships","Public Statements","Transitioning Services"],
+  pract_teaser:{q:"A BCBA has been providing services to a client for 8 months. The client's family then invites the BCBA to the client's birthday party as a personal friend. According to the Ethics Code, what is the BCBA's BEST course of action?",options:{A:"Attend, since it is a social event unrelated to services",B:"Decline and document the boundary to maintain professional objectivity",C:"Consult with a peer before deciding",D:"Accept only if the family initiates"},correct:"B",rationale:"Attending a client's birthday party as a 'personal friend' creates a multiple relationship that risks impairing professional objectivity. The Ethics Code requires BCBAs to avoid such relationships or take reasonable steps to resolve them."}
+},es:{
+  concept:"Relaciones Múltiples (Multiple Relationships)",domain:"E",
+  definition:"Una relación múltiple ocurre cuando un BCBA tiene un rol profesional con una persona y simultáneamente tiene otro tipo de relación con esa misma persona, o con alguien estrechamente asociado a ella.",
+  example:"Un BCBA está proporcionando servicios ABA a un niño y luego descubre que el padre del niño también es su arrendador. Ahora existen simultáneamente la relación profesional y la personal.",
+  strategy:"La pregunta clave es si la relación secundaria podría afectar la objetividad o efectividad del BCBA, o podría explotar o dañar a la persona que recibe servicios. Si es así — debe evitarse o manejarse proactivamente.",
+  why:"Ética (DOM. E) representa aproximadamente el 12% del examen BCBA — 22 conceptos, incluyendo gestión de límites, consentimiento informado y humildad cultural. Estos escenarios requieren juicio aplicado, no solo memorización.",
+  difficulty:"Intermedio",icon:"⚖️",
+  locked_concepts:["Consentimiento Informado","Confidencialidad y HIPAA","Humildad Cultural","Relaciones de Supervisión","Declaraciones Públicas","Transición de Servicios"],
+  pract_teaser:{q:"Un BCBA ha estado proporcionando servicios a un cliente por 8 meses. La familia del cliente invita al BCBA a la fiesta de cumpleaños del cliente como amigo personal. Según el Código de Ética, ¿cuál es la MEJOR acción?",options:{A:"Asistir, ya que es un evento social no relacionado con los servicios",B:"Declinar y documentar el límite para mantener la objetividad profesional",C:"Consultar con un colega antes de decidir",D:"Aceptar solo si la familia lo inicia"},correct:"B",rationale:"Asistir a la fiesta de un cliente como 'amigo personal' crea una relación múltiple que arriesga afectar la objetividad profesional. El Código de Ética requiere que los BCBAs eviten tales relaciones o tomen medidas razonables para resolverlas."}
+}};
+
+const PREF_ITEMS=[
+  {id:"cookie",label_en:"Cookie",label_es:"Galleta",emoji:"🍪"},
+  {id:"ipad",label_en:"iPad",label_es:"iPad",emoji:"📱"},
+  {id:"bubbles",label_en:"Bubbles",label_es:"Burbujas",emoji:"🫧"},
+  {id:"music",label_en:"Music",label_es:"Música",emoji:"🎵"},
+  {id:"blocks",label_en:"Blocks",label_es:"Bloques",emoji:"🧱"}
+];
+// Build all pairs from items
+const PREF_PAIRS=(()=>{const pairs=[];for(let i=0;i<PREF_ITEMS.length;i++){for(let j=i+1;j<PREF_ITEMS.length;j++){pairs.push([i,j]);}}return pairs.sort(()=>Math.random()-.5)})();
+let prefScores={};
+let prefPairIdx=0;
+let prefDone=false;
+let ethicsPractAnswered=false;
+let ethicsPractSelected=null;
+  {concept:"Positive Reinforcement",difficulty:"Beginner",q:"During therapy, Mia labels pictures correctly and immediately receives praise and a token. Over the next week, correct labeling increases. Which contingency is most directly illustrated?",options:{A:"Positive reinforcement",B:"Negative reinforcement",C:"Extinction",D:"Response cost"},correct:"A",hint:"Identify whether something was added or removed after the behavior.",rationale:"Praise and a token were ADDED after correct responding, and the behavior INCREASED. This is the definition of positive reinforcement. Nothing was removed, and behavior increased — classic PR."},
+  {concept:"Negative Reinforcement",difficulty:"Intermediate",q:"A client appropriately asks for a break during difficult work. The therapist removes the task for two minutes, and break requests increase over time. What process is occurring?",options:{A:"Positive punishment",B:"Negative reinforcement",C:"Stimulus generalization",D:"Extinction"},correct:"B",hint:"Look for removal of an aversive condition followed by an increase in behavior.",rationale:"The task (aversive stimulus) was REMOVED after the break request, and the break request INCREASED. Behavior increased because something aversive was taken away — negative reinforcement."},
+  {concept:"Escape",difficulty:"Intermediate",q:"When math worksheets are already on the table, Leo throws his pencil. The teacher removes the worksheet, and pencil throwing increases during math time. Which type of negative reinforcement is this?",options:{A:"Avoidance",B:"Escape",C:"DRA",D:"Positive reinforcement"},correct:"B",hint:"Ask whether the aversive stimulus was already present when the behavior occurred.",rationale:"The worksheet was ALREADY PRESENT before the behavior. The behavior (throwing) terminated it. When an aversive stimulus is already present and behavior ends it, that is ESCAPE — not avoidance."},
+  {concept:"Avoidance",difficulty:"Advanced",q:"Before independent reading begins, Ana says, 'I need help,' and the teacher sits beside her, preventing independent work. This request increases over time. Which contingency is most likely involved?",options:{A:"Escape",B:"Avoidance",C:"Positive punishment",D:"Respondent extinction"},correct:"B",hint:"Ask whether the behavior prevented the aversive event before it started.",rationale:"Ana's response occurred BEFORE independent work began and PREVENTED it from happening. Nothing aversive was present yet. When behavior prevents an aversive event before it starts — that is AVOIDANCE."},
+  {concept:"Mixed Review",difficulty:"Advanced",q:"A therapist presents a difficult task. The learner says, 'Break please,' the therapist removes the task, and appropriate break requests increase. What is the best classification?",options:{A:"Positive reinforcement",B:"Escape-maintained negative reinforcement",C:"Avoidance-maintained behavior",D:"Negative punishment"},correct:"B",hint:"The task was already presented, and the behavior removed it.",rationale:"The aversive task was ALREADY PRESENT when the response occurred. The response removed it and behavior increased. Use the sequence: something removed + behavior increased + aversive already present = ESCAPE-maintained negative reinforcement."}
 ],es:[
-{concept:"Positive Reinforcement",difficulty:"Básico",q:"Durante terapia, Mia etiqueta imágenes correctamente e inmediatamente recibe elogios y una ficha. Durante la semana siguiente, las respuestas correctas aumentan. ¿Qué contingencia se ilustra directamente?",options:{A:"Reforzamiento positivo (Positive reinforcement)",B:"Reforzamiento negativo (Negative reinforcement)",C:"Extinción (Extinction)",D:"Costo de respuesta (Response cost)"},correct:"A",hint:"Identifica si algo fue añadido o removido después de la conducta.",rationale:"Los elogios y la ficha fueron añadidos después de la respuesta correcta, y la conducta aumentó. Eso es Positive Reinforcement."},
-{concept:"Negative Reinforcement",difficulty:"Intermedio",q:"Un cliente pide apropiadamente un descanso durante una tarea difícil. El terapeuta retira la tarea por dos minutos, y las solicitudes de descanso aumentan con el tiempo. ¿Qué proceso está ocurriendo?",options:{A:"Castigo positivo (Positive punishment)",B:"Reforzamiento negativo (Negative reinforcement)",C:"Generalización de estímulos (Stimulus generalization)",D:"Extinción (Extinction)"},correct:"B",hint:"Busca la remoción de una condición aversiva seguida por un aumento de la conducta.",rationale:"La tarea fue retirada después de la solicitud de descanso, y la solicitud aumentó. Esto es Negative Reinforcement."},
-{concept:"Escape",difficulty:"Intermedio",q:"Cuando las hojas de matemática ya están sobre la mesa, Leo lanza su lápiz. La maestra retira la hoja, y lanzar el lápiz aumenta durante matemáticas. ¿Qué tipo de Negative Reinforcement es este?",options:{A:"Avoidance",B:"Escape",C:"DRA",D:"Positive reinforcement"},correct:"B",hint:"Pregunta si el estímulo aversivo ya estaba presente.",rationale:"La hoja ya estaba presente y la conducta la terminó. Eso es Escape."},
-{concept:"Avoidance",difficulty:"Avanzado",q:"Antes de que comience la lectura independiente, Ana dice: “Necesito ayuda”, y la maestra se sienta a su lado, evitando el trabajo independiente. Esta solicitud aumenta con el tiempo. ¿Qué contingencia está más probablemente involucrada?",options:{A:"Escape",B:"Avoidance",C:"Positive punishment",D:"Respondent extinction"},correct:"B",hint:"Pregunta si la conducta previno el evento aversivo antes de que comenzara.",rationale:"La respuesta de Ana ocurrió antes del trabajo independiente y lo previno. Eso es Avoidance."},
-{concept:"Mixed Review",difficulty:"Avanzado",q:"Un terapeuta presenta una tarea difícil. El estudiante dice: “Break please”, el terapeuta retira la tarea, y las solicitudes apropiadas de descanso aumentan. ¿Cuál es la mejor clasificación?",options:{A:"Positive reinforcement",B:"Escape-maintained negative reinforcement",C:"Avoidance-maintained behavior",D:"Negative punishment"},correct:"B",hint:"La tarea ya había sido presentada, y la conducta la removió.",rationale:"Como la tarea aversiva ya estaba presente y fue removida después de la respuesta, esto es Escape-maintained Negative Reinforcement."}
+  {concept:"Positive Reinforcement",difficulty:"Básico",q:"Durante terapia, Mia etiqueta imágenes correctamente e inmediatamente recibe elogios y una ficha. Durante la semana siguiente, las respuestas correctas aumentan. ¿Qué contingencia se ilustra directamente?",options:{A:"Reforzamiento positivo",B:"Reforzamiento negativo",C:"Extinción",D:"Costo de respuesta"},correct:"A",hint:"Identifica si algo fue añadido o removido después de la conducta.",rationale:"Los elogios y la ficha fueron AÑADIDOS después de la respuesta correcta, y la conducta AUMENTÓ. Esto es Positive Reinforcement. Nada fue removido."},
+  {concept:"Negative Reinforcement",difficulty:"Intermedio",q:"Un cliente pide apropiadamente un descanso durante una tarea difícil. El terapeuta retira la tarea por dos minutos, y las solicitudes de descanso aumentan con el tiempo. ¿Qué proceso está ocurriendo?",options:{A:"Castigo positivo",B:"Reforzamiento negativo",C:"Generalización de estímulos",D:"Extinción"},correct:"B",hint:"Busca la remoción de una condición aversiva seguida por un aumento de la conducta.",rationale:"La tarea fue RETIRADA después de la solicitud de descanso, y la solicitud AUMENTÓ. La conducta aumentó porque algo aversivo fue removido — Negative Reinforcement."},
+  {concept:"Escape",difficulty:"Intermedio",q:"Cuando las hojas de matemática ya están sobre la mesa, Leo lanza su lápiz. La maestra retira la hoja, y lanzar el lápiz aumenta durante matemáticas. ¿Qué tipo de Negative Reinforcement es este?",options:{A:"Avoidance",B:"Escape",C:"DRA",D:"Positive reinforcement"},correct:"B",hint:"Pregunta si el estímulo aversivo ya estaba presente cuando ocurrió la conducta.",rationale:"La hoja ya estaba PRESENTE antes de la conducta. La conducta la terminó. Cuando un estímulo aversivo ya está presente y la conducta lo termina → ESCAPE."},
+  {concept:"Avoidance",difficulty:"Avanzado",q:"Antes de que comience la lectura independiente, Ana dice: 'Necesito ayuda', y la maestra se sienta a su lado, evitando el trabajo independiente. Esta solicitud aumenta. ¿Qué contingencia está involucrada?",options:{A:"Escape",B:"Avoidance",C:"Positive punishment",D:"Respondent extinction"},correct:"B",hint:"Pregunta si la conducta previno el evento aversivo antes de que comenzara.",rationale:"La respuesta de Ana ocurrió ANTES de que comenzara el trabajo independiente y lo PREVINO. Nada aversivo estaba presente aún. Conducta previene el aversivo antes de que ocurra → AVOIDANCE."},
+  {concept:"Mixed Review",difficulty:"Avanzado",q:"Un terapeuta presenta una tarea difícil. El estudiante dice: 'Break please', el terapeuta retira la tarea, y las solicitudes de descanso aumentan. ¿Cuál es la mejor clasificación?",options:{A:"Positive reinforcement",B:"Escape-maintained negative reinforcement",C:"Avoidance-maintained behavior",D:"Negative punishment"},correct:"B",hint:"La tarea ya había sido presentada, y la conducta la removió.",rationale:"La tarea aversiva ya estaba PRESENTE cuando ocurrió la respuesta. La respuesta la removió y la conducta aumentó. Algo removido + conducta aumentó + aversivo ya presente = ESCAPE-maintained Negative Reinforcement."}
 ]};
+
 const MOCK={en:[
-{concept:"Stimulus Control",difficulty:"Advanced",q:"A learner says 'cookie' only when shown a cookie and not when shown other foods. Which interpretation best fits this outcome?",options:{A:"Stimulus discrimination",B:"Response generalization",C:"Motivating operation",D:"Extinction"},correct:"A",rationale:"The response occurs in the presence of one stimulus and not others, indicating stimulus discrimination."},
-{concept:"Motivating Operations",difficulty:"Advanced",q:"After several hours without water, a client is more likely to request water and water becomes more effective as a reinforcer. What is the best classification?",options:{A:"Abolishing operation",B:"Establishing operation",C:"Stimulus delta",D:"Rule-governed behavior"},correct:"B",rationale:"Deprivation increases the value of water and evokes behavior that has produced water in the past."},
-{concept:"Escape vs Avoidance",difficulty:"Advanced",q:"Before a difficult task is presented, a student asks to go to the restroom and the task is delayed. This pattern increases. Which classification is strongest?",options:{A:"Escape",B:"Avoidance",C:"Positive reinforcement",D:"Response cost"},correct:"B",rationale:"The response occurs before the aversive task and postpones it, which is avoidance."}
+  {concept:"Stimulus Control",difficulty:"Advanced",q:"A learner correctly says 'cookie' when shown a cookie but does not say 'cookie' when shown other foods. This pattern is consistent across multiple sessions. Which behavioral process best explains this outcome?",options:{A:"Stimulus discrimination",B:"Response generalization",C:"Motivating operation",D:"Extinction"},correct:"A",rationale:"The response occurs selectively in the presence of one specific stimulus (cookie) and not others. This is stimulus discrimination — the hallmark of stimulus control."},
+  {concept:"Motivating Operations",difficulty:"Advanced",q:"After several hours without water, a client is significantly more likely to request water, and water becomes markedly more effective as a reinforcer. What is the best behavioral classification?",options:{A:"Abolishing operation",B:"Establishing operation",C:"Stimulus delta",D:"Rule-governed behavior"},correct:"B",rationale:"Water deprivation increases the reinforcing value of water (value-altering effect) and evokes behavior that has produced water in the past (behavior-altering effect). This is an establishing operation (EO)."},
+  {concept:"Escape vs Avoidance",difficulty:"Advanced",q:"Every morning before difficult tasks are presented, a student raises her hand and asks to go to the nurse. The teacher excuses her, and the task is delayed. This pattern increases over the semester. What is the most precise behavioral classification?",options:{A:"Escape-maintained negative reinforcement",B:"Avoidance-maintained negative reinforcement",C:"Positive reinforcement",D:"Respondent conditioning"},correct:"B",rationale:"The request occurs BEFORE the difficult task is presented, and it postpones it. Because behavior occurs before the aversive event and prevents/delays it — this is avoidance-maintained negative reinforcement, not escape."},
+  {concept:"Experimental Design · DOM. D",difficulty:"Advanced",q:"A researcher uses a reversal design (ABA) to evaluate a self-monitoring intervention. After removing the intervention in the second A phase, the target behavior returns to near-baseline levels. When the intervention is reintroduced, behavior improves again. What does this pattern most directly demonstrate?",options:{A:"External validity of the intervention","B":"Social validity as rated by stakeholders",C:"Experimental control over the target behavior",D:"Stimulus generalization across settings"},correct:"C",rationale:"When behavior reverts to baseline after intervention removal, and improves again upon reinstatement, this demonstrates experimental control — the intervention, not extraneous variables, is responsible for the behavior change. This is the logic of reversal/withdrawal designs."}
 ],es:[
-{concept:"Stimulus Control",difficulty:"Avanzado",q:"Un estudiante dice “galleta” solo cuando se le muestra una galleta y no cuando se le muestran otros alimentos. ¿Qué interpretación encaja mejor con este resultado?",options:{A:"Discriminación de estímulos (Stimulus discrimination)",B:"Generalización de respuesta (Response generalization)",C:"Operación motivadora (Motivating operation)",D:"Extinción (Extinction)"},correct:"A",rationale:"La respuesta ocurre en presencia de un estímulo y no en presencia de otros. Esto indica Stimulus Discrimination."},
-{concept:"Motivating Operations",difficulty:"Avanzado",q:"Después de varias horas sin agua, un cliente tiene más probabilidad de pedir agua y el agua se vuelve más efectiva como reforzador. ¿Cuál es la mejor clasificación?",options:{A:"Abolishing operation",B:"Establishing operation",C:"Stimulus delta",D:"Rule-governed behavior"},correct:"B",rationale:"La deprivación aumenta el valor del agua y evoca conductas que anteriormente produjeron acceso al agua. Eso es Establishing Operation."},
-{concept:"Escape vs Avoidance",difficulty:"Avanzado",q:"Antes de que se presente una tarea difícil, un estudiante pide ir al baño y la tarea se retrasa. Este patrón aumenta. ¿Qué clasificación es más fuerte?",options:{A:"Escape",B:"Avoidance",C:"Positive reinforcement",D:"Response cost"},correct:"B",rationale:"La respuesta ocurre antes de la tarea aversiva y la pospone. Eso es Avoidance."}
+  {concept:"Stimulus Control",difficulty:"Avanzado",q:"Un estudiante dice 'galleta' correctamente al ver una galleta pero no lo dice al ver otros alimentos. Este patrón es consistente en múltiples sesiones. ¿Qué proceso conductual explica mejor este resultado?",options:{A:"Discriminación de estímulos",B:"Generalización de respuesta",C:"Operación motivadora",D:"Extinción"},correct:"A",rationale:"La respuesta ocurre selectivamente en presencia de un estímulo específico y no en presencia de otros. Esto es discriminación de estímulos — el sello del control de estímulos."},
+  {concept:"Motivating Operations",difficulty:"Avanzado",q:"Después de varias horas sin agua, un cliente tiene significativamente más probabilidad de pedir agua, y el agua se vuelve mucho más efectiva como reforzador. ¿Cuál es la mejor clasificación conductual?",options:{A:"Abolishing operation",B:"Establishing operation",C:"Stimulus delta",D:"Rule-governed behavior"},correct:"B",rationale:"La privación de agua aumenta el valor reforzador del agua (efecto alterador de valor) y evoca conductas que han producido agua en el pasado (efecto alterador de conducta). Esto es una Establishing Operation (EO)."},
+  {concept:"Escape vs Avoidance",difficulty:"Avanzado",q:"Cada mañana antes de que se presenten tareas difíciles, una estudiante levanta la mano y pide ir a la enfermería. La maestra la excusa y la tarea se retrasa. Este patrón aumenta durante el semestre. ¿Cuál es la clasificación conductual más precisa?",options:{A:"Negative reinforcement mantenido por escape",B:"Negative reinforcement mantenido por avoidance",C:"Positive reinforcement",D:"Condicionamiento respondiente"},correct:"B",rationale:"La solicitud ocurre ANTES de que se presente la tarea difícil y la pospone. Porque la conducta ocurre antes del evento aversivo y lo previene/retrasa → Avoidance-maintained Negative Reinforcement."},
+  {concept:"Diseño Experimental · DOM. D",difficulty:"Avanzado",q:"Un investigador usa un diseño de reversión (ABA) para evaluar una intervención de auto-monitoreo. Después de retirar la intervención en la segunda fase A, la conducta objetivo regresa a niveles cercanos a la línea base. Cuando se reintroduce la intervención, la conducta mejora nuevamente. ¿Qué demuestra más directamente este patrón?",options:{A:"Validez externa de la intervención",B:"Validez social según los stakeholders",C:"Control experimental sobre la conducta objetivo",D:"Generalización de estímulos entre contextos"},correct:"C",rationale:"Cuando la conducta regresa a la línea base después de retirar la intervención, y mejora nuevamente al reintroducirla, esto demuestra control experimental — la intervención, no variables extrañas, es responsable del cambio. Esta es la lógica de los diseños de reversión/retiro."}
 ]};
-const UI={en:{lang:"Language",dashboard:"Public Demo Dashboard",dashboardSub:"Explore the available demo path and preview the full BCBA curriculum included in the complete platform.",startLearning:"Start Learning Demo →",available:"Available in Public Demo",mockBanner:"MOCK EXAM PREVIEW",learn:"Learn Demo",practice:"Demo Practice",mock:"Mock Exam Preview",view:"View Curriculum Preview",definition:"Definition",example:"Clinical Example",strategy:"Exam Strategy",nextModule:"Next Module →",continuePractice:"Continue to 5-Question Practice →",back:"Back to Dashboard",question:"Question",timed:"⏱ Timed Practice Preview",hint:"💡 Hint / Strategy",correct:"Correct",incorrect:"Incorrect",nextQuestion:"Next Question →",enterMock:"Enter 3-Question Mock Preview →",startMock:"Start Mock Preview →",nextMock:"Next Mock Question →",summary:"View Demo Summary →",complete:"Public Demo Complete",completeSub:"You completed the learning path, practice demo, and mock exam preview.",strengths:"Strengths",focus:"Recommended Focus",unlock:"Unlock Full Version"},es:{lang:"Idioma",dashboard:"Panel Demo Público",dashboardSub:"Explora el recorrido demo disponible y visualiza el currículo completo incluido en la plataforma.",startLearning:"Comenzar Demo de Aprendizaje →",available:"Disponible en el Demo Público",mockBanner:"VISTA PREVIA DEL EXAMEN",learn:"Aprender Demo",practice:"Práctica Demo",mock:"Vista Previa del Examen",view:"Ver Vista del Currículo",definition:"Definición",example:"Ejemplo Clínico",strategy:"Estrategia de Examen",nextModule:"Siguiente Módulo →",continuePractice:"Continuar a Práctica de 5 Preguntas →",back:"Volver al Dashboard",question:"Pregunta",timed:"⏱ Práctica Cronometrada Preview",hint:"💡 Pista / Estrategia",correct:"Correcto",incorrect:"Incorrecto",nextQuestion:"Siguiente Pregunta →",enterMock:"Entrar al Mock Preview de 3 Preguntas →",startMock:"Comenzar Mock Preview →",nextMock:"Siguiente Pregunta del Mock →",summary:"Ver Resumen del Demo →",complete:"Demo Público Completado",completeSub:"Completaste el recorrido de aprendizaje, la práctica demo y el mock preview.",strengths:"Fortalezas",focus:"Enfoque Recomendado",unlock:"Desbloquear Versión Completa"}};
-let lang=localStorage.getItem("bcba_demo_lang")||"en";
-let currentScreen="dashboard",learnIndex=0,practiceIndex=0,mockIndex=0,selected=null,answered=false,score=0,mockScore=0,completedModules=0,answeredConcepts=[];
-function qs(id){return document.getElementById(id)}
-function L(k){return UI[lang][k]||UI.en[k]||k}
-function langSwitch(){return '<div class="lang-switch"><span class="lang-note">'+L("lang")+'</span><button type="button" class="lang-btn '+(lang==="en"?"active":"")+'" data-lang="en">🇺🇸 EN</button><button type="button" class="lang-btn '+(lang==="es"?"active":"")+'" data-lang="es">🇪🇸 ES</button></div>'}
-function bindLang(){document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;localStorage.setItem("bcba_demo_lang",lang);rerender()}))}
-function rerender(){if(currentScreen==="dashboard")renderDashboard();else if(currentScreen==="learn")renderLearn();else if(currentScreen==="practice")renderPractice();else if(currentScreen==="mockIntro")renderMockIntro();else if(currentScreen==="mock")renderMock();else if(currentScreen==="complete")renderComplete()}
-function setNav(active){["dashboard","learn","practice","mock"].forEach(id=>{const el=qs("nav-"+id);if(el)el.classList.toggle("active",id===active)})}
-function updateSideProgress(){completedModules=Math.max(completedModules,learnIndex);let pct=Math.min(100,Math.round((completedModules/DEMO_PATH.length)*100));if(qs("sideProgress"))qs("sideProgress").style.width=pct+"%";if(qs("sideProgressText"))qs("sideProgressText").textContent=completedModules+"/"+DEMO_PATH.length+" modules completed"}
-function launchDemo(){qs("landing").classList.remove("active");qs("app").classList.add("active");renderDashboard()}
-function showPremium(title){qs("modalTitle").textContent=title+" — Included in Full Version";qs("premiumModal").classList.add("active")}
+
+
+const PREMIUM_MODALS={
+  exams:{icon:"📋",title:"Full Mock Exams",desc:"Practice exams that simulate the real BCBA environment — 185 questions, 4 hours, randomized from all 9 domains.",features:["185 questions from all 9 BCBA domains","Timed: 4 hours with real clock pressure","Domain-by-domain breakdown after","Compare your score to passing benchmark"]},
+  weakness:{icon:"🎯",title:"Smart Weakness Detection",desc:"The system learns which concepts trip you up most and automatically builds focused sessions around your gaps.",features:["AI-powered error pattern analysis","Concept-level mastery tracking","Automatic drill sessions for weak areas","'Confident but wrong' detection"]},
+  plan:{icon:"📅",title:"Personalized Study Plan",desc:"Enter your exam date and available hours per week. Get a day-by-day plan that guarantees full domain coverage.",features:["Exam-date countdown with daily targets","Hour-based scheduling","Adapts when you miss a session","Built around your onboarding profile"]},
+  analytics:{icon:"📊",title:"Mastery Analytics",desc:"See exactly where you stand across all 9 domains — and what to study next to move the needle.",features:["Domain heatmap: 9 areas, concept level","Score trajectory over time","Time-per-question analysis","Predicted exam performance"]}
+};
+
+const UI={en:{
+  lang:"Language",dash:"Public Demo Dashboard",dashSub:"Explore the demo path and preview the full BCBA curriculum.",
+  startDemo:"Start Learning Path →",avail:"Available in Demo",mock:"Mock Exam Preview",
+  learn:"Learn Mode",pract:"Practice Demo",mockTitle:"Mock Exam",
+  definition:"Definition",example:"Clinical Example",strategy:"Exam Strategy",
+  next:"Next Module →",toPractice:"Continue to Practice →",back:"Back",
+  qLabel:"Question",hint:"💡 Hint",correct:"✓ Correct",incorrect:"✗ Incorrect",
+  nextQ:"Next Question →",enterMock:"Enter Mock Exam Preview →",
+  startMock:"Start Mock Preview",nextMock:"Next Mock Question →",summary:"View Summary →",
+  complete:"Demo Complete",completeSub:"You finished the full demo path.",
+  strengths:"Your Strengths",focus:"Focus Areas",unlock:"Unlock Full Version →",
+  confLabel:"How confident were you before answering?",confHigh:"Very confident",confMid:"Somewhat sure",confLow:"Unsure / guessed",
+  emailHead:"Get your personalized study plan",emailSub:"Based on your demo results, we'll send you a custom study guide for your exam date.",emailPlaceholder:"your@email.com",emailBtn:"Send My Guide",emailThanks:"✓ Check your inbox — your guide is on the way!"
+},es:{
+  lang:"Idioma",dash:"Panel Demo Público",dashSub:"Explora el recorrido demo y visualiza el currículo completo.",
+  startDemo:"Comenzar Ruta de Aprendizaje →",avail:"Disponible en Demo",mock:"Vista Previa del Examen",
+  learn:"Aprender",pract:"Práctica",mockTitle:"Examen Mock",
+  definition:"Definición",example:"Ejemplo Clínico",strategy:"Estrategia de Examen",
+  next:"Siguiente Módulo →",toPractice:"Continuar a Práctica →",back:"Volver",
+  qLabel:"Pregunta",hint:"💡 Pista",correct:"✓ Correcto",incorrect:"✗ Incorrecto",
+  nextQ:"Siguiente Pregunta →",enterMock:"Entrar al Mock Preview →",
+  startMock:"Comenzar Mock Preview",nextMock:"Siguiente Pregunta →",summary:"Ver Resumen →",
+  complete:"Demo Completado",completeSub:"Completaste el recorrido completo del demo.",
+  strengths:"Tus Fortalezas",focus:"Áreas de Enfoque",unlock:"Desbloquear Versión Completa →",
+  confLabel:"¿Qué tan seguro/a estabas antes de responder?",confHigh:"Muy seguro/a",confMid:"Algo seguro/a",confLow:"No seguro / adiviné",
+  emailHead:"Recibe tu plan de estudio personalizado",emailSub:"Basado en tus resultados del demo, te enviaremos una guía de estudio personalizada.",emailPlaceholder:"tu@email.com",emailBtn:"Enviar Mi Guía",emailThanks:"✓ Revisa tu correo — ¡tu guía está en camino!"
+}};
+
+/* ─── STATE ─── */
+let lang=localStorage.getItem("bcba_lang")||"en";
+let learnIdx=0,practIdx=0,mockIdx=0,selected=null,answered=false;
+let score=0,mockScore=0,completedMods=0,answeredData=[];
+let confidence=null,mockTimerSec=240,mockTimerHandle=null;
+let currentScreen="dashboard";
+let userProfile={name:"",examDate:"",hoursPerWeek:""};
+
+/* ─── ONBOARDING DATA ─── */
+const OB_STEPS=[
+  {key:"examDate",q_en:"When is your BCBA exam?",q_es:"¿Cuándo es tu examen BCBA?",sub_en:"This helps us calibrate your demo and urgency.",sub_es:"Esto nos ayuda a calibrar tu demo y urgencia.",opts:[{label_en:"Less than 3 months",label_es:"Menos de 3 meses",val:"<3mo",emoji:"🔥"},{label_en:"3–6 months",label_es:"3–6 meses",val:"3-6mo",emoji:"📅"},{label_en:"6–12 months",label_es:"6–12 meses",val:"6-12mo",emoji:"🗓️"},{label_en:"Not scheduled yet",label_es:"Aún sin programar",val:"none",emoji:"🤔"}]},
+  {key:"hoursPerWeek",q_en:"How many hours per week can you study?",q_es:"¿Cuántas horas por semana puedes estudiar?",sub_en:"We'll show you what's realistic for your schedule.",sub_es:"Te mostraremos qué es realista para tu horario.",opts:[{label_en:"Less than 5 hrs",label_es:"Menos de 5 hrs",val:"<5",emoji:"⏳"},{label_en:"5–10 hrs",label_es:"5–10 hrs",val:"5-10",emoji:"⏰"},{label_en:"10–15 hrs",label_es:"10–15 hrs",val:"10-15",emoji:"💪"},{label_en:"15+ hrs",label_es:"15+ hrs",val:"15+",emoji:"🚀"}]}
+];
+let obStep=0,obAnswers={};
+
+/* ─── HELPERS ─── */
+const qs=id=>document.getElementById(id);
+const L=k=>UI[lang][k]||UI.en[k]||k;
+const diffClass=d=>{if(d==="Beginner"||d==="Básico")return"diff-beginner";if(d==="Intermediate"||d==="Intermedio")return"diff-intermediate";return"diff-advanced"};
+function langSwitch(){return`<div class="lang-switch"><button type="button" class="lang-btn ${lang==="en"?"active":""}" data-lang="en">🇺🇸 EN</button><button type="button" class="lang-btn ${lang==="es"?"active":""}" data-lang="es">🇪🇸 ES</button></div>`}
+function bindLang(){document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;localStorage.setItem("bcba_lang",lang);rerender()}))}
+function setNav(a){["dashboard","learn","practice","mock"].forEach(id=>{const el=qs("nav-"+id);if(el)el.classList.toggle("active",id===a)})}
+function updateProgress(){const pct=Math.min(100,Math.round((completedMods/DEMO_PATH.length)*100));const fill=qs("sideProgress");const txt=qs("sideProgressText");const pctTxt=qs("sideProgressPct");if(fill)fill.style.width=pct+"%";if(txt)txt.textContent=completedMods+"/"+DEMO_PATH.length+" módulos";if(pctTxt)pctTxt.textContent=pct+"%"}
+function rerender(){if(currentScreen==="dashboard")renderDash();else if(currentScreen==="learn")renderLearn();else if(currentScreen==="practice")renderPractice();else if(currentScreen==="mockIntro")renderMockIntro();else if(currentScreen==="mock")renderMock();else if(currentScreen==="complete")renderComplete()}
+
+/* ─── LAUNCH ─── */
+function launchDemo(){qs("landing").classList.remove("active");qs("onboarding").classList.add("active");renderOnboard()}
+
+/* ─── ONBOARDING ─── */
+function renderOnboard(){
+  const step=OB_STEPS[obStep];
+  const dots=OB_STEPS.map((_,i)=>`<div class="pdot ${i===obStep?"active":""}"></div>`).join("");
+  const opts=step.opts.map(o=>`<button type="button" class="onboard-opt ${obAnswers[step.key]===o.val?"selected":""}" data-val="${o.val}"><span class="opt-emoji">${o.emoji}</span>${lang==="es"?o.label_es:o.label_en}</button>`).join("");
+  const isLast=obStep===OB_STEPS.length-1;
+  qs("onboardCard").innerHTML=`
+    <div class="progress-dots">${dots}</div>
+    <div class="onboard-step">${lang==="es"?"Paso":"Step"} ${obStep+1} de ${OB_STEPS.length}</div>
+    <div class="onboard-q">${lang==="es"?step.q_es:step.q_en}</div>
+    <div class="onboard-sub">${lang==="es"?step.sub_es:step.sub_en}</div>
+    <div class="onboard-opts">${opts}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${langSwitch()}
+      <button type="button" class="btn btn-primary" id="obNext" ${!obAnswers[step.key]?"disabled style='opacity:.5;cursor:not-allowed'":""} style="margin-left:auto;flex:1">${isLast?(lang==="es"?"Comenzar Demo →":"Start Demo →"):(lang==="es"?"Siguiente →":"Next →")}</button>
+    </div>`;
+  bindLang();
+  qs("onboardCard").querySelectorAll(".onboard-opt").forEach(b=>b.addEventListener("click",()=>{obAnswers[step.key]=b.dataset.val;buildUserProfile();renderOnboard()}));
+  const nb=qs("obNext");
+  if(nb&&!nb.disabled)nb.addEventListener("click",()=>{if(obStep<OB_STEPS.length-1){obStep++; renderOnboard();}else{startApp()}});
+}
+function buildUserProfile(){const exam=obAnswers.examDate;const hrs=obAnswers.hoursPerWeek;userProfile.name="Demo";if(exam)userProfile.examDate=exam;if(hrs)userProfile.hoursPerWeek=hrs}
+function startApp(){qs("onboarding").classList.remove("active");qs("app").classList.add("active");if(qs("userName"))qs("userName").textContent="Demo User";if(qs("userAvatar"))qs("userAvatar").textContent="D";renderDash()}
+
+/* ─── PREMIUM MODAL ─── */
+function showPremium(feat){
+  const data=PREMIUM_MODALS[feat]||{icon:"🔒",title:"Full Version Feature",desc:"Available in the complete BCBA Study Hub.",features:["Full curriculum","Unlimited practice","Timed exams","Analytics"]};
+  qs("modalIcon").textContent=data.icon;
+  qs("modalTitle").textContent=data.title;
+  qs("modalDesc").textContent=data.desc;
+  qs("modalFeatures").innerHTML=data.features.map(f=>`<div class="modal-feat"><div class="mf-dot">✓</div>${f}</div>`).join("");
+  qs("premiumModal").classList.add("active");
+}
 function hidePremium(){qs("premiumModal").classList.remove("active")}
-function renderDashboard(){currentScreen="dashboard";setNav("dashboard");updateSideProgress();let html='<div class="topbar"><div><div class="page-title">'+L("dashboard")+'</div><div class="page-sub">'+L("dashboardSub")+'</div></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+langSwitch()+'<button type="button" class="btn btn-primary" id="startDemoPathTop">'+L("startLearning")+'</button></div></div><div class="metrics"><div class="metric"><div class="metric-value">9</div><div class="metric-label">BCBA domains</div></div><div class="metric"><div class="metric-value">180+</div><div class="metric-label">concept-level targets</div></div><div class="metric"><div class="metric-value">1000+</div><div class="metric-label">clinical-style scenarios planned</div></div><div class="metric"><div class="metric-value">Adaptive</div><div class="metric-label">mastery-based practice</div></div></div><div class="banner"><div><div class="eyebrow">'+L("available")+'</div><div style="font-weight:800;font-size:15px;margin-bottom:4px">DOM. B — Concepts and Principles</div><div class="page-sub">Guided path: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review</div></div><button type="button" class="btn btn-primary" id="startDemoPathBanner">Start Demo Path</button></div><div class="exam-banner"><div class="pill exam">'+L("mockBanner")+'</div><div style="font-weight:800;margin-bottom:4px">3 timed clinical questions · exam-style pressure</div><div class="page-sub">Unlocked after the practice demo to leave users wanting the full exam experience.</div></div><div class="topbar" style="margin-top:20px"><div><div class="page-title" style="font-size:19px">Full Curriculum Preview</div><div class="page-sub">Visible for preview. Full access required to unlock all domains and practice banks.</div></div></div><div class="grid">';
-DOMAINS.forEach(d=>{html+='<div class="card '+(d[4]?'demo':'locked')+'"><div class="pill '+(d[4]?'demo':'premium')+'">'+(d[4]?'AVAILABLE IN PUBLIC DEMO':'AVAILABLE IN FULL VERSION')+'</div><div class="domain-title">DOM. '+d[0]+' · '+d[1]+'</div><div class="domain-meta">'+d[2]+' concepts · '+d[3]+' clinical scenarios</div><div class="include-title">Includes</div><ul class="preview">'+d[5].map(x=>'<li>'+x+'</li>').join("")+'</ul>'; if(d[4]){html+='<div class="include-title">Demo Path</div><div class="demo-path">'+DEMO_PATH.map((x,i)=>'<div class="path-item '+(i<learnIndex?'done':'')+' '+(i===learnIndex?'active-path':'')+'">'+(i<learnIndex?'✓':'○')+' '+x+'</div>').join("")+'</div><button type="button" class="btn btn-primary start-demo-inline" style="width:100%">Start Demo Path →</button>'}else{html+='<button type="button" class="btn btn-lock premium-inline" data-title="Domain '+d[0]+'" style="width:100%">🔒 Available in Full Version</button>'} html+='</div>'}); html+='</div>';qs("main").innerHTML=html;bindLang();document.querySelectorAll("#startDemoPathTop,#startDemoPathBanner,.start-demo-inline").forEach(b=>b.addEventListener("click",startDemoPath));document.querySelectorAll(".premium-inline").forEach(b=>b.addEventListener("click",()=>showPremium(b.dataset.title||"Premium Feature")))}
-function startDemoPath(){setNav("learn");renderLearn()}
-function renderLearn(){currentScreen="learn";updateSideProgress();const concept=DEMO_PATH[learnIndex],m=LEARN_MODULES[lang][concept];let html='<div class="topbar"><div><div class="page-title">'+L("learn")+'</div><div class="page-sub">DOM. B — Concepts and Principles · Guided demo path</div></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+langSwitch()+'<button type="button" class="btn btn-secondary" id="backCurriculum">'+L("view")+'</button></div></div><div class="learn-wrap"><div class="demo-path" style="margin-bottom:16px">'+DEMO_PATH.map((x,i)=>'<div class="path-item '+(i<learnIndex?'done':'')+' '+(i===learnIndex?'active-path':'')+'">'+(i<learnIndex?'✓':i===learnIndex?'●':'○')+' '+x+'</div>').join("")+'</div><div class="learn-card"><div class="module-label">Module '+(learnIndex+1)+' of '+DEMO_PATH.length+'</div><div class="module-title">'+concept+'</div><div class="difficulty">Difficulty: '+m.difficulty+'</div><div class="section-title">'+L("definition")+'</div><div class="definition">'+m.definition+'</div><div class="section-title">'+L("example")+'</div><div class="body-text">'+m.example+'</div><div class="note-box"><strong>'+L("strategy")+':</strong> '+m.strategy+'</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">'+(learnIndex<DEMO_PATH.length-1?'<button type="button" class="btn btn-primary" id="nextLearnBtn">'+L("nextModule")+'</button>':'<button type="button" class="btn btn-primary" id="toPracticeBtn">'+L("continuePractice")+'</button>')+'<button type="button" class="btn btn-secondary" id="backDashBtn">'+L("back")+'</button></div></div></div>';qs("main").innerHTML=html;bindLang();qs("backCurriculum").addEventListener("click",renderDashboard);qs("backDashBtn").addEventListener("click",renderDashboard);const n=qs("nextLearnBtn");if(n)n.addEventListener("click",()=>{learnIndex++;completedModules=Math.max(completedModules,learnIndex);renderLearn()});const p=qs("toPracticeBtn");if(p)p.addEventListener("click",()=>{completedModules=DEMO_PATH.length;startPractice()})}
-function startPractice(){setNav("practice");practiceIndex=0;selected=null;answered=false;score=0;answeredConcepts=[];renderPractice()}
-function renderPractice(){currentScreen="practice";updateSideProgress();const q=QUESTIONS[lang][practiceIndex];let html='<div class="topbar"><div><div class="page-title">'+L("practice")+'</div><div class="page-sub">5 curated clinical exam-style questions · No repeats</div></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+langSwitch()+'<button type="button" class="btn btn-secondary" id="practiceBack">'+L("view")+'</button></div></div><div class="practice-wrap"><div class="question-card"><div class="question-head"><div class="question-count">'+L("question")+' '+(practiceIndex+1)+' of '+QUESTIONS[lang].length+' · '+q.concept+'</div><div class="timer">'+L("timed")+'</div></div><div class="difficulty">Difficulty: '+q.difficulty+'</div><div class="question-text">'+q.q+'</div>';Object.keys(q.options).forEach(letter=>{let cls="";if(answered&&letter===q.correct)cls="correct";if(answered&&letter===selected&&letter!==q.correct)cls="wrong";html+='<button type="button" class="option '+cls+'" data-letter="'+letter+'" '+(answered?'disabled':'')+'><strong>'+letter+'.</strong> '+q.options[letter]+'</button>'});html+='<button type="button" class="btn btn-secondary" id="hintBtn" style="margin-top:4px">'+L("hint")+'</button><div id="hintBox" class="note-box" style="display:none">'+q.hint+'</div>';if(answered){html+='<div class="feedback '+(selected===q.correct?'good':'bad')+'"><strong>'+(selected===q.correct?L("correct"):L("incorrect"))+'.</strong> '+q.rationale+'</div>'+(practiceIndex<QUESTIONS[lang].length-1?'<button type="button" class="btn btn-primary" id="nextPracticeBtn">'+L("nextQuestion")+'</button>':'<button type="button" class="btn btn-primary" id="mockPreviewBtn">'+L("enterMock")+'</button>')}html+='</div></div>';qs("main").innerHTML=html;bindLang();qs("practiceBack").addEventListener("click",renderDashboard);qs("hintBtn").addEventListener("click",()=>{const box=qs("hintBox");box.style.display=box.style.display==="none"?"block":"none"});document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answerQuestion(b.dataset.letter)));const nx=qs("nextPracticeBtn");if(nx)nx.addEventListener("click",()=>{practiceIndex++;selected=null;answered=false;renderPractice()});const fn=qs("mockPreviewBtn");if(fn)fn.addEventListener("click",renderMockIntro)}
-function answerQuestion(letter){if(answered)return;const q=QUESTIONS[lang][practiceIndex];selected=letter;answered=true;if(letter===q.correct)score++;answeredConcepts.push({concept:q.concept,ok:letter===q.correct});renderPractice()}
-function renderMockIntro(){currentScreen="mockIntro";setNav("mock");qs("main").innerHTML='<div class="learn-wrap"><div class="topbar"><div></div>'+langSwitch()+'</div><div class="exam-banner"><div class="pill exam">'+L("mockBanner")+'</div><div class="page-title" style="font-size:22px">'+(lang==="es"?"Entrar en Modo Examen":"Enter Exam Mode")+'</div><div class="page-sub" style="margin-bottom:14px">'+(lang==="es"?"Estás a punto de entrar a una vista previa cronometrada con escenarios clínicos modelados al estilo del examen BCBA.":"You are about to enter a timed clinical scenario preview modeled after the BCBA examination environment.")+'</div><div class="metrics"><div class="metric"><div class="metric-value">3</div><div class="metric-label">'+(lang==="es"?"preguntas":"questions")+'</div></div><div class="metric"><div class="metric-value">4 min</div><div class="metric-label">timed preview</div></div><div class="metric"><div class="metric-value">'+(lang==="es"?"Avanzado":"Advanced")+'</div><div class="metric-label">clinical scenarios</div></div></div><button type="button" class="btn btn-primary" id="startMockBtn">'+L("startMock")+'</button></div></div>';bindLang();qs("startMockBtn").addEventListener("click",startMock)}
-function startMock(){setNav("mock");mockIndex=0;selected=null;answered=false;mockScore=0;renderMock()}
-function renderMock(){currentScreen="mock";const q=MOCK[lang][mockIndex];let html='<div class="topbar"><div><div class="page-title">'+L("mock")+'</div><div class="page-sub">3 timed clinical questions · preview only</div></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+langSwitch()+'<div class="timer exam">⏱ 4:00 Preview</div></div></div><div class="practice-wrap"><div class="question-card"><div class="question-head"><div class="question-count">'+(lang==="es"?"Pregunta Mock":"Mock Question")+' '+(mockIndex+1)+' of '+MOCK[lang].length+' · '+q.concept+'</div><div class="timer exam">Exam Mode</div></div><div class="difficulty">Difficulty: '+q.difficulty+'</div><div class="question-text">'+q.q+'</div>';Object.keys(q.options).forEach(letter=>{let cls="";if(answered&&letter===q.correct)cls="correct";if(answered&&letter===selected&&letter!==q.correct)cls="wrong";html+='<button type="button" class="option '+cls+'" data-letter="'+letter+'" '+(answered?'disabled':'')+'><strong>'+letter+'.</strong> '+q.options[letter]+'</button>'});if(answered){html+='<div class="feedback '+(selected===q.correct?'good':'bad')+'"><strong>'+(selected===q.correct?L("correct"):L("incorrect"))+'.</strong> '+q.rationale+'</div>'+(mockIndex<MOCK[lang].length-1?'<button type="button" class="btn btn-primary" id="nextMockBtn">'+L("nextMock")+'</button>':'<button type="button" class="btn btn-primary" id="finishMockBtn">'+L("summary")+'</button>')}html+='</div></div>';qs("main").innerHTML=html;bindLang();document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answerMock(b.dataset.letter)));const nx=qs("nextMockBtn");if(nx)nx.addEventListener("click",()=>{mockIndex++;selected=null;answered=false;renderMock()});const fn=qs("finishMockBtn");if(fn)fn.addEventListener("click",renderComplete)}
-function answerMock(letter){if(answered)return;const q=MOCK[lang][mockIndex];selected=letter;answered=true;if(letter===q.correct)mockScore++;renderMock()}
-function renderComplete(){currentScreen="complete";setNav("dashboard");const missed=answeredConcepts.filter(x=>!x.ok).map(x=>x.concept);let needs=missed.length?missed.join(", "):(lang==="es"?"Discriminación avanzada bajo tiempo de examen":"Advanced discrimination under exam timing");qs("main").innerHTML='<div class="topbar"><div></div>'+langSwitch()+'</div><div class="complete-card"><div style="font-size:52px;margin-bottom:10px">🎯</div><h2 style="font-size:25px;margin-bottom:8px">'+L("complete")+'</h2><p class="page-sub" style="margin-bottom:12px">'+L("completeSub")+'</p><div style="font-size:28px;font-weight:850;color:#0F6E56;margin:12px 0">Practice: '+score+'/'+QUESTIONS[lang].length+' · Mock Preview: '+mockScore+'/'+MOCK[lang].length+'</div><div class="summary-grid"><div class="summary-box summary-good"><strong>'+L("strengths")+'</strong><br>✓ Reinforcement contingencies<br>✓ Concept-based learning path<br>✓ Clinical scenario interpretation</div><div class="summary-box summary-improve"><strong>'+L("focus")+'</strong><br>• '+needs+'<br>• '+(lang==="es"?"La versión completa desbloquea remediation personalizada y mastery tracking.":"Full version unlocks personalized remediation and mastery tracking.")+'</div></div><div class="feature-grid"><div class="feature">✓ All 9 BCBA domains</div><div class="feature">✓ Full curriculum access</div><div class="feature">✓ Unlimited practice</div><div class="feature">✓ Timed mock exams</div><div class="feature">✓ Progress tracking</div><div class="feature">✓ Mastery analytics</div></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px"><button type="button" class="btn btn-primary" id="unlockBtn">'+L("unlock")+'</button><button type="button" class="btn btn-secondary" id="completeBack">'+L("back")+'</button></div></div>';bindLang();qs("unlockBtn").addEventListener("click",()=>showPremium("Unlock Full Version"));qs("completeBack").addEventListener("click",renderDashboard)}
-document.addEventListener("DOMContentLoaded",function(){qs("startDemoBtn").addEventListener("click",launchDemo);qs("nav-dashboard").addEventListener("click",renderDashboard);qs("nav-learn").addEventListener("click",startDemoPath);qs("nav-practice").addEventListener("click",startPractice);qs("nav-mock").addEventListener("click",renderMockIntro);document.querySelectorAll(".premium-btn").forEach(b=>b.addEventListener("click",()=>showPremium(b.dataset.title)));qs("closeModalBtn").addEventListener("click",hidePremium);qs("premiumModal").addEventListener("click",e=>{if(e.target.id==="premiumModal")hidePremium()})});
+
+/* ─── DASHBOARD ─── */
+function renderDash(){
+  currentScreen="dashboard";setNav("dashboard");updateProgress();
+  const urgencyMsg=obAnswers.examDate==="<3mo"?'⚡ Tu examen se acerca — cada día cuenta.':obAnswers.examDate==="3-6mo"?'📅 Tienes tiempo, pero el plan importa.':'📘 Construye una base sólida desde ahora.';
+  let html=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title">${L("dash")}</div>
+      <div class="page-sub">${L("dashSub")}</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-primary" id="topStart">${L("startDemo")}</button></div>
+  </div>
+  <div class="social-strip animate-in">
+    <div class="live-dot"></div>
+    <div style="font-size:12px;color:var(--green-dark);font-weight:600">${urgencyMsg} ${obAnswers.hoursPerWeek?`Estudiando ${obAnswers.hoursPerWeek} hrs/semana.`:""}</div>
+  </div>
+  <div class="metrics animate-in">
+    <div class="metric"><div class="metric-value">9</div><div class="metric-label">dominios BCBA</div></div>
+    <div class="metric"><div class="metric-value">180+</div><div class="metric-label">conceptos objetivo</div></div>
+    <div class="metric"><div class="metric-value">1000+</div><div class="metric-label">escenarios clínicos</div></div>
+    <div class="metric"><div class="metric-value">Adaptive</div><div class="metric-label">mastery learning</div></div>
+  </div>
+  <div class="banner animate-in">
+    <div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:4px">${L("avail")}</div>
+      <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">DOM. B — Concepts and Principles</div>
+      <div class="page-sub">Ruta guiada: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review</div>
+    </div>
+    <button type="button" class="btn btn-primary" id="bannerStart">Comenzar Ruta →</button>
+  </div>
+  <div class="exam-banner animate-in">
+    <div class="pill exam">${L("mock")}</div>
+    <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">4 preguntas clínicas · 3 dominios · timer real de 5 minutos</div>
+    <div class="page-sub">DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — disponible tras completar la práctica demo.</div>
+  </div>
+  <div style="font-family:var(--font-display);font-size:19px;font-weight:900;margin:20px 0 12px;color:var(--ink)">Currículo Completo — Preview</div>
+  <div class="grid animate-in">`;
+  DOMAINS.forEach(d=>{
+    const isDemo=d[4]===true;
+    const isTeaser=d[4]==="teaser";
+    const isPref=d[4]==="pref";
+    const isLocked=!d[4];
+    let pillClass=isDemo?"demo":isTeaser?"teaser":isPref?"pref":"premium";
+    let pillLabel=isDemo?"DISPONIBLE EN DEMO":isTeaser?"PREVIEW DISPONIBLE":isPref?"HERRAMIENTA INTERACTIVA":"VERSIÓN COMPLETA";
+    html+=`<div class="card ${isDemo?"demo":""}${isTeaser?" ":" "}">
+      <div class="pill ${pillClass}">${pillLabel}</div>
+      <div class="domain-title">DOM. ${d[0]} · ${d[1]}</div>
+      <div class="domain-meta">${d[2]} conceptos · ${d[3]} escenarios</div>
+      <div class="include-title">Incluye</div>
+      <ul class="preview">${d[5].map(x=>`<li>${x}</li>`).join("")}</ul>`;
+    if(isDemo){html+=`<div class="demo-path" style="margin-top:10px">${DEMO_PATH.map((x,i)=>`<div class="path-item ${i<learnIdx?"done":""} ${i===learnIdx?"active-path":""}">${i<learnIdx?"✓":i===learnIdx?"●":"○"} ${x}</div>`).join("")}</div><button type="button" class="btn btn-primary start-inline" style="width:100%;margin-top:8px">Comenzar Demo →</button>`;}
+    else if(isTeaser){html+=`<div class="teaser-gate"><div class="teaser-gate-title">⚖️ ${lang==="es"?"Vista Previa: Multiple Relationships":"Preview: Multiple Relationships"}</div><div class="teaser-gate-sub">${lang==="es"?"1 concepto desbloqueado · Práctica bloqueada":"1 concept unlocked · Practice locked"}</div><button type="button" class="btn ethics-teaser-btn" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);color:white;width:100%;padding:10px">${lang==="es"?"Ver Preview de Ética →":"View Ethics Preview →"}</button></div>`;}
+    else if(isPref){html+=`<div class="teaser-gate" style="background:linear-gradient(135deg,#FFF0F6,#FCE7F3);border-color:#F9A8D4"><div class="teaser-gate-title" style="color:#831843">🧪 ${lang==="es"?"Preference Assessment Interactivo":"Interactive Preference Assessment"}</div><div class="teaser-gate-sub" style="color:#BE185D">${lang==="es"?"Simula un MSWO real con un cliente":"Simulate a real MSWO with a client"}</div><button type="button" class="btn pref-demo-btn" style="background:linear-gradient(135deg,#831843,#BE185D);color:white;width:100%;padding:10px">${lang==="es"?"Probar Assessment →":"Try Assessment →"}</button></div>`;}
+    else{html+=`<button type="button" class="btn btn-lock premium-inline" data-feat="${["exams","weakness","plan","analytics","exams","weakness","plan","analytics","analytics"][DOMAINS.indexOf(d)%9]}" style="width:100%;margin-top:8px">🔒 Versión Completa</button>`;}
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  qs("main").innerHTML=html;
+  bindLang();
+  qs("topStart").addEventListener("click",startLearn);
+  qs("bannerStart").addEventListener("click",startLearn);
+  document.querySelectorAll(".start-inline").forEach(b=>b.addEventListener("click",startLearn));
+  document.querySelectorAll(".premium-inline").forEach(b=>b.addEventListener("click",()=>showPremium(b.dataset.feat)));
+  document.querySelectorAll(".ethics-teaser-btn").forEach(b=>b.addEventListener("click",renderEthicsTeaser));
+  document.querySelectorAll(".pref-demo-btn").forEach(b=>b.addEventListener("click",renderPrefAssessment));
+}
+
+/* ─── LEARN ─── */
+function startLearn(){setNav("learn");renderLearn()}
+function renderLearn(){
+  currentScreen="learn";updateProgress();
+  const concept=DEMO_PATH[learnIdx];
+  const m=LEARN[lang][concept];
+  const isLast=learnIdx===DEMO_PATH.length-1;
+  const html=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title">${L("learn")}</div>
+      <div class="page-sub">DOM. B · ${concept} · Módulo ${learnIdx+1} de ${DEMO_PATH.length}</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="learnBack">${L("back")}</button></div>
+  </div>
+  <div class="learn-wrap">
+    <div class="demo-path" style="margin-bottom:16px">${DEMO_PATH.map((x,i)=>`<div class="path-item ${i<learnIdx?"done":""} ${i===learnIdx?"active-path":""}">${i<learnIdx?"✓":i===learnIdx?"●":"○"} ${x}</div>`).join("")}</div>
+    <div class="learn-card animate-in">
+      <div class="module-label">Módulo ${learnIdx+1} de ${DEMO_PATH.length}</div>
+      <div class="module-title">${m.icon} ${concept}</div>
+      <div class="difficulty-badge ${diffClass(m.difficulty)}">${m.difficulty}</div>
+      <div class="section-label">${L("definition")}</div>
+      <div class="definition">${m.definition}</div>
+      <div class="section-label">${L("example")}</div>
+      <div style="font-size:14px;line-height:1.8;color:var(--ink-mid);background:var(--surface);border-radius:var(--radius-sm);padding:14px;margin-bottom:4px">${m.example}</div>
+      <div class="note-box"><strong>💡 ${L("strategy")}:</strong> ${m.strategy}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
+        ${isLast?`<button type="button" class="btn btn-primary" id="toPracticeBtn">${L("toPractice")}</button>`:`<button type="button" class="btn btn-primary" id="nextLearnBtn">${L("next")}</button>`}
+        <button type="button" class="btn btn-secondary" id="learnBackBtn">${L("back")}</button>
+      </div>
+    </div>
+  </div>`;
+  qs("main").innerHTML=html;
+  bindLang();
+  qs("learnBack").addEventListener("click",renderDash);
+  qs("learnBackBtn").addEventListener("click",renderDash);
+  const nl=qs("nextLearnBtn");
+  if(nl)nl.addEventListener("click",()=>{learnIdx++;completedMods=Math.max(completedMods,learnIdx);renderLearn()});
+  const tp=qs("toPracticeBtn");
+  if(tp)tp.addEventListener("click",()=>{completedMods=DEMO_PATH.length;startPractice()});
+}
+
+/* ─── PRACTICE ─── */
+function startPractice(){setNav("practice");practIdx=0;selected=null;answered=false;confidence=null;score=0;answeredData=[];renderPractice()}
+function renderPractice(){
+  currentScreen="practice";updateProgress();
+  const q=QUESTIONS[lang][practIdx];
+  const total=QUESTIONS[lang].length;
+  let html=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title">${L("pract")}</div>
+      <div class="page-sub">${total} preguntas clínicas · DOM. B — Concepts and Principles</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="practBack">${L("back")}</button></div>
+  </div>
+  <div class="practice-wrap">
+    <div class="question-card animate-in">
+      <div class="question-head">
+        <div class="question-meta">${L("qLabel")} ${practIdx+1}/${total} · <strong>${q.concept}</strong></div>
+        <div class="timer-pill practice">⏱ ${L("pract")}</div>
+      </div>
+      <div class="difficulty-badge ${diffClass(q.difficulty)}" style="margin-bottom:12px">${q.difficulty}</div>
+      <div class="question-text">${q.q}</div>`;
+  Object.keys(q.options).forEach(letter=>{
+    let cls="";
+    if(answered&&letter===q.correct)cls="correct";
+    if(answered&&letter===selected&&letter!==q.correct)cls="wrong";
+    html+=`<button type="button" class="option ${cls}" data-letter="${letter}" ${answered?"disabled":""}><span class="option-letter">${letter}</span>${q.options[letter]}</button>`;
+  });
+  if(!answered){
+    html+=`<button type="button" class="hint-btn" id="hintBtn">${L("hint")}: ${q.hint}</button>`;
+  }
+  if(!answered&&!confidence){
+    html+=`<div class="confidence-panel"><div class="conf-label">${L("confLabel")}</div><div class="conf-opts">
+      <button type="button" class="conf-btn" data-conf="high">${L("confHigh")}</button>
+      <button type="button" class="conf-btn" data-conf="mid">${L("confMid")}</button>
+      <button type="button" class="conf-btn" data-conf="low">${L("confLow")}</button>
+    </div></div>`;
+  }
+  if(answered){
+    const ok=selected===q.correct;
+    html+=`<div class="feedback ${ok?"good":"bad"}"><div class="feedback-title">${ok?L("correct"):L("incorrect")}</div>${q.rationale}</div>`;
+    if(practIdx<total-1)html+=`<button type="button" class="btn btn-primary" id="nextPractBtn" style="margin-top:4px">${L("nextQ")}</button>`;
+    else html+=`<button type="button" class="btn btn-primary" id="mockBtn" style="margin-top:4px">${L("enterMock")}</button>`;
+  }
+  html+=`</div></div>`;
+  qs("main").innerHTML=html;
+  bindLang();
+  qs("practBack").addEventListener("click",renderDash);
+  document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answerPractice(b.dataset.letter)));
+  document.querySelectorAll(".conf-btn").forEach(b=>b.addEventListener("click",()=>{
+    confidence=b.dataset.conf;
+    document.querySelectorAll(".conf-btn").forEach(x=>{x.className="conf-btn";});
+    b.classList.add(`selected-${b.dataset.conf}`);
+  }));
+  const nb=qs("nextPractBtn");
+  if(nb)nb.addEventListener("click",()=>{practIdx++;selected=null;answered=false;confidence=null;renderPractice()});
+  const mb=qs("mockBtn");
+  if(mb)mb.addEventListener("click",renderMockIntro);
+}
+function answerPractice(letter){
+  if(answered)return;
+  const q=QUESTIONS[lang][practIdx];
+  selected=letter;answered=true;
+  if(letter===q.correct)score++;
+  answeredData.push({concept:q.concept,ok:letter===q.correct,confidence:confidence||"unknown"});
+  renderPractice();
+}
+
+/* ─── MOCK INTRO ─── */
+function renderMockIntro(){
+  currentScreen="mockIntro";setNav("mock");
+  qs("main").innerHTML=`
+  <div class="topbar"><div></div><div class="topbar-right">${langSwitch()}</div></div>
+  <div class="mock-intro-card animate-scale">
+    <div class="exam-mode-header">
+      <div class="exam-icon">📋</div>
+      <div class="exam-title">${lang==="es"?"Entrar al Modo Examen":"Enter Exam Mode"}</div>
+      <div class="exam-subtitle">${lang==="es"?"4 preguntas clínicas cronometradas — 3 dominios distintos":"4 timed clinical questions — spanning 3 different domains"}</div>
+    </div>
+    <div class="exam-rules">
+      <div class="rule-item"><div class="rule-value">4</div><div class="rule-label">${lang==="es"?"preguntas":"questions"}</div></div>
+      <div class="rule-item"><div class="rule-value">5:00</div><div class="rule-label">${lang==="es"?"minutos reales":"real minutes"}</div></div>
+      <div class="rule-item"><div class="rule-value">${lang==="es"?"3 DOM.":"3 DOM."}</div><div class="rule-label">${lang==="es"?"B, C, D cubiertos":"B, C, D covered"}</div></div>
+    </div>
+    <div class="note-box" style="margin-bottom:20px">⚠️ ${lang==="es"?"El timer correrá desde que presiones comenzar. Las preguntas son de nivel avanzado — escenarios clínicos reales de 3 dominios diferentes.":"Timer starts when you press begin. Advanced clinical scenarios spanning DOM. B (Concepts), DOM. B (Escape/Avoidance), and DOM. D (Experimental Design)."}</div>
+    <button type="button" class="btn btn-gold" id="startMockBtn" style="width:100%;font-size:15px;padding:14px">${L("startMock")} →</button>
+  </div>`;
+  bindLang();
+  qs("startMockBtn").addEventListener("click",startMock);
+}
+function startMock(){setNav("mock");mockIdx=0;selected=null;answered=false;mockScore=0;mockTimerSec=300;renderMock();startMockTimer()}
+
+/* ─── MOCK ─── */
+let mockTimerInterval=null;
+function startMockTimer(){
+  clearInterval(mockTimerInterval);
+  mockTimerInterval=setInterval(()=>{
+    mockTimerSec--;
+    const el=qs("mockTimer");
+    if(el){
+      const m=Math.floor(mockTimerSec/60);
+      const s=mockTimerSec%60;
+      el.textContent=`⏱ ${m}:${s.toString().padStart(2,"0")}`;
+      el.className="timer-pill exam"+(mockTimerSec<=30?" urgent":"");
+    }
+    if(mockTimerSec<=0){clearInterval(mockTimerInterval);if(!answered){timeExpired()}}
+  },1000);
+}
+function timeExpired(){answered=true;selected="TIMEOUT";renderMock()}
+function renderMock(){
+  currentScreen="mock";
+  const q=MOCK[lang][mockIdx];
+  const m=Math.floor(mockTimerSec/60);
+  const s=mockTimerSec%60;
+  let html=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title">${L("mockTitle")}</div>
+      <div class="page-sub">Preview · 3 ${lang==="es"?"preguntas avanzadas":"advanced questions"}</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<div class="timer-pill exam${mockTimerSec<=30?" urgent":""}" id="mockTimer">⏱ ${m}:${s.toString().padStart(2,"0")}</div></div>
+  </div>
+  <div class="practice-wrap">
+    <div class="question-card animate-in">
+      <div class="question-head">
+        <div class="question-meta">${lang==="es"?"Pregunta":"Question"} ${mockIdx+1}/${MOCK[lang].length} · ${q.concept}</div>
+        <div class="timer-pill exam">🎓 Exam Mode</div>
+      </div>
+      <div class="difficulty-badge ${diffClass(q.difficulty)}">${q.difficulty}</div>
+      <div class="question-text">${q.q}</div>`;
+  Object.keys(q.options).forEach(letter=>{
+    let cls="";
+    if(answered&&letter===q.correct)cls="correct";
+    if(answered&&letter===selected&&letter!==q.correct)cls="wrong";
+    html+=`<button type="button" class="option ${cls}" data-letter="${letter}" ${answered?"disabled":""}><span class="option-letter">${letter}</span>${q.options[letter]}</button>`;
+  });
+  if(answered){
+    if(selected==="TIMEOUT"){html+=`<div class="feedback bad"><div class="feedback-title">⏰ ${lang==="es"?"Tiempo agotado":"Time's up"}</div>${lang==="es"?"Se acabó el tiempo. La respuesta correcta es":"Time expired. The correct answer is"} <strong>${q.correct}. ${q.options[q.correct]}</strong>. ${q.rationale}</div>`;}
+    else{const ok=selected===q.correct;html+=`<div class="feedback ${ok?"good":"bad"}"><div class="feedback-title">${ok?L("correct"):L("incorrect")}</div>${q.rationale}</div>`;}
+    if(mockIdx<MOCK[lang].length-1)html+=`<button type="button" class="btn btn-primary" id="nextMockBtn" style="margin-top:4px">${L("nextMock")}</button>`;
+    else html+=`<button type="button" class="btn btn-gold" id="finishBtn" style="margin-top:4px">${L("summary")}</button>`;
+  }
+  html+=`</div></div>`;
+  qs("main").innerHTML=html;
+  bindLang();
+  document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answerMock(b.dataset.letter)));
+  const nb=qs("nextMockBtn");
+  if(nb)nb.addEventListener("click",()=>{mockIdx++;selected=null;answered=false;renderMock()});
+  const fb=qs("finishBtn");
+  if(fb)fb.addEventListener("click",()=>{clearInterval(mockTimerInterval);renderComplete()});
+}
+function answerMock(letter){
+  if(answered)return;
+  const q=MOCK[lang][mockIdx];
+  selected=letter;answered=true;
+  if(letter===q.correct)mockScore++;
+  renderMock();
+}
+
+/* ─── COMPLETE ─── */
+function renderComplete(){
+  currentScreen="complete";setNav("dashboard");
+  clearInterval(mockTimerInterval);
+  const total=QUESTIONS[lang].length;
+  const missed=answeredData.filter(x=>!x.ok).map(x=>x.concept);
+  const confident_wrong=answeredData.filter(x=>!x.ok&&x.confidence==="high");
+  const needsFocus=missed.length?[...new Set(missed)].join(", "):(lang==="es"?"Discriminación avanzada bajo tiempo":"Advanced discrimination under exam timing");
+  const pct=Math.round((score/total)*100);
+  let insightText="";
+  if(missed.includes("Avoidance")||missed.includes("Mixed Review")){insightText=lang==="es"?`Respondiste ${score}/${total} correctamente. Tu mayor oportunidad de mejora es <strong>Escape vs. Avoidance</strong> — uno de los conceptos más frecuentes en el BCBA real. La versión completa tiene 23 preguntas específicas con remediation adaptativa.`:`You got ${score}/${total} correct. Your biggest opportunity is <strong>Escape vs. Avoidance</strong> — one of the most frequently tested distinctions on the real BCBA. The full version has 23 targeted questions with adaptive remediation.`;}
+  else if(confident_wrong.length){insightText=lang==="es"?`Importante: respondiste con <strong>alta confianza pero incorrectamente</strong> en ${confident_wrong.length} pregunta(s). Eso es más peligroso en el examen real que simplemente adivinar. La versión completa detecta y corrige estos patrones.`:`Important: you answered with <strong>high confidence but incorrectly</strong> on ${confident_wrong.length} question(s). That's more dangerous on the real exam than guessing. The full version detects and corrects these patterns.`;}
+  else{insightText=lang==="es"?`Excelente rendimiento en el demo — ${score}/${total} correctas. El currículo completo cubre los 9 dominios con el mismo nivel de detalle clínico, más analytics de progreso y mock exams completos.`:`Strong demo performance — ${score}/${total} correct. The full curriculum covers all 9 domains with the same clinical depth, plus progress analytics and full mock exams.`;}
+
+  qs("main").innerHTML=`
+  <div class="topbar"><div></div><div class="topbar-right">${langSwitch()}</div></div>
+  <div class="complete-card animate-scale">
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-size:42px">🎯</div>
+      <div class="page-title" style="margin-top:8px">${L("complete")}</div>
+      <div class="page-sub">${L("completeSub")}</div>
+    </div>
+    <div class="score-display">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:8px">Practice</div>
+        <div class="score-ring"><div class="score-num">${score}</div><div class="score-denom">de ${total}</div></div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px">Mock Exam</div>
+        <div class="score-ring" style="border-color:var(--gold);background:var(--gold-light)"><div class="score-num" style="color:var(--gold)">${mockScore}</div><div class="score-denom">de ${MOCK[lang].length}</div></div>      </div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-label">${lang==="es"?"📊 TU ANÁLISIS PERSONALIZADO":"📊 YOUR PERSONALIZED INSIGHT"}</div>
+      <div class="insight-text">${insightText}</div>
+    </div>
+    <div class="summary-cols">
+      <div class="sum-box sum-good">
+        <strong>✓ ${L("strengths")}</strong><br>
+        • ${lang==="es"?"Contingencias de reforzamiento":"Reinforcement contingencies"}<br>
+        • ${lang==="es"?"Ruta de aprendizaje basada en conceptos":"Concept-based learning path"}<br>
+        • ${lang==="es"?"Interpretación de escenarios clínicos":"Clinical scenario interpretation"}
+      </div>
+      <div class="sum-box sum-improve">
+        <strong>📌 ${L("focus")}</strong><br>
+        • ${needsFocus}<br>
+        • ${lang==="es"?"Discriminación bajo presión de tiempo":"Discrimination under time pressure"}
+      </div>
+    </div>
+    <div class="email-capture">
+      <div class="ec-label">${lang==="es"?"PRÓXIMO PASO":"NEXT STEP"}</div>
+      <div class="ec-heading">${L("emailHead")}</div>
+      <div class="ec-sub">${L("emailSub")}</div>
+      <div class="ec-form" id="ecForm">
+        <input type="email" class="ec-input" id="ecEmail" placeholder="${L("emailPlaceholder")}"/>
+        <button type="button" class="ec-btn" id="ecBtn">${L("emailBtn")}</button>
+      </div>
+      <div class="ec-success" id="ecSuccess">${L("emailThanks")}</div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--ink-mid);margin-bottom:10px">${lang==="es"?"¿Qué incluye la versión completa?":"What's included in the full version?"}</div>
+    <div class="feature-chips">
+      <div class="chip active">✓ 9 dominios BCBA</div>
+      <div class="chip active">✓ Práctica ilimitada</div>
+      <div class="chip active">✓ Mock exams cronometrados</div>
+      <div class="chip active">✓ Weakness Detection AI</div>
+      <div class="chip">📅 Study Plan personalizado</div>
+      <div class="chip">📊 Mastery Analytics</div>
+      <div class="chip">🇺🇸🇪🇸 EN + ES</div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px">
+      <button type="button" class="btn btn-gold" id="unlockBtn" style="font-size:14px;padding:12px 24px">${L("unlock")}</button>
+      <button type="button" class="btn btn-secondary" id="completeBack">${L("back")}</button>
+    </div>
+  </div>`;
+  bindLang();
+  const eb=qs("ecBtn");
+  if(eb)eb.addEventListener("click",()=>{
+    const email=qs("ecEmail").value;
+    if(email&&email.includes("@")){qs("ecForm").style.display="none";qs("ecSuccess").style.display="block";}
+    else{qs("ecEmail").style.borderColor="rgba(255,100,100,.6)";}
+  });
+  qs("unlockBtn").addEventListener("click",()=>showPremium("exams"));
+  qs("completeBack").addEventListener("click",renderDash);
+}
+
+/* ─── ETHICS TEASER ─── */
+function renderEthicsTeaser(){
+  currentScreen="ethicsTeaser";
+  const m=ETHICS_TEASER[lang];
+  const pq=m.pract_teaser;
+  ethicsPractAnswered=false;ethicsPractSelected=null;
+  qs("main").innerHTML=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title" style="color:#5B21B6">⚖️ DOM. E — Ethics Preview</div>
+      <div class="page-sub">${lang==="es"?"1 concepto desbloqueado · Práctica bloqueada · 22 conceptos en versión completa":"1 concept unlocked · Practice locked · 22 concepts in full version"}</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="ethicsBack">${L("back")}</button></div>
+  </div>
+  <div class="learn-wrap">
+    <div class="ethics-banner">
+      <div>
+        <div class="ethics-pct">${m.why.match(/\d+%/)?.[0]||"12%"}</div>
+        <div class="ethics-pct-label">${lang==="es"?"del examen BCBA":"of the BCBA exam"}</div>
+      </div>
+      <div style="font-size:13px;line-height:1.6;opacity:.9">${m.why}</div>
+    </div>
+    <div class="ethics-teaser-card animate-in">
+      <div class="module-label" style="color:#6D28D9">DOM. E · ${lang==="es"?"Vista Previa Desbloqueada":"Unlocked Preview"}</div>
+      <div class="module-title">${m.icon} ${m.concept}</div>
+      <div class="difficulty-badge ${diffClass(m.difficulty)}">${m.difficulty}</div>
+      <div class="section-label">${L("definition")}</div>
+      <div class="definition" style="border-left-color:#7C3AED">${m.definition}</div>
+      <div class="section-label">${L("example")}</div>
+      <div style="font-size:14px;line-height:1.8;color:var(--ink-mid);background:var(--surface);border-radius:var(--radius-sm);padding:14px">${m.example}</div>
+      <div class="note-box" style="background:#F3EEFF;border-color:#C4B5FD;color:#4C1D95"><strong>💡 ${L("strategy")}:</strong> ${m.strategy}</div>
+
+      <div class="section-label" style="margin-top:20px">${lang==="es"?"Práctica — 1 Pregunta Preview":"Practice — 1 Preview Question"}</div>
+      <div class="question-card" style="border-color:#C4B5FD;margin-top:8px">
+        <div class="question-text" style="border-left-color:#7C3AED">${pq.q}</div>
+        ${Object.keys(pq.options).map(letter=>{
+          let cls="";
+          if(ethicsPractAnswered&&letter===pq.correct)cls="correct";
+          if(ethicsPractAnswered&&letter===ethicsPractSelected&&letter!==pq.correct)cls="wrong";
+          return`<button type="button" class="option ${cls} ethics-pq-opt" data-letter="${letter}" ${ethicsPractAnswered?"disabled":""}><span class="option-letter">${letter}</span>${pq.options[letter]}</button>`;
+        }).join("")}
+        ${ethicsPractAnswered?`<div class="feedback ${ethicsPractSelected===pq.correct?"good":"bad"}"><div class="feedback-title">${ethicsPractSelected===pq.correct?L("correct"):L("incorrect")}</div>${pq.rationale}</div>`:""}
+      </div>
+
+      <div style="background:linear-gradient(135deg,#EDE9FE,#F3EEFF);border:1.5px dashed #A78BFA;border-radius:var(--radius-md);padding:18px;margin-top:16px;text-align:center">
+        <div style="font-size:14px;font-weight:700;color:#5B21B6;margin-bottom:6px">🔒 ${lang==="es"?"21 conceptos más bloqueados":"21 more concepts locked"}</div>
+        <div style="font-size:12px;color:#6D28D9;margin-bottom:12px;line-height:1.6">${lang==="es"?"La versión completa incluye:":"The full version includes:"} ${m.locked_concepts.join(" · ")}</div>
+        <button type="button" class="btn" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);color:white" id="ethicsUnlockBtn">${lang==="es"?"Desbloquear DOM. E Completo →":"Unlock Full DOM. E →"}</button>
+      </div>
+    </div>
+  </div>`;
+  bindLang();
+  qs("ethicsBack").addEventListener("click",renderDash);
+  document.querySelectorAll(".ethics-pq-opt").forEach(b=>b.addEventListener("click",()=>{
+    if(ethicsPractAnswered)return;
+    ethicsPractSelected=b.dataset.letter;
+    ethicsPractAnswered=true;
+    renderEthicsTeaser();
+  }));
+  const eu=qs("ethicsUnlockBtn");
+  if(eu)eu.addEventListener("click",()=>showPremium("exams"));
+}
+
+/* ─── PREFERENCE ASSESSMENT ─── */
+function renderPrefAssessment(){
+  currentScreen="prefAssessment";
+  prefScores={};PREF_ITEMS.forEach(it=>{prefScores[it.id]=0});
+  prefPairIdx=0;prefDone=false;
+  renderPrefRound();
+}
+function renderPrefRound(){
+  const totalPairs=PREF_PAIRS.length;
+  const pct=Math.round((prefPairIdx/totalPairs)*100);
+  if(prefDone){renderPrefResults();return;}
+  const pair=PREF_PAIRS[prefPairIdx];
+  const itemA=PREF_ITEMS[pair[0]];
+  const itemB=PREF_ITEMS[pair[1]];
+  const nameA=lang==="es"?itemA.label_es:itemA.label_en;
+  const nameB=lang==="es"?itemB.label_es:itemB.label_en;
+  qs("main").innerHTML=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title" style="color:#BE185D">🧪 DOM. F — Preference Assessment</div>
+      <div class="page-sub">${lang==="es"?"Evaluación de preferencia de estímulo emparejado (MSWO simulado)":"Paired Stimulus Preference Assessment (Simulated MSWO)"}</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="prefBack">${L("back")}</button></div>
+  </div>
+  <div class="pref-wrap">
+    <div class="pref-card animate-in">
+      <div class="pref-progress-row">
+        <div class="pref-prog-bar"><div class="pref-prog-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:11px;font-weight:700;color:var(--ink-soft)">${prefPairIdx}/${totalPairs}</span>
+      </div>
+      <div class="pref-header">
+        <div class="pref-round">${lang==="es"?"EVALUACIÓN DE PREFERENCIA · Par":"PREFERENCE ASSESSMENT · Pair"} ${prefPairIdx+1} de ${totalPairs}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink-mid);margin-top:4px">${lang==="es"?"Imagina que eres el/la cliente. ¿Cuál preferirías?":"Imagine you are the client. Which would you prefer?"}</div>
+      </div>
+      <div class="note-box" style="margin-bottom:4px;font-size:12px">📋 ${lang==="es"?"Instrucción clínica: El BCBA presenta dos ítems simultáneamente y registra cuál selecciona el cliente. El orden de presentación sigue un protocolo MSWO para controlar efectos de orden.":"Clinical instruction: The BCBA presents two items simultaneously and records which the client selects. Presentation order follows MSWO protocol to control for order effects."}</div>
+      <div class="pref-pair">
+        <button type="button" class="pref-item" id="prefA">
+          <span class="pref-emoji">${itemA.emoji}</span>
+          <span class="pref-name">${nameA}</span>
+        </button>
+        <div class="pref-vs">VS</div>
+        <button type="button" class="pref-item" id="prefB">
+          <span class="pref-emoji">${itemB.emoji}</span>
+          <span class="pref-name">${nameB}</span>
+        </button>
+      </div>
+    </div>
+  </div>`;
+  bindLang();
+  qs("prefBack").addEventListener("click",renderDash);
+  qs("prefA").addEventListener("click",()=>recordPrefChoice(itemA.id,itemB.id,"prefA","prefB"));
+  qs("prefB").addEventListener("click",()=>recordPrefChoice(itemB.id,itemA.id,"prefB","prefA"));
+}
+function recordPrefChoice(winnerId,loserId,winEl,loseEl){
+  prefScores[winnerId]=(prefScores[winnerId]||0)+1;
+  const w=qs(winEl);const l=qs(loseEl);
+  if(w)w.classList.add("selected-winner");
+  if(l)l.classList.add("selected-loser");
+  setTimeout(()=>{
+    prefPairIdx++;
+    if(prefPairIdx>=PREF_PAIRS.length){prefDone=true;}
+    renderPrefRound();
+  },520);
+}
+function renderPrefResults(){
+  const maxScore=PREF_ITEMS.length-1;
+  const ranked=[...PREF_ITEMS].sort((a,b)=>(prefScores[b.id]||0)-(prefScores[a.id]||0));
+  const rankClass=i=>["r1","r2","r3","r4","r4"][i]||"r4";
+  const rankLabel=i=>["🥇","🥈","🥉","4°","5°"][i]||`${i+1}°`;
+  const hierItems=ranked.map((it,i)=>{
+    const sc=prefScores[it.id]||0;
+    const pct=Math.round((sc/maxScore)*100);
+    const name=lang==="es"?it.label_es:it.label_en;
+    return`<div class="hierarchy-item">
+      <div class="hier-rank ${rankClass(i)}">${rankLabel(i)}</div>
+      <span style="font-size:18px">${it.emoji}</span>
+      <span style="font-size:13px;font-weight:600;flex:1">${name}</span>
+      <div class="hier-bar"><div class="hier-bar-fill" style="width:${pct}%"></div></div>
+      <span class="hier-pct">${pct}%</span>
+    </div>`;
+  }).join("");
+  qs("main").innerHTML=`
+  <div class="topbar animate-in">
+    <div>
+      <div class="page-title" style="color:#BE185D">🧪 DOM. F — Resultados del Assessment</div>
+      <div class="page-sub">${lang==="es"?"Jerarquía de preferencia generada — ${PREF_PAIRS.length} presentaciones emparejadas":"Preference hierarchy generated — ${PREF_PAIRS.length} paired presentations"}</div>
+    </div>
+    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="prefBackResults">${L("back")}</button></div>
+  </div>
+  <div class="pref-wrap">
+    <div class="pref-card animate-scale">
+      <div class="module-label" style="color:#BE185D">${lang==="es"?"JERARQUÍA DE PREFERENCIA · DOM. F":"PREFERENCE HIERARCHY · DOM. F"}</div>
+      <div class="module-title" style="font-size:22px">${lang==="es"?"Resultado del Cliente":"Client Assessment Results"}</div>
+      <div class="note-box" style="background:#FFF0F6;border-color:#F9A8D4;color:#831843;margin-bottom:16px">
+        <strong>${lang==="es"?"¿Qué muestra esto?":"What does this show?"}</strong> ${lang==="es"?"Esta jerarquía identifica cuáles ítems tienen mayor valor reforzador para este cliente en este momento. Un BCBA usa estos resultados para seleccionar reforzadores efectivos e implementar programas de intervención basados en preferencia.":"This hierarchy identifies which items have the highest reinforcing value for this client at this time. A BCBA uses these results to select effective reinforcers and implement preference-based intervention programs."}
+      </div>
+      <div class="hierarchy-list">${hierItems}</div>
+      <div class="note-box" style="font-size:12px;margin-top:4px">
+        📋 <strong>${lang==="es"?"Nota clínica:":"Clinical note:"}</strong> ${lang==="es"?"Las preferencias son dinámicas — cambian con saciación, privación y contexto. Los BCBAs reevalúan regularmente. En la versión completa aprenderás cómo interpretar estos datos en el contexto del examen BCBA.":"Preferences are dynamic — they change with satiation, deprivation, and context. BCBAs reassess regularly. The full version teaches you how to interpret this data in the BCBA exam context."}
+      </div>
+      <div class="pref-gate">
+        <div class="pref-gate-title">${lang==="es"?"¿Listo para más?":"Ready for more?"}</div>
+        <div class="pref-gate-sub">${lang==="es"?"La versión completa incluye el módulo completo de DOM. F con preference assessments (MSWO, Paired Stimulus, Free Operant), functional analysis, y 70+ preguntas de práctica.":"The full version includes the complete DOM. F module with preference assessments (MSWO, Paired Stimulus, Free Operant), functional analysis, and 70+ practice questions."}</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button type="button" class="btn" style="background:white;color:#831843;font-weight:800" id="prefUnlock">${lang==="es"?"Desbloquear DOM. F →":"Unlock DOM. F →"}</button>
+          <button type="button" class="btn" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.4)" id="prefRetry">${lang==="es"?"Repetir Assessment":"Retry Assessment"}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  bindLang();
+  qs("prefBackResults").addEventListener("click",renderDash);
+  qs("prefUnlock").addEventListener("click",()=>showPremium("exams"));
+  qs("prefRetry").addEventListener("click",renderPrefAssessment);
+}
+
+/* ─── INIT ─── */
+document.addEventListener("DOMContentLoaded",function(){
+  qs("startDemoBtn").addEventListener("click",launchDemo);
+  qs("nav-dashboard").addEventListener("click",renderDash);
+  qs("nav-learn").addEventListener("click",startLearn);
+  qs("nav-practice").addEventListener("click",startPractice);
+  qs("nav-mock").addEventListener("click",renderMockIntro);
+  document.querySelectorAll(".premium-btn").forEach(b=>b.addEventListener("click",()=>showPremium(b.dataset.feat)));
+  qs("closeModalBtn").addEventListener("click",hidePremium);
+  qs("premiumModal").addEventListener("click",e=>{if(e.target.id==="premiumModal")hidePremium()});
+});
 })();
 </script>
 </body>
