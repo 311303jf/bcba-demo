@@ -393,8 +393,12 @@ ul.preview{padding-left:16px;font-size:12.5px;line-height:1.8;color:var(--ink-mi
       <nav>
         <div class="nav-section">Demo</div>
         <button type="button" id="nav-dashboard" class="nav-btn active">🏠 Dashboard</button>
-        <button type="button" id="nav-learn" class="nav-btn">🎓 Learn Mode</button>
-        <button type="button" id="nav-practice" class="nav-btn">🧩 Practice</button>
+        <button type="button" id="nav-learn" class="nav-btn">🎓 DOM. B — Learn</button>
+        <button type="button" id="nav-practice" class="nav-btn">🧩 DOM. B — Practice</button>
+        <button type="button" id="nav-learn-e" class="nav-btn">⚖️ DOM. E — Learn</button>
+        <button type="button" id="nav-practice-e" class="nav-btn">⚖️ DOM. E — Practice</button>
+        <button type="button" id="nav-learn-f" class="nav-btn">🎯 DOM. F — Learn</button>
+        <button type="button" id="nav-practice-f" class="nav-btn">🎯 DOM. F — Practice</button>
         <button type="button" id="nav-mock" class="nav-btn">⏱ Mock Exam</button>
         <div class="nav-section">Premium</div>
         <button type="button" class="nav-btn locked premium-btn" data-feat="exams">📋 Full Mock Exams <span class="nav-lock">PRO</span></button>
@@ -403,10 +407,10 @@ ul.preview{padding-left:16px;font-size:12.5px;line-height:1.8;color:var(--ink-mi
         <button type="button" class="nav-btn locked premium-btn" data-feat="analytics">📊 Analytics <span class="nav-lock">PRO</span></button>
       </nav>
       <div class="sidebar-footer">
-        <div class="prog-label"><span>Demo Progress</span><span id="sideProgressPct">0%</span></div>
+        <div class="prog-label"><span id="sideProgLabel">Demo Progress</span><span id="sideProgressPct">0%</span></div>
         <div class="progress-bar"><div class="progress-bar-fill" id="sideProgress"></div></div>
-        <div style="font-size:11px;color:var(--ink-soft);font-weight:500" id="sideProgressText">0/5 módulos</div>
-        <div class="streak-badge" style="margin-top:10px" id="streakBadge">🔥 Día 1 de estudio</div>
+        <div style="font-size:11px;color:var(--ink-soft);font-weight:500" id="sideProgressText">0/5 modules</div>
+        <div class="streak-badge" style="margin-top:10px" id="streakBadge">🔥 Day 1</div>
       </div>
     </aside>
     <main id="main"></main>
@@ -427,7 +431,7 @@ ul.preview{padding-left:16px;font-size:12.5px;line-height:1.8;color:var(--ink-mi
 <script>
 (function(){
 /* ─── DATA ─── */
-const DOMAINS=[["A","Behaviorism & Philosophical Foundations",8,"30+",false,["Description, prediction, and control","Determinism, empiricism, parsimony","Selectionism","Radical behaviorism","7 dimensions of ABA"]],["B","Concepts and Principles",24,"80+",true,["Positive and negative reinforcement","Escape vs avoidance","Punishment procedures","Stimulus control","Motivating operations","Verbal behavior","Schedules of reinforcement","Generalization and maintenance"]],["C","Measurement, Data Display & Interpretation",21,"60+",false,["Frequency, rate, count","Duration, latency, IRT","Continuous and discontinuous measurement","IOA and reliability","Graphing and visual analysis"]],["D","Experimental Design",13,"40+",false,["Independent and dependent variables","Internal and external validity","Reversal designs","Multiple baseline designs","Multielement designs"]],["E","Ethical and Professional Issues",22,"70+","teaser",["Core ethics principles","Confidentiality","Multiple relationships","Cultural humility","Public statements"]],["F","Behavior Assessment",23,"70+","pref",["Records review","Preference assessments","Descriptive assessment","Functional analysis","Goal prioritization"]],["G","Behavior-Change Procedures",25,"90+",false,["Differential reinforcement","Token economies","Prompting and prompt fading","Shaping","Chaining"]],["H","Selecting and Implementing Interventions",20,"60+",false,["Goal development","Evidence-based selection","Social validity","Relapse prevention","Treatment integrity"]],["I","Personnel Supervision and Management",19,"50+",false,["Supervision contracts","Equity in supervision","BST","Performance feedback","Self-care and burnout prevention"]]];
+const DOMAINS=[["A","Behaviorism & Philosophical Foundations",8,"30+",false,["Description, prediction, and control","Determinism, empiricism, parsimony","Selectionism","Radical behaviorism","7 dimensions of ABA"]],["B","Concepts and Principles",24,"80+",true,["Positive and negative reinforcement","Escape vs avoidance","Punishment procedures","Stimulus control","Motivating operations","Verbal behavior","Schedules of reinforcement","Generalization and maintenance"]],["C","Measurement, Data Display & Interpretation",21,"60+",false,["Frequency, rate, count","Duration, latency, IRT","Continuous and discontinuous measurement","IOA and reliability","Graphing and visual analysis"]],["D","Experimental Design",13,"40+",false,["Independent and dependent variables","Internal and external validity","Reversal designs","Multiple baseline designs","Multielement designs"]],["E","Ethical and Professional Issues",22,"70+",true,["Core ethics principles","Confidentiality","Multiple relationships","Cultural humility","Public statements"]],["F","Behavior Assessment",23,"70+",true,["Records review","Preference assessments","Descriptive assessment","Functional analysis","Goal prioritization"]],["G","Behavior-Change Procedures",25,"90+",false,["Differential reinforcement","Token economies","Prompting and prompt fading","Shaping","Chaining"]],["H","Selecting and Implementing Interventions",20,"60+",false,["Goal development","Evidence-based selection","Social validity","Relapse prevention","Treatment integrity"]],["I","Personnel Supervision and Management",19,"50+",false,["Supervision contracts","Equity in supervision","BST","Performance feedback","Self-care and burnout prevention"]]];
 
 const DEMO_PATH=["Positive Reinforcement","Negative Reinforcement","Escape","Avoidance","Mixed Review"];
 
@@ -526,7 +530,25 @@ const UI={en:{
   complete:"Demo Complete",completeSub:"You finished the full demo path.",
   strengths:"Your Strengths",focus:"Focus Areas",unlock:"Unlock Full Version →",
   confLabel:"How confident were you before answering?",confHigh:"Very confident",confMid:"Somewhat sure",confLow:"Unsure / guessed",
-  emailHead:"Get your personalized study plan",emailSub:"Based on your demo results, we'll send you a custom study guide for your exam date.",emailPlaceholder:"your@email.com",emailBtn:"Send My Guide",emailThanks:"✓ Check your inbox — your guide is on the way!"
+  emailHead:"Get your personalized study plan",emailSub:"Based on your demo results, we'll send you a custom study guide for your exam date.",emailPlaceholder:"your@email.com",emailBtn:"Send My Guide",emailThanks:"✓ Check your inbox — your guide is on the way!",
+  // Dashboard strings
+  metricDomains:"BCBA domains",metricConcepts:"concept targets",metricScenarios:"clinical scenarios",
+  guidedPath:"Guided path: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review",
+  startPath:"Start Path →",
+  mock4q:"4 clinical questions · 3 domains · 5 minute real timer",
+  mockAvail:"DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — available after completing practice demo.",
+  curriculumTitle:"Full Curriculum — Preview",
+  pillDemo:"AVAILABLE IN DEMO",pillTeaser:"PREVIEW AVAILABLE",pillPref:"INTERACTIVE TOOL",pillLocked:"FULL VERSION",
+  conceptsLabel:"concepts",scenariosLabel:"scenarios",includesLabel:"Includes",
+  startDemoBtn:"Start Demo →",lockedBtn:"🔒 Full Version",
+  ethicsBtn:"View Ethics Preview →",prefBtn:"Try Assessment →",
+  // Sidebar
+  progLabel:"Demo Progress",modulesLabel:"modules",streakLabel:"Day 1 of studying",
+  // Urgency messages
+  urgency3mo:"⚡ Your exam is coming up — every day counts.",urgency6mo:"📅 You have time, but the plan matters.",urgencyDefault:"📘 Build a solid foundation from the start.",
+  studyingHrs:"Studying",hrsWeek:"hrs/week.",
+  // Onboarding
+  obStep:"Step",obOf:"of",obNext:"Next →",obStart:"Start Demo →"
 },es:{
   lang:"Idioma",dash:"Panel Demo Público",dashSub:"Explora el recorrido demo y visualiza el currículo completo.",
   startDemo:"Comenzar Ruta de Aprendizaje →",avail:"Disponible en Demo",mock:"Vista Previa del Examen",
@@ -539,16 +561,94 @@ const UI={en:{
   complete:"Demo Completado",completeSub:"Completaste el recorrido completo del demo.",
   strengths:"Tus Fortalezas",focus:"Áreas de Enfoque",unlock:"Desbloquear Versión Completa →",
   confLabel:"¿Qué tan seguro/a estabas antes de responder?",confHigh:"Muy seguro/a",confMid:"Algo seguro/a",confLow:"No seguro / adiviné",
-  emailHead:"Recibe tu plan de estudio personalizado",emailSub:"Basado en tus resultados del demo, te enviaremos una guía de estudio personalizada.",emailPlaceholder:"tu@email.com",emailBtn:"Enviar Mi Guía",emailThanks:"✓ Revisa tu correo — ¡tu guía está en camino!"
+  emailHead:"Recibe tu plan de estudio personalizado",emailSub:"Basado en tus resultados del demo, te enviaremos una guía de estudio personalizada.",emailPlaceholder:"tu@email.com",emailBtn:"Enviar Mi Guía",emailThanks:"✓ Revisa tu correo — ¡tu guía está en camino!",
+  // Dashboard strings
+  metricDomains:"dominios BCBA",metricConcepts:"conceptos objetivo",metricScenarios:"escenarios clínicos",
+  guidedPath:"Ruta guiada: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review",
+  startPath:"Comenzar Ruta →",
+  mock4q:"4 preguntas clínicas · 3 dominios · timer real de 5 minutos",
+  mockAvail:"DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — disponible tras completar la práctica demo.",
+  curriculumTitle:"Currículo Completo — Preview",
+  pillDemo:"DISPONIBLE EN DEMO",pillTeaser:"PREVIEW DISPONIBLE",pillPref:"HERRAMIENTA INTERACTIVA",pillLocked:"VERSIÓN COMPLETA",
+  conceptsLabel:"conceptos",scenariosLabel:"escenarios",includesLabel:"Incluye",
+  startDemoBtn:"Comenzar Demo →",lockedBtn:"🔒 Versión Completa",
+  ethicsBtn:"Ver Preview de Ética →",prefBtn:"Probar Assessment →",
+  // Sidebar
+  progLabel:"Progreso Demo",modulesLabel:"módulos",streakLabel:"Día 1 de estudio",
+  // Urgency messages
+  urgency3mo:"⚡ Tu examen se acerca — cada día cuenta.",urgency6mo:"📅 Tienes tiempo, pero el plan importa.",urgencyDefault:"📘 Construye una base sólida desde ahora.",
+  studyingHrs:"Estudiando",hrsWeek:"hrs/semana.",
+  // Onboarding
+  obStep:"Paso",obOf:"de",obNext:"Siguiente →",obStart:"Comenzar Demo →"
 }};
+
+/* ─── DOMAIN DATA ─── */
+const DEMO_PATH_E=["Multiple Relationships","Confidentiality","Cultural Humility"];
+const DEMO_PATH_F=["Preference Assessments","Descriptive Assessment","Functional Analysis"];
+
+const LEARN_E={en:{
+  "Multiple Relationships":{definition:"A multiple relationship occurs when a BCBA is in a professional role with a person and simultaneously has another type of relationship with that same person, or with someone closely associated with that person.",example:"A BCBA provides ABA services to a child and later discovers the child's parent is also her landlord. Both a professional and personal relationship now exist simultaneously.",strategy:"Ask: does the secondary relationship risk impairing objectivity, effectiveness, or could it exploit the client? If yes — avoid it or manage it proactively with documentation.",difficulty:"Intermediate",icon:"⚖️"},
+  "Confidentiality":{definition:"BCBAs protect confidential information and disclose it only with written client consent, or as required or permitted by law (e.g., mandated reporting of abuse, harm to self or others).",example:"A parent calls requesting progress notes for their adult child's ABA program. The BCBA cannot share without the adult client's written authorization, regardless of who pays for services.",strategy:"Always require written consent before sharing. Exceptions are narrow and law-driven: mandated reporting, court order, imminent danger. Age matters — adults hold their own confidentiality rights.",difficulty:"Intermediate",icon:"🔐"},
+  "Cultural Humility":{definition:"BCBAs engage in ongoing self-reflection about how their own culture, biases, and power dynamics affect the therapeutic relationship, and actively seek to understand clients' cultural contexts.",example:"A BCBA implements eye contact as a reinforcer. The family later explains that direct eye contact is considered disrespectful in their culture. The BCBA revises the intervention collaboratively.",strategy:"Cultural humility is ONGOING, not a one-time training. On the exam, look for BCBAs who proactively seek understanding, involve families in goal-setting, and revise plans based on cultural input.",difficulty:"Advanced",icon:"🌍"}
+},es:{
+  "Multiple Relationships":{definition:"Una relación múltiple ocurre cuando un BCBA tiene un rol profesional con una persona y simultáneamente tiene otro tipo de relación con esa misma persona, o con alguien estrechamente asociado a ella.",example:"Un BCBA proporciona servicios ABA a un niño y luego descubre que el padre del niño también es su arrendador. Ahora existen simultáneamente una relación profesional y una personal.",strategy:"Pregunta: ¿la relación secundaria arriesga afectar la objetividad o podría explotar al cliente? Si es así — evítala o manéjala proactivamente con documentación.",difficulty:"Intermedio",icon:"⚖️"},
+  "Confidentiality":{definition:"Los BCBAs protegen la información confidencial y la divulgan solo con el consentimiento escrito del cliente, o según lo requiera la ley (ej. reporte obligatorio de abuso, daño a sí mismo u otros).",example:"Un padre llama solicitando notas de progreso del programa ABA de su hijo adulto. El BCBA no puede compartirlas sin la autorización escrita del cliente adulto, independientemente de quién pague.",strategy:"Siempre requiere consentimiento escrito antes de compartir. Las excepciones son específicas: reporte obligatorio, orden judicial, peligro inminente. La edad importa — los adultos tienen sus propios derechos de confidencialidad.",difficulty:"Intermedio",icon:"🔐"},
+  "Cultural Humility":{definition:"Los BCBAs se involucran en autorreflexión continua sobre cómo su propia cultura, sesgos y dinámicas de poder afectan la relación terapéutica, y buscan activamente comprender el contexto cultural de los clientes.",example:"Un BCBA implementa el contacto visual como reforzador. La familia explica que en su cultura el contacto visual directo es irrespetuoso. El BCBA revisa la intervención colaborativamente.",strategy:"La humildad cultural es CONTINUA, no un entrenamiento de una sola vez. En el examen, busca BCBAs que proactivamente busquen comprensión, involucren a las familias y revisen planes basados en aportes culturales.",difficulty:"Avanzado",icon:"🌍"}
+}};
+
+const LEARN_F={en:{
+  "Preference Assessments":{definition:"Systematic procedures used to identify stimuli with the highest reinforcing potential for a specific individual at a specific time. Results generate a preference hierarchy — not a confirmed reinforcer list.",example:"An MSWO assessment with 6 items shows the iPad selected 80% of trials. The BCBA uses iPad access tentatively as a reinforcer, then confirms it by measuring behavior increase.",strategy:"PREFERENCE ≠ REINFORCER. A preferred item must actually increase behavior to be a reinforcer. Reassess frequently — preferences change with satiation, deprivation, and context.",difficulty:"Beginner",icon:"🎯"},
+  "Descriptive Assessment":{definition:"Naturalistic observation methods (ABC recording, scatterplots, narrative recording) that document antecedents, behaviors, and consequences in the environment where behavior occurs — without experimental manipulation.",example:"A BCBA observes a student for 30 minutes and records that aggression consistently follows teacher demands and is followed by peer attention. This generates a hypothesis, not a conclusion.",strategy:"Descriptive assessments CANNOT establish functional relationships — they only generate hypotheses. Only a functional analysis (experimental method) can demonstrate function. This distinction is heavily tested.",difficulty:"Intermediate",icon:"🔍"},
+  "Functional Analysis":{definition:"An experimental procedure (Iwata et al., 1982) that systematically manipulates antecedents and consequences across controlled conditions to demonstrate the function maintaining a behavior.",example:"SIB occurs at high rates in the Escape condition and near-zero in all others, including Alone. This pattern directly demonstrates escape-maintained behavior — not automatic reinforcement.",strategy:"FA is the ONLY method that establishes experimental control over behavior. Know the 4 standard conditions: Attention, Escape, Alone (sensory/automatic), Control. High rates in ONE condition = that function. High in multiple = multiply-maintained.",difficulty:"Advanced",icon:"🧪"}
+},es:{
+  "Preference Assessments":{definition:"Procedimientos sistemáticos para identificar estímulos con mayor potencial reforzador para un individuo específico en un momento específico. Los resultados generan una jerarquía de preferencia — no una lista confirmada de reforzadores.",example:"Una evaluación MSWO con 6 ítems muestra que el iPad es seleccionado en el 80% de los ensayos. El BCBA usa acceso al iPad tentativamente como reforzador y luego confirma midiendo el aumento de la conducta.",strategy:"PREFERENCIA ≠ REFORZADOR. Un ítem preferido debe realmente aumentar la conducta para ser reforzador. Reevalúa frecuentemente — las preferencias cambian con saciación, privación y contexto.",difficulty:"Básico",icon:"🎯"},
+  "Descriptive Assessment":{definition:"Métodos de observación naturalista (registro ABC, dispersogramas, registro narrativo) que documentan antecedentes, conductas y consecuencias en el ambiente donde ocurre la conducta — sin manipulación experimental.",example:"Un BCBA observa a un estudiante por 30 minutos y registra que la agresión ocurre consistentemente después de demandas del maestro y es seguida por atención de compañeros. Esto genera una hipótesis, no una conclusión.",strategy:"Los assessments descriptivos NO pueden establecer relaciones funcionales — solo generan hipótesis. Solo un análisis funcional (método experimental) puede demostrar la función. Esta distinción es muy evaluada en el examen.",difficulty:"Intermedio",icon:"🔍"},
+  "Functional Analysis":{definition:"Procedimiento experimental (Iwata et al., 1982) que manipula sistemáticamente antecedentes y consecuencias en condiciones controladas para demostrar la función que mantiene una conducta.",example:"La autolesión ocurre en tasas altas en la condición de Escape y casi cero en todas las demás, incluyendo la condición Sola. Este patrón demuestra directamente conducta mantenida por escape — no reforzamiento automático.",strategy:"El FA es el ÚNICO método que establece control experimental sobre la conducta. Conoce las 4 condiciones estándar: Atención, Escape, Sola (sensorial/automático), Control. Tasas altas en UNA condición = esa función.",difficulty:"Avanzado",icon:"🧪"}
+}};
+
+const QUESTIONS_E={en:[
+  {concept:"Multiple Relationships",difficulty:"Intermediate",q:"A BCBA has provided ABA services to a client for 8 months. The client's parent then offers the BCBA a part-time job at their family business. According to the Ethics Code, what is the BCBA's best course of action?",options:{A:"Accept if it does not interfere with service hours",B:"Decline to prevent a multiple relationship that could impair professional objectivity",C:"Accept with written supervisor approval",D:"Accept only on weekends when services are not occurring"},correct:"B",hint:"Ask whether accepting would create a secondary relationship that risks impairing objectivity.",rationale:"Employment by a client's family creates a financial multiple relationship that risks compromising the BCBA's professional judgment. The Ethics Code requires avoiding relationships that could impair objectivity or exploit the client."},
+  {concept:"Confidentiality",difficulty:"Intermediate",q:"A teacher requests a copy of a student's behavior intervention plan from the BCBA, stating she needs it to support the student in class. No release of information has been signed by the guardians. What should the BCBA do?",options:{A:"Share a verbal summary since the purpose is educational",B:"Provide only the data graphs, not the written plan",C:"Decline to share any information without written guardian consent",D:"Ask the school principal to authorize the release"},correct:"C",hint:"Confidentiality requires written consent before sharing with any third party, regardless of intent.",rationale:"Without a signed release of information from the guardians, the BCBA cannot share client information with any third party — including educators. Good intentions do not override confidentiality requirements."},
+  {concept:"Cultural Humility",difficulty:"Advanced",q:"During a team meeting, a BCBA reviews a client's goals and realizes several target behaviors conflict with the family's stated cultural values from intake. What is the most ethically appropriate next step?",options:{A:"Maintain the original goals since they were clinically validated at intake",B:"Modify the goals independently to align with what the BCBA understands about the culture",C:"Engage the family in a collaborative conversation to revise goals in alignment with their values",D:"Document the conflict and consult BACB ethics resources before taking action"},correct:"C",hint:"Cultural humility requires active collaboration with families — not unilateral decision-making.",rationale:"Cultural humility is an ongoing process that requires collaboration, not assumption. The BCBA must engage the family directly to revise goals together. Unilaterally maintaining or changing goals — even with good intent — bypasses the family's voice."}
+],es:[
+  {concept:"Multiple Relationships",difficulty:"Intermedio",q:"Un BCBA ha proporcionado servicios ABA a un cliente por 8 meses. El padre del cliente le ofrece al BCBA un trabajo de medio tiempo en su negocio familiar. Según el Código de Ética, ¿cuál es la mejor acción del BCBA?",options:{A:"Aceptar si no interfiere con los horarios de servicio",B:"Declinar para evitar una relación múltiple que podría afectar la objetividad profesional",C:"Aceptar con aprobación escrita del supervisor",D:"Aceptar solo los fines de semana cuando no ocurren servicios"},correct:"B",hint:"Pregunta si aceptar crearía una relación secundaria que arriesga afectar la objetividad.",rationale:"El empleo por parte de la familia de un cliente crea una relación múltiple financiera que arriesga comprometer el juicio profesional del BCBA. El Código de Ética requiere evitar relaciones que puedan afectar la objetividad o explotar al cliente."},
+  {concept:"Confidentiality",difficulty:"Intermedio",q:"Una maestra solicita una copia del plan de intervención conductual de un estudiante al BCBA, indicando que lo necesita para apoyar al estudiante en clase. Los tutores no han firmado ninguna autorización de información. ¿Qué debe hacer el BCBA?",options:{A:"Compartir un resumen verbal ya que el propósito es educativo",B:"Proporcionar solo las gráficas de datos, no el plan escrito",C:"Negarse a compartir cualquier información sin el consentimiento escrito de los tutores",D:"Pedirle al director de la escuela que autorice la divulgación"},correct:"C",hint:"La confidencialidad requiere consentimiento escrito antes de compartir con cualquier tercero, independientemente de la intención.",rationale:"Sin una autorización firmada por los tutores, el BCBA no puede compartir información del cliente con ningún tercero — incluyendo educadores. Las buenas intenciones no anulan los requisitos de confidencialidad."},
+  {concept:"Cultural Humility",difficulty:"Avanzado",q:"Durante una reunión de equipo, un BCBA revisa las metas de un cliente y se da cuenta de que varios comportamientos objetivo entran en conflicto con los valores culturales declarados por la familia durante la evaluación inicial. ¿Cuál es el siguiente paso más ético?",options:{A:"Mantener las metas originales ya que fueron validadas clínicamente en la evaluación inicial",B:"Modificar las metas independientemente para alinearlas con lo que el BCBA entiende sobre la cultura",C:"Involucrar a la familia en una conversación colaborativa para revisar las metas en alineación con sus valores",D:"Documentar el conflicto y consultar los recursos de ética del BACB antes de actuar"},correct:"C",hint:"La humildad cultural requiere colaboración activa con las familias — no toma de decisiones unilateral.",rationale:"La humildad cultural es un proceso continuo que requiere colaboración, no suposición. El BCBA debe involucrar directamente a la familia para revisar las metas juntos. Mantener o cambiar metas unilateralmente — incluso con buena intención — omite la voz de la familia."}
+]};
+
+const QUESTIONS_F={en:[
+  {concept:"Preference Assessments",difficulty:"Beginner",q:"A BCBA conducts a paired stimulus preference assessment. The client consistently selects the iPad across trials. The BCBA uses iPad access as a reinforcer in a new program. After 3 sessions, the target behavior shows no increase. What does this most directly suggest?",options:{A:"The paired stimulus assessment was conducted incorrectly",B:"Preference does not guarantee reinforcer effectiveness",C:"The client experienced satiation before the assessment",D:"A free operant assessment should have been used instead"},correct:"B",hint:"Remember: reinforcers are defined by their effect on behavior, not by what the client selects.",rationale:"Preference assessments identify items a client selects — but selection does not guarantee the item will function as a reinforcer. Reinforcers are defined by their effect: a future increase in behavior. Always confirm with a reinforcer assessment after identifying preferences."},
+  {concept:"Descriptive Assessment",difficulty:"Intermediate",q:"After conducting 10 ABC observation sessions, a BCBA concludes that a student's aggression is maintained by escape from demands. What is the most important limitation of this conclusion?",options:{A:"ABC data requires a minimum of 20 sessions to be valid",B:"Descriptive assessments cannot establish a functional relationship",C:"The BCBA should have used a scatterplot instead of ABC recording",D:"Antecedent data is insufficient without consequence intervals"},correct:"B",hint:"Ask what type of evidence is needed to establish that escape actually CAUSES the behavior.",rationale:"Descriptive/ABC assessments identify patterns and generate hypotheses about function, but they cannot establish functional relationships. Only an experimental functional analysis — which manipulates variables systematically — can demonstrate that escape is the maintaining variable."},
+  {concept:"Functional Analysis",difficulty:"Advanced",q:"During a functional analysis, a client's self-injurious behavior (SIB) occurs at high rates in the Escape condition and near-zero rates in the Attention, Alone, and Control conditions. What does this pattern most directly indicate?",options:{A:"The behavior is maintained by automatic reinforcement",B:"The behavior is escape-maintained social negative reinforcement",C:"The Alone condition was conducted incorrectly",D:"The behavior has multiple maintaining functions"},correct:"B",hint:"Near-zero in the Alone condition rules out automatic reinforcement. High rates only in Escape points to one function.",rationale:"High rates exclusively in the Escape condition, with near-zero in Alone (which controls for automatic reinforcement), directly indicates escape-maintained social negative reinforcement. If automatic reinforcement were a factor, the Alone condition would show elevated rates."}
+],es:[
+  {concept:"Preference Assessments",difficulty:"Básico",q:"Un BCBA realiza una evaluación de preferencia de estímulo emparejado. El cliente selecciona consistentemente el iPad en los ensayos. El BCBA usa acceso al iPad como reforzador en un nuevo programa. Después de 3 sesiones, la conducta objetivo no muestra aumento. ¿Qué sugiere esto más directamente?",options:{A:"La evaluación de estímulo emparejado fue realizada incorrectamente",B:"La preferencia no garantiza la efectividad del reforzador",C:"El cliente experimentó saciación antes de la evaluación",D:"Se debería haber usado una evaluación de operante libre"},correct:"B",hint:"Recuerda: los reforzadores se definen por su efecto en la conducta, no por lo que el cliente selecciona.",rationale:"Las evaluaciones de preferencia identifican ítems que el cliente selecciona — pero la selección no garantiza que el ítem funcione como reforzador. Los reforzadores se definen por su efecto: un aumento futuro en la conducta. Siempre confirma con una evaluación de reforzadores."},
+  {concept:"Descriptive Assessment",difficulty:"Intermedio",q:"Después de realizar 10 sesiones de observación ABC, un BCBA concluye que la agresión de un estudiante es mantenida por escape de demandas. ¿Cuál es la limitación más importante de esta conclusión?",options:{A:"Los datos ABC requieren un mínimo de 20 sesiones para ser válidos",B:"Los assessments descriptivos no pueden establecer una relación funcional",C:"El BCBA debería haber usado un dispersograma en lugar de registro ABC",D:"Los datos de antecedentes son insuficientes sin intervalos de consecuencias"},correct:"B",hint:"Pregunta qué tipo de evidencia se necesita para establecer que el escape CAUSA la conducta.",rationale:"Los assessments descriptivos/ABC identifican patrones y generan hipótesis sobre la función, pero no pueden establecer relaciones funcionales. Solo un análisis funcional experimental — que manipula variables sistemáticamente — puede demostrar que el escape es la variable mantenedora."},
+  {concept:"Functional Analysis",difficulty:"Avanzado",q:"Durante un análisis funcional, la autolesión (SIB) de un cliente ocurre en tasas altas en la condición de Escape y tasas casi cero en las condiciones de Atención, Sola y Control. ¿Qué indica este patrón más directamente?",options:{A:"La conducta es mantenida por reforzamiento automático",B:"La conducta es reforzamiento negativo social mantenido por escape",C:"La condición Sola fue realizada incorrectamente",D:"La conducta tiene múltiples funciones mantenedoras"},correct:"B",hint:"Casi cero en la condición Sola descarta el reforzamiento automático. Tasas altas solo en Escape señala una función.",rationale:"Tasas altas exclusivamente en la condición de Escape, con casi cero en la condición Sola (que controla el reforzamiento automático), indica directamente reforzamiento negativo social mantenido por escape. Si el reforzamiento automático fuera un factor, la condición Sola mostraría tasas elevadas."}
+]};
+
+/* ─── DOMAIN REGISTRY ─── */
+const DOMAIN_DEMOS={
+  B:{path:null,learn:null,questions:null,label:"DOM. B — Concepts & Principles",color:"var(--green)",navId:"learn"},
+  E:{path:DEMO_PATH_E,learn:LEARN_E,questions:QUESTIONS_E,label:"DOM. E — Ethics",color:"#6D28D9",navId:"learn-e"},
+  F:{path:DEMO_PATH_F,learn:LEARN_F,questions:QUESTIONS_F,label:"DOM. F — Behavior Assessment",color:"#BE185D",navId:"learn-f"}
+};
 
 /* ─── STATE ─── */
 let lang=localStorage.getItem("bcba_lang")||"en";
-let learnIdx=0,practIdx=0,mockIdx=0,selected=null,answered=false;
-let score=0,mockScore=0,completedMods=0,answeredData=[];
-let confidence=null,mockTimerSec=240,mockTimerHandle=null;
+let mockIdx=0,mockTimerSec=300;
+let mockTimerInterval=null;
 let currentScreen="dashboard";
+let currentDomain="B";
 let userProfile={name:"",examDate:"",hoursPerWeek:""};
+
+// Per-domain state
+const DS={
+  B:{learnIdx:0,practIdx:0,score:0,answeredData:[],selected:null,answered:false,confidence:null,completedMods:0},
+  E:{learnIdx:0,practIdx:0,score:0,answeredData:[],selected:null,answered:false,confidence:null,completedMods:0},
+  F:{learnIdx:0,practIdx:0,score:0,answeredData:[],selected:null,answered:false,confidence:null,completedMods:0}
+};
+// Shorthands kept for backward compat with mock/onboard
+let mockScore=0;
 
 /* ─── ONBOARDING DATA ─── */
 const OB_STEPS=[
@@ -563,9 +663,28 @@ const L=k=>UI[lang][k]||UI.en[k]||k;
 const diffClass=d=>{if(d==="Beginner"||d==="Básico")return"diff-beginner";if(d==="Intermediate"||d==="Intermedio")return"diff-intermediate";return"diff-advanced"};
 function langSwitch(){return`<div class="lang-switch"><button type="button" class="lang-btn ${lang==="en"?"active":""}" data-lang="en">🇺🇸 EN</button><button type="button" class="lang-btn ${lang==="es"?"active":""}" data-lang="es">🇪🇸 ES</button></div>`}
 function bindLang(){document.querySelectorAll(".lang-btn").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;localStorage.setItem("bcba_lang",lang);rerender()}))}
-function setNav(a){["dashboard","learn","practice","mock"].forEach(id=>{const el=qs("nav-"+id);if(el)el.classList.toggle("active",id===a)})}
-function updateProgress(){const pct=Math.min(100,Math.round((completedMods/DEMO_PATH.length)*100));const fill=qs("sideProgress");const txt=qs("sideProgressText");const pctTxt=qs("sideProgressPct");if(fill)fill.style.width=pct+"%";if(txt)txt.textContent=completedMods+"/"+DEMO_PATH.length+" módulos";if(pctTxt)pctTxt.textContent=pct+"%"}
-function rerender(){if(currentScreen==="dashboard")renderDash();else if(currentScreen==="learn")renderLearn();else if(currentScreen==="practice")renderPractice();else if(currentScreen==="mockIntro")renderMockIntro();else if(currentScreen==="mock")renderMock();else if(currentScreen==="complete")renderComplete()}
+function setNav(a){["dashboard","learn","practice","mock","learn-e","practice-e","learn-f","practice-f"].forEach(id=>{const el=qs("nav-"+id);if(el)el.classList.toggle("active",id===a)})}
+function totalMods(){return(DS.B.completedMods>0?1:0)+(DS.E.completedMods>0?1:0)+(DS.F.completedMods>0?1:0)}
+function updateProgress(){
+  const total=DEMO_PATH.length+DEMO_PATH_E.length+DEMO_PATH_F.length;
+  const done=DS.B.completedMods+DS.E.completedMods+DS.F.completedMods;
+  const pct=Math.min(100,Math.round((done/total)*100));
+  const fill=qs("sideProgress");const txt=qs("sideProgressText");const pctTxt=qs("sideProgressPct");const lbl=qs("sideProgLabel");const streak=qs("streakBadge");
+  if(fill)fill.style.width=pct+"%";
+  if(txt)txt.textContent=done+"/"+total+" "+L("modulesLabel");
+  if(pctTxt)pctTxt.textContent=pct+"%";
+  if(lbl)lbl.textContent=L("progLabel");
+  if(streak)streak.textContent="🔥 "+L("streakLabel");
+}
+function rerender(){
+  if(currentScreen==="dashboard")renderDash();
+  else if(currentScreen==="learn")renderLearn();
+  else if(currentScreen==="practice")renderPractice();
+  else if(currentScreen==="mockIntro")renderMockIntro();
+  else if(currentScreen==="mock")renderMock();
+  else if(currentScreen==="complete")renderComplete();
+  else if(currentScreen==="prefAssessment")renderPrefRound();
+}
 
 /* ─── LAUNCH ─── */
 function launchDemo(){qs("landing").classList.remove("active");qs("onboarding").classList.add("active");renderOnboard()}
@@ -578,13 +697,13 @@ function renderOnboard(){
   const isLast=obStep===OB_STEPS.length-1;
   qs("onboardCard").innerHTML=`
     <div class="progress-dots">${dots}</div>
-    <div class="onboard-step">${lang==="es"?"Paso":"Step"} ${obStep+1} de ${OB_STEPS.length}</div>
+    <div class="onboard-step">${L("obStep")} ${obStep+1} ${L("obOf")} ${OB_STEPS.length}</div>
     <div class="onboard-q">${lang==="es"?step.q_es:step.q_en}</div>
     <div class="onboard-sub">${lang==="es"?step.sub_es:step.sub_en}</div>
     <div class="onboard-opts">${opts}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${langSwitch()}
-      <button type="button" class="btn btn-primary" id="obNext" ${!obAnswers[step.key]?"disabled style='opacity:.5;cursor:not-allowed'":""} style="margin-left:auto;flex:1">${isLast?(lang==="es"?"Comenzar Demo →":"Start Demo →"):(lang==="es"?"Siguiente →":"Next →")}</button>
+      <button type="button" class="btn btn-primary" id="obNext" ${!obAnswers[step.key]?"disabled style='opacity:.5;cursor:not-allowed'":""} style="margin-left:auto;flex:1">${isLast?L("obStart"):L("obNext")}</button>
     </div>`;
   bindLang();
   qs("onboardCard").querySelectorAll(".onboard-opt").forEach(b=>b.addEventListener("click",()=>{obAnswers[step.key]=b.dataset.val;buildUserProfile();renderOnboard()}));
@@ -608,7 +727,7 @@ function hidePremium(){qs("premiumModal").classList.remove("active")}
 /* ─── DASHBOARD ─── */
 function renderDash(){
   currentScreen="dashboard";setNav("dashboard");updateProgress();
-  const urgencyMsg=obAnswers.examDate==="<3mo"?'⚡ Tu examen se acerca — cada día cuenta.':obAnswers.examDate==="3-6mo"?'📅 Tienes tiempo, pero el plan importa.':'📘 Construye una base sólida desde ahora.';
+  const urgencyMsg=obAnswers.examDate==="<3mo"?L("urgency3mo"):obAnswers.examDate==="3-6mo"?L("urgency6mo"):L("urgencyDefault");
   let html=`
   <div class="topbar animate-in">
     <div>
@@ -619,87 +738,101 @@ function renderDash(){
   </div>
   <div class="social-strip animate-in">
     <div class="live-dot"></div>
-    <div style="font-size:12px;color:var(--green-dark);font-weight:600">${urgencyMsg} ${obAnswers.hoursPerWeek?`Estudiando ${obAnswers.hoursPerWeek} hrs/semana.`:""}</div>
+    <div style="font-size:12px;color:var(--green-dark);font-weight:600">${urgencyMsg} ${obAnswers.hoursPerWeek?L("studyingHrs")+" "+obAnswers.hoursPerWeek+" "+L("hrsWeek"):""}</div>
   </div>
   <div class="metrics animate-in">
-    <div class="metric"><div class="metric-value">9</div><div class="metric-label">dominios BCBA</div></div>
-    <div class="metric"><div class="metric-value">180+</div><div class="metric-label">conceptos objetivo</div></div>
-    <div class="metric"><div class="metric-value">1000+</div><div class="metric-label">escenarios clínicos</div></div>
+    <div class="metric"><div class="metric-value">9</div><div class="metric-label">${L("metricDomains")}</div></div>
+    <div class="metric"><div class="metric-value">180+</div><div class="metric-label">${L("metricConcepts")}</div></div>
+    <div class="metric"><div class="metric-value">1000+</div><div class="metric-label">${L("metricScenarios")}</div></div>
     <div class="metric"><div class="metric-value">Adaptive</div><div class="metric-label">mastery learning</div></div>
   </div>
   <div class="banner animate-in">
     <div>
       <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:4px">${L("avail")}</div>
       <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">DOM. B — Concepts and Principles</div>
-      <div class="page-sub">Ruta guiada: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review</div>
+      <div class="page-sub">${L("guidedPath")}</div>
     </div>
-    <button type="button" class="btn btn-primary" id="bannerStart">Comenzar Ruta →</button>
+    <button type="button" class="btn btn-primary" id="bannerStart">${L("startPath")}</button>
   </div>
   <div class="exam-banner animate-in">
     <div class="pill exam">${L("mock")}</div>
-    <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">4 preguntas clínicas · 3 dominios · timer real de 5 minutos</div>
-    <div class="page-sub">DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — disponible tras completar la práctica demo.</div>
+    <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:4px">${L("mock4q")}</div>
+    <div class="page-sub">${L("mockAvail")}</div>
   </div>
-  <div style="font-family:var(--font-display);font-size:19px;font-weight:900;margin:20px 0 12px;color:var(--ink)">Currículo Completo — Preview</div>
+  <div style="font-family:var(--font-display);font-size:19px;font-weight:900;margin:20px 0 12px;color:var(--ink)">${L("curriculumTitle")}</div>
   <div class="grid animate-in">`;
   DOMAINS.forEach(d=>{
+    const dk=d[0];
     const isDemo=d[4]===true;
-    const isTeaser=d[4]==="teaser";
-    const isPref=d[4]==="pref";
     const isLocked=!d[4];
-    let pillClass=isDemo?"demo":isTeaser?"teaser":isPref?"pref":"premium";
-    let pillLabel=isDemo?"DISPONIBLE EN DEMO":isTeaser?"PREVIEW DISPONIBLE":isPref?"HERRAMIENTA INTERACTIVA":"VERSIÓN COMPLETA";
-    html+=`<div class="card ${isDemo?"demo":""}${isTeaser?" ":" "}">
+    let pillClass=isDemo?"demo":"premium";
+    let pillLabel=isDemo?L("pillDemo"):L("pillLocked");
+    const domPath=dk==="B"?DEMO_PATH:dk==="E"?DEMO_PATH_E:dk==="F"?DEMO_PATH_F:null;
+    const domState=isDemo&&domPath?DS[dk]:null;
+    html+=`<div class="card ${isDemo?"demo":""}">
       <div class="pill ${pillClass}">${pillLabel}</div>
       <div class="domain-title">DOM. ${d[0]} · ${d[1]}</div>
-      <div class="domain-meta">${d[2]} conceptos · ${d[3]} escenarios</div>
-      <div class="include-title">Incluye</div>
+      <div class="domain-meta">${d[2]} ${L("conceptsLabel")} · ${d[3]} ${L("scenariosLabel")}</div>
+      <div class="include-title">${L("includesLabel")}</div>
       <ul class="preview">${d[5].map(x=>`<li>${x}</li>`).join("")}</ul>`;
-    if(isDemo){html+=`<div class="demo-path" style="margin-top:10px">${DEMO_PATH.map((x,i)=>`<div class="path-item ${i<learnIdx?"done":""} ${i===learnIdx?"active-path":""}">${i<learnIdx?"✓":i===learnIdx?"●":"○"} ${x}</div>`).join("")}</div><button type="button" class="btn btn-primary start-inline" style="width:100%;margin-top:8px">Comenzar Demo →</button>`;}
-    else if(isTeaser){html+=`<div class="teaser-gate"><div class="teaser-gate-title">⚖️ ${lang==="es"?"Vista Previa: Multiple Relationships":"Preview: Multiple Relationships"}</div><div class="teaser-gate-sub">${lang==="es"?"1 concepto desbloqueado · Práctica bloqueada":"1 concept unlocked · Practice locked"}</div><button type="button" class="btn ethics-teaser-btn" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);color:white;width:100%;padding:10px">${lang==="es"?"Ver Preview de Ética →":"View Ethics Preview →"}</button></div>`;}
-    else if(isPref){html+=`<div class="teaser-gate" style="background:linear-gradient(135deg,#FFF0F6,#FCE7F3);border-color:#F9A8D4"><div class="teaser-gate-title" style="color:#831843">🧪 ${lang==="es"?"Preference Assessment Interactivo":"Interactive Preference Assessment"}</div><div class="teaser-gate-sub" style="color:#BE185D">${lang==="es"?"Simula un MSWO real con un cliente":"Simulate a real MSWO with a client"}</div><button type="button" class="btn pref-demo-btn" style="background:linear-gradient(135deg,#831843,#BE185D);color:white;width:100%;padding:10px">${lang==="es"?"Probar Assessment →":"Try Assessment →"}</button></div>`;}
-    else{html+=`<button type="button" class="btn btn-lock premium-inline" data-feat="${["exams","weakness","plan","analytics","exams","weakness","plan","analytics","analytics"][DOMAINS.indexOf(d)%9]}" style="width:100%;margin-top:8px">🔒 Versión Completa</button>`;}
+    if(isDemo&&domPath){
+      const accentColor=dk==="B"?"var(--green)":dk==="E"?"#6D28D9":"#BE185D";
+      html+=`<div class="demo-path" style="margin-top:10px">${domPath.map((x,i)=>`<div class="path-item ${i<domState.learnIdx?"done":""} ${i===domState.learnIdx?"active-path":""}">${i<domState.learnIdx?"✓":i===domState.learnIdx?"●":"○"} ${x}</div>`).join("")}</div>
+      <button type="button" class="btn btn-primary start-inline" data-dom="${dk}" style="width:100%;margin-top:8px;background:${accentColor}">${L("startDemoBtn")}</button>`;
+    } else {
+      html+=`<button type="button" class="btn btn-lock premium-inline" data-feat="${["exams","weakness","plan","analytics","exams","weakness","plan","analytics","analytics"][DOMAINS.indexOf(d)%9]}" style="width:100%;margin-top:8px">${L("lockedBtn")}</button>`;
+    }
     html+=`</div>`;
   });
   html+=`</div>`;
   qs("main").innerHTML=html;
   bindLang();
-  qs("topStart").addEventListener("click",startLearn);
-  qs("bannerStart").addEventListener("click",startLearn);
-  document.querySelectorAll(".start-inline").forEach(b=>b.addEventListener("click",startLearn));
+  qs("topStart").addEventListener("click",()=>startLearn("B"));
+  qs("bannerStart").addEventListener("click",()=>startLearn("B"));
+  document.querySelectorAll(".start-inline").forEach(b=>b.addEventListener("click",()=>startLearn(b.dataset.dom||"B")));
   document.querySelectorAll(".premium-inline").forEach(b=>b.addEventListener("click",()=>showPremium(b.dataset.feat)));
-  document.querySelectorAll(".ethics-teaser-btn").forEach(b=>b.addEventListener("click",renderEthicsTeaser));
-  document.querySelectorAll(".pref-demo-btn").forEach(b=>b.addEventListener("click",renderPrefAssessment));
 }
 
 /* ─── LEARN ─── */
-function startLearn(){setNav("learn");renderLearn()}
+function startLearn(domKey){
+  currentDomain=domKey||"B";
+  setNav(currentDomain==="B"?"learn":currentDomain==="E"?"learn-e":"learn-f");
+  renderLearn();
+}
 function renderLearn(){
   currentScreen="learn";updateProgress();
-  const concept=DEMO_PATH[learnIdx];
-  const m=LEARN[lang][concept];
-  const isLast=learnIdx===DEMO_PATH.length-1;
+  const dk=currentDomain;
+  const path=dk==="B"?DEMO_PATH:dk==="E"?DEMO_PATH_E:DEMO_PATH_F;
+  const learnData=dk==="B"?LEARN[lang]:dk==="E"?LEARN_E[lang]:LEARN_F[lang];
+  const state=DS[dk];
+  const concept=path[state.learnIdx];
+  const m=learnData[concept];
+  const isLast=state.learnIdx===path.length-1;
+  const domLabel=dk==="B"?"DOM. B — Concepts and Principles":dk==="E"?"DOM. E — Ethical Issues":"DOM. F — Behavior Assessment";
+  const accentColor=dk==="B"?"var(--green)":dk==="E"?"#6D28D9":"#BE185D";
+  const modLabel=lang==="es"?"Módulo":"Module";
+  const ofLabel=lang==="es"?"de":"of";
   const html=`
   <div class="topbar animate-in">
     <div>
       <div class="page-title">${L("learn")}</div>
-      <div class="page-sub">DOM. B · ${concept} · Módulo ${learnIdx+1} de ${DEMO_PATH.length}</div>
+      <div class="page-sub">${domLabel} · ${concept} · ${modLabel} ${state.learnIdx+1} ${ofLabel} ${path.length}</div>
     </div>
     <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="learnBack">${L("back")}</button></div>
   </div>
   <div class="learn-wrap">
-    <div class="demo-path" style="margin-bottom:16px">${DEMO_PATH.map((x,i)=>`<div class="path-item ${i<learnIdx?"done":""} ${i===learnIdx?"active-path":""}">${i<learnIdx?"✓":i===learnIdx?"●":"○"} ${x}</div>`).join("")}</div>
+    <div class="demo-path" style="margin-bottom:16px">${path.map((x,i)=>`<div class="path-item ${i<state.learnIdx?"done":""} ${i===state.learnIdx?"active-path":""}">${i<state.learnIdx?"✓":i===state.learnIdx?"●":"○"} ${x}</div>`).join("")}</div>
     <div class="learn-card animate-in">
-      <div class="module-label">Módulo ${learnIdx+1} de ${DEMO_PATH.length}</div>
+      <div class="module-label" style="color:${accentColor}">${modLabel} ${state.learnIdx+1} ${ofLabel} ${path.length}</div>
       <div class="module-title">${m.icon} ${concept}</div>
       <div class="difficulty-badge ${diffClass(m.difficulty)}">${m.difficulty}</div>
       <div class="section-label">${L("definition")}</div>
-      <div class="definition">${m.definition}</div>
+      <div class="definition" style="border-left-color:${accentColor}">${m.definition}</div>
       <div class="section-label">${L("example")}</div>
-      <div style="font-size:14px;line-height:1.8;color:var(--ink-mid);background:var(--surface);border-radius:var(--radius-sm);padding:14px;margin-bottom:4px">${m.example}</div>
+      <div style="font-size:14px;line-height:1.8;color:var(--ink-mid);background:var(--surface);border-radius:var(--radius-sm);padding:14px">${m.example}</div>
       <div class="note-box"><strong>💡 ${L("strategy")}:</strong> ${m.strategy}</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
-        ${isLast?`<button type="button" class="btn btn-primary" id="toPracticeBtn">${L("toPractice")}</button>`:`<button type="button" class="btn btn-primary" id="nextLearnBtn">${L("next")}</button>`}
+        ${isLast?`<button type="button" class="btn btn-primary" id="toPracticeBtn" style="background:${accentColor}">${L("toPractice")}</button>`:`<button type="button" class="btn btn-primary" id="nextLearnBtn" style="background:${accentColor}">${L("next")}</button>`}
         <button type="button" class="btn btn-secondary" id="learnBackBtn">${L("back")}</button>
       </div>
     </div>
@@ -709,54 +842,78 @@ function renderLearn(){
   qs("learnBack").addEventListener("click",renderDash);
   qs("learnBackBtn").addEventListener("click",renderDash);
   const nl=qs("nextLearnBtn");
-  if(nl)nl.addEventListener("click",()=>{learnIdx++;completedMods=Math.max(completedMods,learnIdx);renderLearn()});
+  if(nl)nl.addEventListener("click",()=>{
+    state.learnIdx++;
+    state.completedMods=Math.max(state.completedMods,state.learnIdx);
+    renderLearn();
+  });
   const tp=qs("toPracticeBtn");
-  if(tp)tp.addEventListener("click",()=>{completedMods=DEMO_PATH.length;startPractice()});
+  if(tp)tp.addEventListener("click",()=>{
+    state.completedMods=path.length;
+    startPractice(dk);
+  });
 }
 
 /* ─── PRACTICE ─── */
-function startPractice(){setNav("practice");practIdx=0;selected=null;answered=false;confidence=null;score=0;answeredData=[];renderPractice()}
+function startPractice(domKey){
+  currentDomain=domKey||"B";
+  setNav(currentDomain==="B"?"practice":currentDomain==="E"?"practice-e":"practice-f");
+  const state=DS[currentDomain];
+  state.practIdx=0;state.selected=null;state.answered=false;state.confidence=null;
+  state.score=0;state.answeredData=[];
+  renderPractice();
+}
 function renderPractice(){
   currentScreen="practice";updateProgress();
-  const q=QUESTIONS[lang][practIdx];
-  const total=QUESTIONS[lang].length;
+  const dk=currentDomain;
+  const qArr=dk==="B"?QUESTIONS[lang]:dk==="E"?QUESTIONS_E[lang]:QUESTIONS_F[lang];
+  const state=DS[dk];
+  const q=qArr[state.practIdx];
+  const total=qArr.length;
+  const accentColor=dk==="B"?"var(--green)":dk==="E"?"#6D28D9":"#BE185D";
+  const domLabel=dk==="B"?"DOM. B — Concepts and Principles":dk==="E"?"DOM. E — Ethical Issues":"DOM. F — Behavior Assessment";
   let html=`
   <div class="topbar animate-in">
     <div>
       <div class="page-title">${L("pract")}</div>
-      <div class="page-sub">${total} preguntas clínicas · DOM. B — Concepts and Principles</div>
+      <div class="page-sub">${total} ${lang==="es"?"preguntas clínicas":"clinical questions"} · ${domLabel}</div>
     </div>
     <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="practBack">${L("back")}</button></div>
   </div>
   <div class="practice-wrap">
     <div class="question-card animate-in">
       <div class="question-head">
-        <div class="question-meta">${L("qLabel")} ${practIdx+1}/${total} · <strong>${q.concept}</strong></div>
-        <div class="timer-pill practice">⏱ ${L("pract")}</div>
+        <div class="question-meta">${L("qLabel")} ${state.practIdx+1}/${total} · <strong>${q.concept}</strong></div>
+        <div class="timer-pill practice" style="color:${accentColor};border-color:${accentColor}40;background:${accentColor}15">⏱ ${L("pract")}</div>
       </div>
       <div class="difficulty-badge ${diffClass(q.difficulty)}" style="margin-bottom:12px">${q.difficulty}</div>
       <div class="question-text">${q.q}</div>`;
   Object.keys(q.options).forEach(letter=>{
     let cls="";
-    if(answered&&letter===q.correct)cls="correct";
-    if(answered&&letter===selected&&letter!==q.correct)cls="wrong";
-    html+=`<button type="button" class="option ${cls}" data-letter="${letter}" ${answered?"disabled":""}><span class="option-letter">${letter}</span>${q.options[letter]}</button>`;
+    if(state.answered&&letter===q.correct)cls="correct";
+    if(state.answered&&letter===state.selected&&letter!==q.correct)cls="wrong";
+    html+=`<button type="button" class="option ${cls}" data-letter="${letter}" ${state.answered?"disabled":""}><span class="option-letter">${letter}</span>${q.options[letter]}</button>`;
   });
-  if(!answered){
-    html+=`<button type="button" class="hint-btn" id="hintBtn">${L("hint")}: ${q.hint}</button>`;
+  if(!state.answered){
+    html+=`<button type="button" class="hint-btn">${L("hint")}: ${q.hint}</button>`;
   }
-  if(!answered&&!confidence){
+  if(!state.answered&&!state.confidence){
     html+=`<div class="confidence-panel"><div class="conf-label">${L("confLabel")}</div><div class="conf-opts">
       <button type="button" class="conf-btn" data-conf="high">${L("confHigh")}</button>
       <button type="button" class="conf-btn" data-conf="mid">${L("confMid")}</button>
       <button type="button" class="conf-btn" data-conf="low">${L("confLow")}</button>
     </div></div>`;
   }
-  if(answered){
-    const ok=selected===q.correct;
+  if(state.answered){
+    const ok=state.selected===q.correct;
     html+=`<div class="feedback ${ok?"good":"bad"}"><div class="feedback-title">${ok?L("correct"):L("incorrect")}</div>${q.rationale}</div>`;
-    if(practIdx<total-1)html+=`<button type="button" class="btn btn-primary" id="nextPractBtn" style="margin-top:4px">${L("nextQ")}</button>`;
-    else html+=`<button type="button" class="btn btn-primary" id="mockBtn" style="margin-top:4px">${L("enterMock")}</button>`;
+    if(state.practIdx<total-1){
+      html+=`<button type="button" class="btn btn-primary" id="nextPractBtn" style="margin-top:4px;background:${accentColor}">${L("nextQ")}</button>`;
+    } else if(dk==="B"){
+      html+=`<button type="button" class="btn btn-primary" id="mockBtn" style="margin-top:4px">${L("enterMock")}</button>`;
+    } else {
+      html+=`<button type="button" class="btn btn-primary" id="finishDomBtn" style="margin-top:4px;background:${accentColor}">${lang==="es"?"Ver Resumen →":"View Summary →"}</button>`;
+    }
   }
   html+=`</div></div>`;
   qs("main").innerHTML=html;
@@ -764,22 +921,78 @@ function renderPractice(){
   qs("practBack").addEventListener("click",renderDash);
   document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answerPractice(b.dataset.letter)));
   document.querySelectorAll(".conf-btn").forEach(b=>b.addEventListener("click",()=>{
-    confidence=b.dataset.conf;
+    state.confidence=b.dataset.conf;
     document.querySelectorAll(".conf-btn").forEach(x=>{x.className="conf-btn";});
     b.classList.add(`selected-${b.dataset.conf}`);
   }));
   const nb=qs("nextPractBtn");
-  if(nb)nb.addEventListener("click",()=>{practIdx++;selected=null;answered=false;confidence=null;renderPractice()});
+  if(nb)nb.addEventListener("click",()=>{state.practIdx++;state.selected=null;state.answered=false;state.confidence=null;renderPractice()});
   const mb=qs("mockBtn");
   if(mb)mb.addEventListener("click",renderMockIntro);
+  const fb=qs("finishDomBtn");
+  if(fb)fb.addEventListener("click",()=>renderDomainComplete(dk));
 }
 function answerPractice(letter){
-  if(answered)return;
-  const q=QUESTIONS[lang][practIdx];
-  selected=letter;answered=true;
-  if(letter===q.correct)score++;
-  answeredData.push({concept:q.concept,ok:letter===q.correct,confidence:confidence||"unknown"});
+  const dk=currentDomain;
+  const qArr=dk==="B"?QUESTIONS[lang]:dk==="E"?QUESTIONS_E[lang]:QUESTIONS_F[lang];
+  const state=DS[dk];
+  if(state.answered)return;
+  const q=qArr[state.practIdx];
+  state.selected=letter;state.answered=true;
+  if(letter===q.correct)state.score++;
+  state.answeredData.push({concept:q.concept,ok:letter===q.correct,confidence:state.confidence||"unknown"});
   renderPractice();
+}
+
+/* ─── DOMAIN COMPLETE (E and F) ─── */
+function renderDomainComplete(dk){
+  currentScreen="complete";setNav("dashboard");
+  const state=DS[dk];
+  const qArr=dk==="E"?QUESTIONS_E[lang]:QUESTIONS_F[lang];
+  const total=qArr.length;
+  const accentColor=dk==="E"?"#6D28D9":"#BE185D";
+  const domLabel=dk==="E"?"DOM. E — Ethical Issues":"DOM. F — Behavior Assessment";
+  const missed=[...new Set(state.answeredData.filter(x=>!x.ok).map(x=>x.concept))];
+  const confWrong=state.answeredData.filter(x=>!x.ok&&x.confidence==="high");
+  let insightText="";
+  if(confWrong.length){insightText=lang==="es"?`Respondiste con <strong>alta confianza pero incorrectamente</strong> en ${confWrong.length} pregunta(s). La versión completa detecta y corrige estos patrones.`:`You answered with <strong>high confidence but incorrectly</strong> on ${confWrong.length} question(s). The full version detects and corrects these patterns.`;}
+  else if(missed.length){insightText=lang==="es"?`Tu área de oportunidad en ${domLabel} es <strong>${missed.join(", ")}</strong>. La versión completa incluye rutas de remediation adaptativas.`:`Your opportunity area in ${domLabel} is <strong>${missed.join(", ")}</strong>. The full version includes adaptive remediation paths.`;}
+  else{insightText=lang==="es"?`Excelente — ${state.score}/${total} correctas en ${domLabel}. La versión completa cubre los ${dk==="E"?"22":"23"} conceptos con el mismo nivel de profundidad.`:`Excellent — ${state.score}/${total} correct in ${domLabel}. The full version covers all ${dk==="E"?"22":"23"} concepts with the same clinical depth.`;}
+  qs("main").innerHTML=`
+  <div class="topbar"><div></div><div class="topbar-right">${langSwitch()}</div></div>
+  <div class="complete-card animate-scale">
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-size:42px">🎯</div>
+      <div class="page-title" style="margin-top:8px">${lang==="es"?"Demo Completado":"Demo Complete"} — ${domLabel}</div>
+      <div class="page-sub">${lang==="es"?"Completaste la ruta de aprendizaje y práctica de este dominio.":"You finished the learn path and practice for this domain."}</div>
+    </div>
+    <div class="score-display">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:8px">${lang==="es"?"Práctica":"Practice"}</div>
+        <div class="score-ring" style="border-color:${accentColor};background:${accentColor}15"><div class="score-num" style="color:${accentColor}">${state.score}</div><div class="score-denom">${lang==="es"?"de":"of"} ${total}</div></div>
+      </div>
+    </div>
+    <div class="insight-box" style="background:linear-gradient(135deg,${accentColor},${accentColor}bb)">
+      <div class="insight-label">📊 ${lang==="es"?"TU ANÁLISIS":"YOUR INSIGHT"}</div>
+      <div class="insight-text">${insightText}</div>
+    </div>
+    <div class="email-capture">
+      <div class="ec-label">${lang==="es"?"PRÓXIMO PASO":"NEXT STEP"}</div>
+      <div class="ec-heading">${L("emailHead")}</div>
+      <div class="ec-sub">${L("emailSub")}</div>
+      <div class="ec-form" id="ecForm"><input type="email" class="ec-input" id="ecEmail" placeholder="${L("emailPlaceholder")}"/><button type="button" class="ec-btn" id="ecBtn">${L("emailBtn")}</button></div>
+      <div class="ec-success" id="ecSuccess">${L("emailThanks")}</div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px">
+      <button type="button" class="btn btn-gold" id="unlockBtn" style="font-size:14px;padding:12px 24px">${L("unlock")}</button>
+      <button type="button" class="btn btn-secondary" id="completeBack">${L("back")}</button>
+    </div>
+  </div>`;
+  bindLang();
+  const eb=qs("ecBtn");
+  if(eb)eb.addEventListener("click",()=>{const email=qs("ecEmail").value;if(email&&email.includes("@")){qs("ecForm").style.display="none";qs("ecSuccess").style.display="block";}else{qs("ecEmail").style.borderColor="rgba(255,100,100,.6)";}});
+  qs("unlockBtn").addEventListener("click",()=>showPremium("exams"));
+  qs("completeBack").addEventListener("click",renderDash);
 }
 
 /* ─── MOCK INTRO ─── */
@@ -796,7 +1009,7 @@ function renderMockIntro(){
     <div class="exam-rules">
       <div class="rule-item"><div class="rule-value">4</div><div class="rule-label">${lang==="es"?"preguntas":"questions"}</div></div>
       <div class="rule-item"><div class="rule-value">5:00</div><div class="rule-label">${lang==="es"?"minutos reales":"real minutes"}</div></div>
-      <div class="rule-item"><div class="rule-value">${lang==="es"?"3 DOM.":"3 DOM."}</div><div class="rule-label">${lang==="es"?"B, C, D cubiertos":"B, C, D covered"}</div></div>
+      <div class="rule-item"><div class="rule-value">3 DOM.</div><div class="rule-label">${lang==="es"?"B, C, D cubiertos":"B, C, D covered"}</div></div>
     </div>
     <div class="note-box" style="margin-bottom:20px">⚠️ ${lang==="es"?"El timer correrá desde que presiones comenzar. Las preguntas son de nivel avanzado — escenarios clínicos reales de 3 dominios diferentes.":"Timer starts when you press begin. Advanced clinical scenarios spanning DOM. B (Concepts), DOM. B (Escape/Avoidance), and DOM. D (Experimental Design)."}</div>
     <button type="button" class="btn btn-gold" id="startMockBtn" style="width:100%;font-size:15px;padding:14px">${L("startMock")} →</button>
@@ -807,7 +1020,6 @@ function renderMockIntro(){
 function startMock(){setNav("mock");mockIdx=0;selected=null;answered=false;mockScore=0;mockTimerSec=300;renderMock();startMockTimer()}
 
 /* ─── MOCK ─── */
-let mockTimerInterval=null;
 function startMockTimer(){
   clearInterval(mockTimerInterval);
   mockTimerInterval=setInterval(()=>{
@@ -877,11 +1089,12 @@ function answerMock(letter){
 function renderComplete(){
   currentScreen="complete";setNav("dashboard");
   clearInterval(mockTimerInterval);
+  const state=DS["B"];
   const total=QUESTIONS[lang].length;
-  const missed=answeredData.filter(x=>!x.ok).map(x=>x.concept);
-  const confident_wrong=answeredData.filter(x=>!x.ok&&x.confidence==="high");
+  const missed=state.answeredData.filter(x=>!x.ok).map(x=>x.concept);
+  const confident_wrong=state.answeredData.filter(x=>!x.ok&&x.confidence==="high");
   const needsFocus=missed.length?[...new Set(missed)].join(", "):(lang==="es"?"Discriminación avanzada bajo tiempo":"Advanced discrimination under exam timing");
-  const pct=Math.round((score/total)*100);
+  const pct=Math.round((state.score/total)*100);
   let insightText="";
   if(missed.includes("Avoidance")||missed.includes("Mixed Review")){insightText=lang==="es"?`Respondiste ${score}/${total} correctamente. Tu mayor oportunidad de mejora es <strong>Escape vs. Avoidance</strong> — uno de los conceptos más frecuentes en el BCBA real. La versión completa tiene 23 preguntas específicas con remediation adaptativa.`:`You got ${score}/${total} correct. Your biggest opportunity is <strong>Escape vs. Avoidance</strong> — one of the most frequently tested distinctions on the real BCBA. The full version has 23 targeted questions with adaptive remediation.`;}
   else if(confident_wrong.length){insightText=lang==="es"?`Importante: respondiste con <strong>alta confianza pero incorrectamente</strong> en ${confident_wrong.length} pregunta(s). Eso es más peligroso en el examen real que simplemente adivinar. La versión completa detecta y corrige estos patrones.`:`Important: you answered with <strong>high confidence but incorrectly</strong> on ${confident_wrong.length} question(s). That's more dangerous on the real exam than guessing. The full version detects and corrects these patterns.`;}
@@ -933,11 +1146,11 @@ function renderComplete(){
     </div>
     <div style="font-size:13px;font-weight:700;color:var(--ink-mid);margin-bottom:10px">${lang==="es"?"¿Qué incluye la versión completa?":"What's included in the full version?"}</div>
     <div class="feature-chips">
-      <div class="chip active">✓ 9 dominios BCBA</div>
-      <div class="chip active">✓ Práctica ilimitada</div>
-      <div class="chip active">✓ Mock exams cronometrados</div>
+      <div class="chip active">✓ 9 ${lang==="es"?"dominios BCBA":"BCBA domains"}</div>
+      <div class="chip active">✓ ${lang==="es"?"Práctica ilimitada":"Unlimited practice"}</div>
+      <div class="chip active">✓ ${lang==="es"?"Mock exams cronometrados":"Timed mock exams"}</div>
       <div class="chip active">✓ Weakness Detection AI</div>
-      <div class="chip">📅 Study Plan personalizado</div>
+      <div class="chip">📅 ${lang==="es"?"Study Plan personalizado":"Personalized Study Plan"}</div>
       <div class="chip">📊 Mastery Analytics</div>
       <div class="chip">🇺🇸🇪🇸 EN + ES</div>
     </div>
@@ -958,11 +1171,15 @@ function renderComplete(){
 }
 
 /* ─── ETHICS TEASER ─── */
+function startEthicsTeaser(){
+  ethicsPractAnswered=false;
+  ethicsPractSelected=null;
+  renderEthicsTeaser();
+}
 function renderEthicsTeaser(){
   currentScreen="ethicsTeaser";
   const m=ETHICS_TEASER[lang];
   const pq=m.pract_teaser;
-  ethicsPractAnswered=false;ethicsPractSelected=null;
   qs("main").innerHTML=`
   <div class="topbar animate-in">
     <div>
@@ -1144,8 +1361,12 @@ function renderPrefResults(){
 document.addEventListener("DOMContentLoaded",function(){
   qs("startDemoBtn").addEventListener("click",launchDemo);
   qs("nav-dashboard").addEventListener("click",renderDash);
-  qs("nav-learn").addEventListener("click",startLearn);
-  qs("nav-practice").addEventListener("click",startPractice);
+  qs("nav-learn").addEventListener("click",()=>startLearn("B"));
+  qs("nav-practice").addEventListener("click",()=>startPractice("B"));
+  qs("nav-learn-e").addEventListener("click",()=>startLearn("E"));
+  qs("nav-practice-e").addEventListener("click",()=>startPractice("E"));
+  qs("nav-learn-f").addEventListener("click",()=>startLearn("F"));
+  qs("nav-practice-f").addEventListener("click",()=>startPractice("F"));
   qs("nav-mock").addEventListener("click",renderMockIntro);
   document.querySelectorAll(".premium-btn").forEach(b=>b.addEventListener("click",()=>showPremium(b.dataset.feat)));
   qs("closeModalBtn").addEventListener("click",hidePremium);
