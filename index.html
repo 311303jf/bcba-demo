@@ -479,6 +479,8 @@ let prefPairIdx=0;
 let prefDone=false;
 let ethicsPractAnswered=false;
 let ethicsPractSelected=null;
+
+const QUESTIONS={en:[
   {concept:"Positive Reinforcement",difficulty:"Beginner",q:"During therapy, Mia labels pictures correctly and immediately receives praise and a token. Over the next week, correct labeling increases. Which contingency is most directly illustrated?",options:{A:"Positive reinforcement",B:"Negative reinforcement",C:"Extinction",D:"Response cost"},correct:"A",hint:"Identify whether something was added or removed after the behavior.",rationale:"Praise and a token were ADDED after correct responding, and the behavior INCREASED. This is the definition of positive reinforcement. Nothing was removed, and behavior increased — classic PR."},
   {concept:"Negative Reinforcement",difficulty:"Intermediate",q:"A client appropriately asks for a break during difficult work. The therapist removes the task for two minutes, and break requests increase over time. What process is occurring?",options:{A:"Positive punishment",B:"Negative reinforcement",C:"Stimulus generalization",D:"Extinction"},correct:"B",hint:"Look for removal of an aversive condition followed by an increase in behavior.",rationale:"The task (aversive stimulus) was REMOVED after the break request, and the break request INCREASED. Behavior increased because something aversive was taken away — negative reinforcement."},
   {concept:"Escape",difficulty:"Intermediate",q:"When math worksheets are already on the table, Leo throws his pencil. The teacher removes the worksheet, and pencil throwing increases during math time. Which type of negative reinforcement is this?",options:{A:"Avoidance",B:"Escape",C:"DRA",D:"Positive reinforcement"},correct:"B",hint:"Ask whether the aversive stimulus was already present when the behavior occurred.",rationale:"The worksheet was ALREADY PRESENT before the behavior. The behavior (throwing) terminated it. When an aversive stimulus is already present and behavior ends it, that is ESCAPE — not avoidance."},
@@ -496,7 +498,7 @@ const MOCK={en:[
   {concept:"Stimulus Control",difficulty:"Advanced",q:"A learner correctly says 'cookie' when shown a cookie but does not say 'cookie' when shown other foods. This pattern is consistent across multiple sessions. Which behavioral process best explains this outcome?",options:{A:"Stimulus discrimination",B:"Response generalization",C:"Motivating operation",D:"Extinction"},correct:"A",rationale:"The response occurs selectively in the presence of one specific stimulus (cookie) and not others. This is stimulus discrimination — the hallmark of stimulus control."},
   {concept:"Motivating Operations",difficulty:"Advanced",q:"After several hours without water, a client is significantly more likely to request water, and water becomes markedly more effective as a reinforcer. What is the best behavioral classification?",options:{A:"Abolishing operation",B:"Establishing operation",C:"Stimulus delta",D:"Rule-governed behavior"},correct:"B",rationale:"Water deprivation increases the reinforcing value of water (value-altering effect) and evokes behavior that has produced water in the past (behavior-altering effect). This is an establishing operation (EO)."},
   {concept:"Escape vs Avoidance",difficulty:"Advanced",q:"Every morning before difficult tasks are presented, a student raises her hand and asks to go to the nurse. The teacher excuses her, and the task is delayed. This pattern increases over the semester. What is the most precise behavioral classification?",options:{A:"Escape-maintained negative reinforcement",B:"Avoidance-maintained negative reinforcement",C:"Positive reinforcement",D:"Respondent conditioning"},correct:"B",rationale:"The request occurs BEFORE the difficult task is presented, and it postpones it. Because behavior occurs before the aversive event and prevents/delays it — this is avoidance-maintained negative reinforcement, not escape."},
-  {concept:"Experimental Design · DOM. D",difficulty:"Advanced",q:"A researcher uses a reversal design (ABA) to evaluate a self-monitoring intervention. After removing the intervention in the second A phase, the target behavior returns to near-baseline levels. When the intervention is reintroduced, behavior improves again. What does this pattern most directly demonstrate?",options:{A:"External validity of the intervention","B":"Social validity as rated by stakeholders",C:"Experimental control over the target behavior",D:"Stimulus generalization across settings"},correct:"C",rationale:"When behavior reverts to baseline after intervention removal, and improves again upon reinstatement, this demonstrates experimental control — the intervention, not extraneous variables, is responsible for the behavior change. This is the logic of reversal/withdrawal designs."}
+  {concept:"Experimental Design · DOM. D",difficulty:"Advanced",q:"A researcher uses a reversal design (ABA) to evaluate a self-monitoring intervention. After removing the intervention in the second A phase, the target behavior returns to near-baseline levels. When the intervention is reintroduced, behavior improves again. What does this pattern most directly demonstrate?",options:{A:"External validity of the intervention",B:"Social validity as rated by stakeholders",C:"Experimental control over the target behavior",D:"Stimulus generalization across settings"},correct:"C",rationale:"When behavior reverts to baseline after intervention removal, and improves again upon reinstatement, this demonstrates experimental control — the intervention, not extraneous variables, is responsible for the behavior change. This is the logic of reversal/withdrawal designs."}
 ],es:[
   {concept:"Stimulus Control",difficulty:"Avanzado",q:"Un estudiante dice 'galleta' correctamente al ver una galleta pero no lo dice al ver otros alimentos. Este patrón es consistente en múltiples sesiones. ¿Qué proceso conductual explica mejor este resultado?",options:{A:"Discriminación de estímulos",B:"Generalización de respuesta",C:"Operación motivadora",D:"Extinción"},correct:"A",rationale:"La respuesta ocurre selectivamente en presencia de un estímulo específico y no en presencia de otros. Esto es discriminación de estímulos — el sello del control de estímulos."},
   {concept:"Motivating Operations",difficulty:"Avanzado",q:"Después de varias horas sin agua, un cliente tiene significativamente más probabilidad de pedir agua, y el agua se vuelve mucho más efectiva como reforzador. ¿Cuál es la mejor clasificación conductual?",options:{A:"Abolishing operation",B:"Establishing operation",C:"Stimulus delta",D:"Rule-governed behavior"},correct:"B",rationale:"La privación de agua aumenta el valor reforzador del agua (efecto alterador de valor) y evoca conductas que han producido agua en el pasado (efecto alterador de conducta). Esto es una Establishing Operation (EO)."},
@@ -1083,6 +1085,7 @@ function recordPrefChoice(winnerId,loserId,winEl,loseEl){
   },520);
 }
 function renderPrefResults(){
+  const totalPairs=PREF_PAIRS.length;
   const maxScore=PREF_ITEMS.length-1;
   const ranked=[...PREF_ITEMS].sort((a,b)=>(prefScores[b.id]||0)-(prefScores[a.id]||0));
   const rankClass=i=>["r1","r2","r3","r4","r4"][i]||"r4";
@@ -1099,11 +1102,14 @@ function renderPrefResults(){
       <span class="hier-pct">${pct}%</span>
     </div>`;
   }).join("");
+  const subLabel=lang==="es"
+    ? "Jerarquía de preferencia generada — "+totalPairs+" presentaciones emparejadas"
+    : "Preference hierarchy generated — "+totalPairs+" paired presentations";
   qs("main").innerHTML=`
   <div class="topbar animate-in">
     <div>
       <div class="page-title" style="color:#BE185D">🧪 DOM. F — Resultados del Assessment</div>
-      <div class="page-sub">${lang==="es"?"Jerarquía de preferencia generada — ${PREF_PAIRS.length} presentaciones emparejadas":"Preference hierarchy generated — ${PREF_PAIRS.length} paired presentations"}</div>
+      <div class="page-sub">${subLabel}</div>
     </div>
     <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="prefBackResults">${L("back")}</button></div>
   </div>
