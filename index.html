@@ -180,6 +180,8 @@ ul.preview{padding-left:16px;font-size:12.5px;line-height:1.8;color:var(--ink-mi
 .option.correct .option-letter{background:#639922;border-color:#639922;color:white}
 .option.wrong{background:var(--red-light);border-color:var(--red-border)}
 .option.wrong .option-letter{background:var(--red);border-color:var(--red);color:white}
+.option.selected{background:var(--blue-light);border-color:var(--blue-border)}
+.option.selected .option-letter{background:var(--blue);border-color:var(--blue);color:white}
 .option:disabled{cursor:default}
 .hint-btn{background:none;border:1px dashed var(--border);color:var(--ink-soft);border-radius:var(--radius-sm);padding:8px 14px;font-size:12px;font-weight:600;margin-top:6px;transition:all .15s}
 .hint-btn:hover{border-color:var(--green);color:var(--green)}
@@ -507,6 +509,51 @@ const MOCK={en:[
 ]};
 
 
+/* ─── ADDED STABLE DOMAIN DATA: E AND F ─── */
+const DEMO_PATH_E=["Multiple Relationships","Confidentiality","Cultural Humility"];
+const DEMO_PATH_F=["Preference Assessment","Descriptive Assessment","Functional Analysis"];
+
+const LEARN_E={en:{
+  "Multiple Relationships":{definition:"A multiple relationship occurs when a BCBA has a professional role with a person and another type of relationship with that same person or someone closely associated.",example:"A BCBA provides services to a child and is invited to the child's birthday party as a personal friend.",strategy:"Ask whether the additional relationship could impair objectivity, effectiveness, or create risk of exploitation.",difficulty:"Intermediate",icon:"⚖️"},
+  "Confidentiality":{definition:"Confidentiality requires protecting client information and sharing it only with appropriate consent or legal/ethical authorization.",example:"A teacher asks for details about a client's therapy goals, but the BCBA does not have permission to disclose them.",strategy:"On ethics questions, identify who has consent and whether the disclosure is necessary and authorized.",difficulty:"Intermediate",icon:"🔐"},
+  "Cultural Humility":{definition:"Cultural humility involves ongoing self-reflection and responsiveness to the values, preferences, and context of clients and stakeholders.",example:"A BCBA adapts caregiver training examples so they fit the family's language, routines, and cultural priorities.",strategy:"Look for collaboration, respect, and individualized decision-making rather than assumptions.",difficulty:"Advanced",icon:"🌎"}
+},es:{
+  "Multiple Relationships":{definition:"Una relación múltiple ocurre cuando un BCBA tiene un rol profesional con una persona y otro tipo de relación con esa misma persona o alguien cercano.",example:"Un BCBA presta servicios a un niño y es invitado a su cumpleaños como amigo personal.",strategy:"Pregunta si la relación adicional puede afectar la objetividad, efectividad o crear riesgo de explotación.",difficulty:"Intermedio",icon:"⚖️"},
+  "Confidentiality":{definition:"La confidencialidad requiere proteger la información del cliente y compartirla solo con consentimiento apropiado o autorización legal/ética.",example:"Una maestra pide detalles sobre las metas de terapia del cliente, pero el BCBA no tiene permiso para compartirlos.",strategy:"En preguntas éticas, identifica quién dio consentimiento y si la divulgación es necesaria y autorizada.",difficulty:"Intermedio",icon:"🔐"},
+  "Cultural Humility":{definition:"La humildad cultural implica auto-reflexión continua y sensibilidad a los valores, preferencias y contexto de clientes y stakeholders.",example:"Un BCBA adapta ejemplos de entrenamiento a cuidadores para que encajen con el idioma, rutinas y prioridades culturales de la familia.",strategy:"Busca colaboración, respeto y toma de decisiones individualizada, no suposiciones.",difficulty:"Avanzado",icon:"🌎"}
+}};
+
+const LEARN_F={en:{
+  "Preference Assessment":{definition:"A preference assessment identifies stimuli that may function as reinforcers by observing choices, approach, or engagement.",example:"A BCBA presents toys in pairs and records which item the learner selects more often.",strategy:"Preference is not the same as reinforcement. A preferred item becomes a reinforcer only if it increases future behavior.",difficulty:"Beginner",icon:"🎯"},
+  "Descriptive Assessment":{definition:"Descriptive assessment involves observing and recording behavior and environmental events as they naturally occur.",example:"A BCBA records antecedents and consequences during classroom routines to identify possible patterns.",strategy:"Descriptive data suggest hypotheses; they do not prove functional relations by themselves.",difficulty:"Intermediate",icon:"📝"},
+  "Functional Analysis":{definition:"Functional analysis systematically manipulates antecedents and consequences to test which variables maintain behavior.",example:"A BCBA alternates attention, escape, alone, and play conditions to identify the function of problem behavior.",strategy:"If conditions are manipulated to demonstrate a functional relation, think functional analysis.",difficulty:"Advanced",icon:"🔬"}
+},es:{
+  "Preference Assessment":{definition:"Un preference assessment identifica estímulos que podrían funcionar como reforzadores observando elecciones, acercamiento o engagement.",example:"Un BCBA presenta juguetes en pares y registra cuál ítem selecciona el estudiante con más frecuencia.",strategy:"Preferencia no es lo mismo que reforzamiento. Un ítem preferido es reforzador solo si aumenta conducta futura.",difficulty:"Básico",icon:"🎯"},
+  "Descriptive Assessment":{definition:"La evaluación descriptiva implica observar y registrar conducta y eventos ambientales tal como ocurren naturalmente.",example:"Un BCBA registra antecedentes y consecuencias durante rutinas de clase para identificar posibles patrones.",strategy:"Los datos descriptivos sugieren hipótesis; no prueban relaciones funcionales por sí solos.",difficulty:"Intermedio",icon:"📝"},
+  "Functional Analysis":{definition:"El análisis funcional manipula sistemáticamente antecedentes y consecuencias para probar qué variables mantienen la conducta.",example:"Un BCBA alterna condiciones de atención, escape, alone y play para identificar la función de la conducta problema.",strategy:"Si las condiciones se manipulan para demostrar una relación funcional, piensa en functional analysis.",difficulty:"Avanzado",icon:"🔬"}
+}};
+
+const QUESTIONS_E={en:[
+  {concept:"Multiple Relationships",difficulty:"Intermediate",q:"A BCBA is invited to a client's family dinner and is told, 'We see you as family now.' What is the BEST response?",options:{A:"Attend because rapport is important",B:"Decline and explain professional boundaries",C:"Attend only if no therapy is discussed",D:"Ask the client to decide"},correct:"B",hint:"Consider objectivity and professional boundaries.",rationale:"The safest ethical response is to maintain boundaries and avoid a multiple relationship that could impair objectivity."},
+  {concept:"Confidentiality",difficulty:"Intermediate",q:"A school staff member asks for details from a client's ABA treatment plan, but the BCBA does not have authorization to disclose them. What should the BCBA do?",options:{A:"Share because the staff works at the school",B:"Share only general gossip-free details",C:"Do not disclose without appropriate consent",D:"Send the full plan after school hours"},correct:"C",hint:"Look for consent and authorization.",rationale:"Client information should not be disclosed without appropriate consent or another valid legal/ethical basis."},
+  {concept:"Cultural Humility",difficulty:"Advanced",q:"A caregiver says a proposed intervention does not fit the family's routines or values. What is the BEST next step?",options:{A:"Explain that evidence-based plans cannot be changed",B:"Collaborate to adapt the plan while maintaining effectiveness",C:"Discontinue services immediately",D:"Ignore the concern unless data worsen"},correct:"B",hint:"Ethical practice includes collaboration and responsiveness.",rationale:"Cultural humility requires collaboration and adapting services to the client's context while preserving effectiveness."}
+],es:[
+  {concept:"Relaciones Múltiples",difficulty:"Intermedio",q:"Un BCBA es invitado a una cena familiar de un cliente y le dicen: 'Ya te vemos como familia.' ¿Cuál es la MEJOR respuesta?",options:{A:"Asistir porque el rapport es importante",B:"Declinar y explicar los límites profesionales",C:"Asistir solo si no se habla de terapia",D:"Pedir al cliente que decida"},correct:"B",hint:"Considera objetividad y límites profesionales.",rationale:"La respuesta ética más segura es mantener límites y evitar una relación múltiple que pueda afectar la objetividad."},
+  {concept:"Confidencialidad",difficulty:"Intermedio",q:"Un miembro del personal escolar pide detalles del plan ABA de un cliente, pero el BCBA no tiene autorización para divulgarlos. ¿Qué debe hacer?",options:{A:"Compartir porque trabaja en la escuela",B:"Compartir solo detalles generales",C:"No divulgar sin consentimiento apropiado",D:"Enviar el plan completo después de clases"},correct:"C",hint:"Busca consentimiento y autorización.",rationale:"La información del cliente no debe divulgarse sin consentimiento apropiado u otra base legal/ética válida."},
+  {concept:"Humildad Cultural",difficulty:"Avanzado",q:"Un cuidador dice que una intervención propuesta no encaja con las rutinas o valores de la familia. ¿Cuál es el MEJOR próximo paso?",options:{A:"Explicar que los planes basados en evidencia no se cambian",B:"Colaborar para adaptar el plan manteniendo efectividad",C:"Descontinuar servicios inmediatamente",D:"Ignorar la preocupación salvo que los datos empeoren"},correct:"B",hint:"La práctica ética incluye colaboración y sensibilidad al contexto.",rationale:"La humildad cultural requiere colaboración y adaptar servicios al contexto del cliente manteniendo efectividad."}
+]};
+
+const QUESTIONS_F={en:[
+  {concept:"Preference Assessment",difficulty:"Beginner",q:"A learner repeatedly chooses bubbles over four other items during paired presentations. What can the BCBA conclude?",options:{A:"Bubbles are definitely a reinforcer",B:"Bubbles are a high-preference item",C:"Bubbles will punish behavior",D:"The behavior function is automatic"},correct:"B",hint:"Preference and reinforcement are related but not identical.",rationale:"The assessment identifies bubbles as preferred. It becomes a reinforcer only if access to bubbles increases future behavior."},
+  {concept:"Descriptive Assessment",difficulty:"Intermediate",q:"A BCBA observes classroom routines and records antecedents and consequences without manipulating variables. What assessment is being used?",options:{A:"Functional analysis",B:"Descriptive assessment",C:"Parametric analysis",D:"Component analysis"},correct:"B",hint:"No variables are manipulated.",rationale:"Observing naturally occurring events without manipulation is descriptive assessment."},
+  {concept:"Functional Analysis",difficulty:"Advanced",q:"A BCBA alternates attention, escape, alone, and play conditions to test which consequence maintains aggression. What is this procedure?",options:{A:"Preference assessment",B:"Functional analysis",C:"Scatterplot recording",D:"Treatment integrity check"},correct:"B",hint:"Conditions are deliberately manipulated.",rationale:"Systematic manipulation of conditions to identify behavioral function is functional analysis."}
+],es:[
+  {concept:"Preference Assessment",difficulty:"Básico",q:"Un estudiante elige burbujas repetidamente sobre otros cuatro ítems durante presentaciones emparejadas. ¿Qué puede concluir el BCBA?",options:{A:"Las burbujas definitivamente son reforzador",B:"Las burbujas son un ítem de alta preferencia",C:"Las burbujas castigarán la conducta",D:"La función de la conducta es automática"},correct:"B",hint:"Preferencia y reforzamiento están relacionados, pero no son idénticos.",rationale:"El assessment identifica burbujas como preferidas. Solo son reforzador si aumentan conducta futura."},
+  {concept:"Evaluación Descriptiva",difficulty:"Intermedio",q:"Un BCBA observa rutinas de clase y registra antecedentes y consecuencias sin manipular variables. ¿Qué evaluación se usa?",options:{A:"Functional analysis",B:"Descriptive assessment",C:"Parametric analysis",D:"Component analysis"},correct:"B",hint:"No se manipulan variables.",rationale:"Observar eventos naturales sin manipulación es evaluación descriptiva."},
+  {concept:"Functional Analysis",difficulty:"Avanzado",q:"Un BCBA alterna condiciones de atención, escape, alone y play para probar qué consecuencia mantiene la agresión. ¿Qué procedimiento es?",options:{A:"Preference assessment",B:"Functional analysis",C:"Scatterplot recording",D:"Treatment integrity check"},correct:"B",hint:"Las condiciones se manipulan deliberadamente.",rationale:"La manipulación sistemática de condiciones para identificar función conductual es functional analysis."}
+]};
+
+
 const PREMIUM_MODALS={
   exams:{icon:"📋",title:"Full Mock Exams",desc:"Practice exams that simulate the real BCBA environment — 185 questions, 4 hours, randomized from all 9 domains.",features:["185 questions from all 9 BCBA domains","Timed: 4 hours with real clock pressure","Domain-by-domain breakdown after","Compare your score to passing benchmark"]},
   weakness:{icon:"🎯",title:"Smart Weakness Detection",desc:"The system learns which concepts trip you up most and automatically builds focused sessions around your gaps.",features:["AI-powered error pattern analysis","Concept-level mastery tracking","Automatic drill sessions for weak areas","'Confident but wrong' detection"]},
@@ -526,10 +573,10 @@ const UI={en:{
   complete:"Demo Complete",completeSub:"You finished the full demo path.",
   strengths:"Your Strengths",focus:"Focus Areas",unlock:"Unlock Full Version →",
   confLabel:"How confident were you before answering?",confHigh:"Very confident",confMid:"Somewhat sure",confLow:"Unsure / guessed",
-  emailHead:"Get your personalized study plan",emailSub:"Based on your demo results, we'll send you a custom study guide for your exam date.",emailPlaceholder:"your@email.com",emailBtn:"Send My Guide",emailThanks:"✓ Check your inbox — your guide is on the way!",
+  emailHead:"Get your personalized study plan",emailSub:"Based on your demo results, we'll send you a custom study guide for your exam date.",emailPlaceholder:"your@email.com",emailBtn:"Send My Guide",emailThanks:"✓ Saved locally for this demo. Database/email integration comes next.",
   metricDomains:"BCBA domains",metricConcepts:"concept targets",metricScenarios:"clinical scenarios",
   guidedPath:"Guided path: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review",
-  startPath:"Start Path →",mock4q:"4 clinical questions · 3 domains · 5 minute real timer",
+  startPath:"Start Path →",mock4q:"4 clinical questions · 3 domains · timer · flag review",
   mockAvail:"DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — available after completing practice demo.",
   curriculumTitle:"Full Curriculum — Preview",
   pillDemo:"AVAILABLE IN DEMO",pillLocked:"FULL VERSION",
@@ -540,8 +587,8 @@ const UI={en:{
   studyingHrs:"Studying",hrsWeek:"hrs/week.",
   obStep:"Step",obOf:"of",obNext:"Next →",obStart:"Start Demo →",
   landEyebrow:"BCBA Exam Preparation · 6th Edition TCO",
-  landHeading:"Master the exam. Trust every answer.",
-  landSub:"Adaptive clinical questions, personalized domain paths, and progress analytics — designed to help you pass the BCBA the first time.",
+  landHeading:"Build exam readiness. Trust your reasoning.",
+  landSub:"Adaptive clinical questions, personalized domain paths, and progress analytics — designed to help you build BCBA exam readiness with confidence.",
   landPositioning:"Designed for candidates who want to <strong>understand the material, not just memorize it</strong> — because the BCBA exam tests clinical reasoning, not recall.",
   trust1:"📘 6th Edition TCO aligned",trust2:"🧩 Real clinical scenarios",trust3:"🎯 Adaptive mastery path",trust4:"🇺🇸🇪🇸 English + Academic Spanish",
   ctaBtn:"▶ Start Free Demo",
@@ -558,10 +605,10 @@ const UI={en:{
   complete:"Demo Completado",completeSub:"Completaste el recorrido completo del demo.",
   strengths:"Tus Fortalezas",focus:"Áreas de Enfoque",unlock:"Desbloquear Versión Completa →",
   confLabel:"¿Qué tan seguro/a estabas antes de responder?",confHigh:"Muy seguro/a",confMid:"Algo seguro/a",confLow:"No seguro / adiviné",
-  emailHead:"Recibe tu plan de estudio personalizado",emailSub:"Basado en tus resultados del demo, te enviaremos una guía de estudio personalizada.",emailPlaceholder:"tu@email.com",emailBtn:"Enviar Mi Guía",emailThanks:"✓ Revisa tu correo — ¡tu guía está en camino!",
+  emailHead:"Recibe tu plan de estudio personalizado",emailSub:"Basado en tus resultados del demo, te enviaremos una guía de estudio personalizada.",emailPlaceholder:"tu@email.com",emailBtn:"Enviar Mi Guía",emailThanks:"✓ Guardado localmente para este demo. La integración con base de datos/correo viene después.",
   metricDomains:"dominios BCBA",metricConcepts:"conceptos objetivo",metricScenarios:"escenarios clínicos",
   guidedPath:"Ruta guiada: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review",
-  startPath:"Comenzar Ruta →",mock4q:"4 preguntas clínicas · 3 dominios · timer real de 5 minutos",
+  startPath:"Comenzar Ruta →",mock4q:"4 preguntas clínicas · 3 dominios · timer · marcar para revisar",
   mockAvail:"DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — disponible tras completar la práctica demo.",
   curriculumTitle:"Currículo Completo — Preview",
   pillDemo:"DISPONIBLE EN DEMO",pillLocked:"VERSIÓN COMPLETA",
@@ -572,8 +619,8 @@ const UI={en:{
   studyingHrs:"Estudiando",hrsWeek:"hrs/semana.",
   obStep:"Paso",obOf:"de",obNext:"Siguiente →",obStart:"Comenzar Demo →",
   landEyebrow:"Preparación para el Examen BCBA · 6th Edition TCO",
-  landHeading:"Domina el examen. Confía en cada respuesta.",
-  landSub:"Preguntas clínicas adaptativas, rutas de dominio personalizadas y análisis de progreso — diseñado para que pases el BCBA la primera vez.",
+  landHeading:"Construye preparación. Confía en tu razonamiento.",
+  landSub:"Preguntas clínicas adaptativas, rutas de dominio personalizadas y análisis de progreso — diseñado para desarrollar preparación y confianza para el examen BCBA.",
   landPositioning:"Diseñado para candidatos que quieren <strong>entender el material, no solo memorizarlo</strong> — porque el examen BCBA evalúa razonamiento clínico, no memorización.",
   trust1:"📘 Alineado al 6th Edition TCO",trust2:"🧩 Escenarios clínicos reales",trust3:"🎯 Ruta de maestría adaptativa",trust4:"🇺🇸🇪🇸 Inglés + Español académico",
   ctaBtn:"▶ Comenzar Demo Gratuito",
@@ -650,6 +697,8 @@ const DS={
   F:{learnIdx:0,practIdx:0,score:0,answeredData:[],selected:null,answered:false,confidence:null,completedMods:0,complete:false}
 };
 let mockScore=0;
+let mockAnswers={};
+let mockFlags={};
 let mockComplete=false;
 let studyPlanLang=lang;
 
@@ -680,13 +729,20 @@ function updateProgress(){
   if(streak)streak.textContent="🔥 "+L("streakLabel");
 }
 function rerender(){
-  if(currentScreen==="dashboard")renderDash();
-  else if(currentScreen==="learn")renderLearn();
-  else if(currentScreen==="practice")renderPractice();
-  else if(currentScreen==="mockIntro")renderMockIntro();
-  else if(currentScreen==="mock")renderMock();
-  else if(currentScreen==="finalComplete")renderFinalComplete();
-  else if(currentScreen==="prefAssessment")renderPrefRound();
+  try{
+    if(currentScreen==="dashboard")renderDash();
+    else if(currentScreen==="learn")renderLearn();
+    else if(currentScreen==="practice")renderPractice();
+    else if(currentScreen==="mockIntro")renderMockIntro();
+    else if(currentScreen==="mock")renderMock();
+    else if(currentScreen==="finalComplete")renderFinalComplete();
+    else if(currentScreen==="prefAssessment")renderPrefRound();
+    else renderDash();
+  }catch(err){
+    console.error("BCBA Study Hub render error:",err);
+    const main=qs("main");
+    if(main)main.innerHTML=`<div class="complete-card"><div style="font-size:42px">⚠️</div><h2 style="font-family:var(--font-display);margin:10px 0">${lang==="es"?"Algo no cargó correctamente":"Something did not load correctly"}</h2><p class="page-sub">${lang==="es"?"Vuelve al dashboard y continúa desde ahí.":"Return to the dashboard and continue from there."}</p><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px">${lang==="es"?"Recargar demo":"Reload demo"}</button></div>`;
+  }
 }
 
 /* ─── TOAST ─── */
@@ -773,7 +829,7 @@ function renderOnboard(){
     <div class="onboard-opts">${opts}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${langSwitch()}
-      <button type="button" class="btn btn-primary" id="obNext" ${!obAnswers[step.key]?"disabled style='opacity:.5;cursor:not-allowed'":""} style="margin-left:auto;flex:1">${isLast?L("obStart"):L("obNext")}</button>
+      <button type="button" class="btn btn-primary" id="obNext" ${!obAnswers[step.key]?"disabled":""} style="margin-left:auto;flex:1;${!obAnswers[step.key]?"opacity:.5;cursor:not-allowed":""}">${isLast?L("obStart"):L("obNext")}</button>
     </div>`;
   bindLang();
   qs("onboardCard").querySelectorAll(".onboard-opt").forEach(b=>b.addEventListener("click",()=>{obAnswers[step.key]=b.dataset.val;buildUserProfile();renderOnboard()}));
@@ -1061,20 +1117,24 @@ function renderMockIntro(){
     <div class="exam-mode-header">
       <div class="exam-icon">📋</div>
       <div class="exam-title">${lang==="es"?"Entrar al Modo Examen":"Enter Exam Mode"}</div>
-      <div class="exam-subtitle">${lang==="es"?"4 preguntas clínicas cronometradas — 3 dominios distintos":"4 timed clinical questions — spanning 3 different domains"}</div>
+      <div class="exam-subtitle">${lang==="es"?"4 preguntas clínicas cronometradas — sin feedback inmediato":"4 timed clinical questions — no immediate feedback"}</div>
     </div>
     <div class="exam-rules">
       <div class="rule-item"><div class="rule-value">4</div><div class="rule-label">${lang==="es"?"preguntas":"questions"}</div></div>
-      <div class="rule-item"><div class="rule-value">5:00</div><div class="rule-label">${lang==="es"?"minutos reales":"real minutes"}</div></div>
-      <div class="rule-item"><div class="rule-value">3 DOM.</div><div class="rule-label">${lang==="es"?"B, C, D cubiertos":"B, C, D covered"}</div></div>
+      <div class="rule-item"><div class="rule-value">5:00</div><div class="rule-label">${lang==="es"?"minutos":"minutes"}</div></div>
+      <div class="rule-item"><div class="rule-value">Flag</div><div class="rule-label">${lang==="es"?"marcar revisión":"mark review"}</div></div>
     </div>
-    <div class="note-box" style="margin-bottom:20px">⚠️ ${lang==="es"?"El timer correrá desde que presiones comenzar. Las preguntas son de nivel avanzado — escenarios clínicos reales de 3 dominios diferentes.":"Timer starts when you press begin. Advanced clinical scenarios spanning DOM. B (Concepts), DOM. B (Escape/Avoidance), and DOM. D (Experimental Design)."}</div>
+    <div class="note-box" style="margin-bottom:20px">⚠️ ${lang==="es"?"El timer correrá desde que presiones comenzar. En modo examen no verás la respuesta correcta hasta el reporte final.":"Timer starts when you press begin. In exam mode, you will not see correct answers until the final report."}</div>
     <button type="button" class="btn btn-gold" id="startMockBtn" style="width:100%;font-size:15px;padding:14px">${L("startMock")} →</button>
   </div>`;
   bindLang();
   qs("startMockBtn").addEventListener("click",startMock);
 }
-function startMock(){setNav("mock");mockIdx=0;selected=null;answered=false;mockScore=0;mockTimerSec=300;renderMock();startMockTimer()}
+function startMock(){
+  setNav("mock");
+  mockIdx=0;selected=null;answered=false;mockScore=0;mockAnswers={};mockFlags={};mockTimerSec=300;
+  renderMock();startMockTimer();
+}
 
 /* ─── MOCK ─── */
 function startMockTimer(){
@@ -1088,20 +1148,20 @@ function startMockTimer(){
       el.textContent=`⏱ ${m}:${s.toString().padStart(2,"0")}`;
       el.className="timer-pill exam"+(mockTimerSec<=30?" urgent":"");
     }
-    if(mockTimerSec<=0){clearInterval(mockTimerInterval);if(!answered){timeExpired()}}
+    if(mockTimerSec<=0){clearInterval(mockTimerInterval);renderFinalComplete();}
   },1000);
 }
-function timeExpired(){answered=true;selected="TIMEOUT";renderMock()}
 function renderMock(){
   currentScreen="mock";
   const q=MOCK[lang][mockIdx];
   const m=Math.floor(mockTimerSec/60);
   const s=mockTimerSec%60;
+  const currentAnswer=mockAnswers[mockIdx]||null;
   let html=`
   <div class="topbar animate-in">
     <div>
       <div class="page-title">${L("mockTitle")}</div>
-      <div class="page-sub">Preview · 3 ${lang==="es"?"preguntas avanzadas":"advanced questions"}</div>
+      <div class="page-sub">Preview · ${MOCK[lang].length} ${lang==="es"?"preguntas avanzadas":"advanced questions"} · ${Object.keys(mockAnswers).length}/${MOCK[lang].length} ${lang==="es"?"respondidas":"answered"}</div>
     </div>
     <div class="topbar-right">${langSwitch()}<div class="timer-pill exam${mockTimerSec<=30?" urgent":""}" id="mockTimer">⏱ ${m}:${s.toString().padStart(2,"0")}</div></div>
   </div>
@@ -1109,41 +1169,36 @@ function renderMock(){
     <div class="question-card animate-in">
       <div class="question-head">
         <div class="question-meta">${lang==="es"?"Pregunta":"Question"} ${mockIdx+1}/${MOCK[lang].length} · ${q.concept}</div>
-        <div class="timer-pill exam">🎓 Exam Mode</div>
+        <button type="button" class="btn btn-secondary" id="flagMockBtn">${mockFlags[mockIdx]?"🚩 "+(lang==="es"?"Marcada":"Flagged"):"⚑ "+(lang==="es"?"Marcar para revisar":"Flag for review")}</button>
       </div>
       <div class="difficulty-badge ${diffClass(q.difficulty)}">${q.difficulty}</div>
       <div class="question-text">${q.q}</div>`;
   Object.keys(q.options).forEach(letter=>{
-    let cls="";
-    if(answered&&letter===q.correct)cls="correct";
-    if(answered&&letter===selected&&letter!==q.correct)cls="wrong";
-    html+=`<button type="button" class="option ${cls}" data-letter="${letter}" ${answered?"disabled":""}><span class="option-letter">${letter}</span>${q.options[letter]}</button>`;
+    const cls=currentAnswer===letter?"selected":"";
+    html+=`<button type="button" class="option ${cls}" data-letter="${letter}"><span class="option-letter">${letter}</span>${q.options[letter]}</button>`;
   });
-  if(answered){
-    if(selected==="TIMEOUT"){html+=`<div class="feedback bad"><div class="feedback-title">⏰ ${lang==="es"?"Tiempo agotado":"Time's up"}</div>${lang==="es"?"Se acabó el tiempo. La respuesta correcta es":"Time expired. The correct answer is"} <strong>${q.correct}. ${q.options[q.correct]}</strong>. ${q.rationale}</div>`;}
-    else{const ok=selected===q.correct;html+=`<div class="feedback ${ok?"good":"bad"}"><div class="feedback-title">${ok?L("correct"):L("incorrect")}</div>${q.rationale}</div>`;}
-    if(mockIdx<MOCK[lang].length-1)html+=`<button type="button" class="btn btn-primary" id="nextMockBtn" style="margin-top:4px">${L("nextMock")}</button>`;
-    else html+=`<button type="button" class="btn btn-gold" id="finishBtn" style="margin-top:4px">${L("summary")}</button>`;
-  }
-  html+=`</div></div>`;
+  html+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+    ${mockIdx>0?`<button type="button" class="btn btn-secondary" id="prevMockBtn">← ${lang==="es"?"Anterior":"Previous"}</button>`:""}
+    ${mockIdx<MOCK[lang].length-1?`<button type="button" class="btn btn-primary" id="nextMockBtn">${lang==="es"?"Siguiente":"Next"} →</button>`:`<button type="button" class="btn btn-gold" id="finishBtn">${L("summary")}</button>`}
+  </div>
+  <div class="note-box" style="margin-top:14px;font-size:12px">${lang==="es"?"Modo examen: las respuestas correctas y explicaciones aparecerán al final.":"Exam mode: correct answers and rationales appear at the end."}</div>
+  </div></div>`;
   qs("main").innerHTML=html;
   bindLang();
   document.querySelectorAll(".option").forEach(b=>b.addEventListener("click",()=>answerMock(b.dataset.letter)));
-  const nb=qs("nextMockBtn");
-  if(nb)nb.addEventListener("click",()=>{mockIdx++;selected=null;answered=false;renderMock()});
-  const fb=qs("finishBtn");
-  if(fb)fb.addEventListener("click",()=>{clearInterval(mockTimerInterval);renderFinalComplete()});
+  const flag=qs("flagMockBtn"); if(flag)flag.addEventListener("click",()=>{mockFlags[mockIdx]=!mockFlags[mockIdx];renderMock()});
+  const prev=qs("prevMockBtn"); if(prev)prev.addEventListener("click",()=>{mockIdx--;renderMock()});
+  const nb=qs("nextMockBtn"); if(nb)nb.addEventListener("click",()=>{mockIdx++;renderMock()});
+  const fb=qs("finishBtn"); if(fb)fb.addEventListener("click",()=>{clearInterval(mockTimerInterval);renderFinalComplete()});
 }
 function answerMock(letter){
-  if(answered)return;
-  const q=MOCK[lang][mockIdx];
-  selected=letter;answered=true;
-  if(letter===q.correct)mockScore++;
+  mockAnswers[mockIdx]=letter;
   renderMock();
 }
 function renderFinalComplete(){
   currentScreen="finalComplete";setNav("dashboard");
   clearInterval(mockTimerInterval);
+  mockScore=MOCK[lang].reduce((acc,q,i)=>acc+(mockAnswers[i]===q.correct?1:0),0);
   mockComplete=true;
   studyPlanLang=lang;
   const s=getTotalScore();const ms=mockScore;
@@ -1252,7 +1307,6 @@ function renderPrefRound(){
         <button type="button" class="pref-item" id="prefB">
           <span class="pref-emoji">${itemB.emoji}</span>
           <span class="pref-name">${nameB}</span>
-        </button>
       </div>
     </div>
   </div>`;
