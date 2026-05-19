@@ -378,42 +378,8 @@ ul.preview{padding-left:16px;font-size:12.5px;line-height:1.8;color:var(--ink-mi
 
 <!-- LANDING -->
 <section id="landing" class="screen active">
-  <div class="land-card animate-scale">
-    <div class="brand-row">
-      <div class="brand-icon">🧠</div>
-      <div>
-        <div class="brand-name">BCBA Study Hub</div>
-        <div class="brand-tagline">Adaptive Mastery Learning System</div>
-      </div>
-    </div>
-    <div class="hero-box">
-      <div class="hero-eyebrow">BCBA Exam Preparation · 6th Edition TCO</div>
-      <div class="hero-heading">Domina el examen. Confía en cada respuesta.</div>
-      <div class="hero-sub">Preguntas clínicas adaptativas, rutas de dominio personalizadas y análisis de progreso — diseñado para que pases el BCBA la primera vez.</div>
-    </div>
-    <div class="social-proof">
-      <div class="proof-avatars">
-        <div class="proof-avatar">MR</div>
-        <div class="proof-avatar">JL</div>
-        <div class="proof-avatar">DS</div>
-        <div class="proof-avatar">+</div>
-      </div>
-      <div class="proof-text">🎉 <strong>47 estudiantes</strong> pasaron el BCBA este mes estudiando con Study Hub.<br>Promedio: <strong>82% en el examen real.</strong></div>
-    </div>
-    <div class="trust-grid">
-      <div class="trust-item">📘 6th Edition TCO alineado</div>
-      <div class="trust-item">🧩 Escenarios clínicos reales</div>
-      <div class="trust-item">🎯 Ruta de maestría adaptativa</div>
-      <div class="trust-item">🇺🇸🇪🇸 Inglés + Español académico</div>
-    </div>
-    <button type="button" class="cta-btn" id="startDemoBtn">▶ Comenzar Demo Gratuito</button>
-    <div class="checklist">
-      <div class="check-item"><div class="check-dot">✓</div> Learn Mode</div>
-      <div class="check-item"><div class="check-dot">✓</div> Practice clínico</div>
-      <div class="check-item"><div class="check-dot">✓</div> Mock Exam preview</div>
-      <div class="check-item"><div class="check-dot">✓</div> Rationales detallados</div>
-      <div class="check-item"><div class="check-dot">✓</div> Sin tarjeta requerida</div>
-    </div>
+  <div class="land-card animate-scale" id="landCard">
+    <!-- rendered by JS -->
   </div>
 </section>
 
@@ -499,26 +465,6 @@ const LEARN={en:{
   "Mixed Review":{definition:"Este módulo compara Positive Reinforcement, Negative Reinforcement, Escape y Avoidance para desarrollar discriminación — el área más evaluada en el BCBA.",example:"El examen suele evaluar si el estímulo fue añadido o removido, y si el evento aversivo ya estaba presente o fue prevenido.",strategy:"Pregunta en orden: (1) ¿Algo fue añadido o removido? (2) ¿Conducia aumentó? (3) ¿El evento aversivo ya estaba presente o fue prevenido? Usa esta secuencia siempre.",difficulty:"Avanzado",icon:"🔀"}
 }};
 
-const ETHICS_TEASER={en:{
-  concept:"Multiple Relationships",domain:"E",
-  definition:"A multiple relationship occurs when a BCBA is in a professional role with a person and simultaneously has another type of relationship with that same person, or with someone closely associated with that person.",
-  example:"A BCBA is providing ABA services to a child and later discovers the child's parent is also her landlord. Both the professional and personal relationship now exist simultaneously.",
-  strategy:"The key question is whether the secondary relationship could impair the BCBA's objectivity or effectiveness, or could exploit or harm the person receiving services. If yes — it must be avoided or managed proactively.",
-  why:"Ethics (DOM. E) accounts for approximately 12% of the BCBA exam — 22 concepts, including boundary management, informed consent, and cultural humility. These scenarios require applied judgment, not just memorization.",
-  difficulty:"Intermediate",icon:"⚖️",
-  locked_concepts:["Informed Consent","Confidentiality & HIPAA","Cultural Humility","Supervisory Relationships","Public Statements","Transitioning Services"],
-  pract_teaser:{q:"A BCBA has been providing services to a client for 8 months. The client's family then invites the BCBA to the client's birthday party as a personal friend. According to the Ethics Code, what is the BCBA's BEST course of action?",options:{A:"Attend, since it is a social event unrelated to services",B:"Decline and document the boundary to maintain professional objectivity",C:"Consult with a peer before deciding",D:"Accept only if the family initiates"},correct:"B",rationale:"Attending a client's birthday party as a 'personal friend' creates a multiple relationship that risks impairing professional objectivity. The Ethics Code requires BCBAs to avoid such relationships or take reasonable steps to resolve them."}
-},es:{
-  concept:"Relaciones Múltiples (Multiple Relationships)",domain:"E",
-  definition:"Una relación múltiple ocurre cuando un BCBA tiene un rol profesional con una persona y simultáneamente tiene otro tipo de relación con esa misma persona, o con alguien estrechamente asociado a ella.",
-  example:"Un BCBA está proporcionando servicios ABA a un niño y luego descubre que el padre del niño también es su arrendador. Ahora existen simultáneamente la relación profesional y la personal.",
-  strategy:"La pregunta clave es si la relación secundaria podría afectar la objetividad o efectividad del BCBA, o podría explotar o dañar a la persona que recibe servicios. Si es así — debe evitarse o manejarse proactivamente.",
-  why:"Ética (DOM. E) representa aproximadamente el 12% del examen BCBA — 22 conceptos, incluyendo gestión de límites, consentimiento informado y humildad cultural. Estos escenarios requieren juicio aplicado, no solo memorización.",
-  difficulty:"Intermedio",icon:"⚖️",
-  locked_concepts:["Consentimiento Informado","Confidencialidad y HIPAA","Humildad Cultural","Relaciones de Supervisión","Declaraciones Públicas","Transición de Servicios"],
-  pract_teaser:{q:"Un BCBA ha estado proporcionando servicios a un cliente por 8 meses. La familia del cliente invita al BCBA a la fiesta de cumpleaños del cliente como amigo personal. Según el Código de Ética, ¿cuál es la MEJOR acción?",options:{A:"Asistir, ya que es un evento social no relacionado con los servicios",B:"Declinar y documentar el límite para mantener la objetividad profesional",C:"Consultar con un colega antes de decidir",D:"Aceptar solo si la familia lo inicia"},correct:"B",rationale:"Asistir a la fiesta de un cliente como 'amigo personal' crea una relación múltiple que arriesga afectar la objetividad profesional. El Código de Ética requiere que los BCBAs eviten tales relaciones o tomen medidas razonables para resolverlas."}
-}};
-
 const PREF_ITEMS=[
   {id:"cookie",label_en:"Cookie",label_es:"Galleta",emoji:"🍪"},
   {id:"ipad",label_en:"iPad",label_es:"iPad",emoji:"📱"},
@@ -581,24 +527,25 @@ const UI={en:{
   strengths:"Your Strengths",focus:"Focus Areas",unlock:"Unlock Full Version →",
   confLabel:"How confident were you before answering?",confHigh:"Very confident",confMid:"Somewhat sure",confLow:"Unsure / guessed",
   emailHead:"Get your personalized study plan",emailSub:"Based on your demo results, we'll send you a custom study guide for your exam date.",emailPlaceholder:"your@email.com",emailBtn:"Send My Guide",emailThanks:"✓ Check your inbox — your guide is on the way!",
-  // Dashboard strings
   metricDomains:"BCBA domains",metricConcepts:"concept targets",metricScenarios:"clinical scenarios",
   guidedPath:"Guided path: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review",
-  startPath:"Start Path →",
-  mock4q:"4 clinical questions · 3 domains · 5 minute real timer",
+  startPath:"Start Path →",mock4q:"4 clinical questions · 3 domains · 5 minute real timer",
   mockAvail:"DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — available after completing practice demo.",
   curriculumTitle:"Full Curriculum — Preview",
-  pillDemo:"AVAILABLE IN DEMO",pillTeaser:"PREVIEW AVAILABLE",pillPref:"INTERACTIVE TOOL",pillLocked:"FULL VERSION",
+  pillDemo:"AVAILABLE IN DEMO",pillLocked:"FULL VERSION",
   conceptsLabel:"concepts",scenariosLabel:"scenarios",includesLabel:"Includes",
   startDemoBtn:"Start Demo →",lockedBtn:"🔒 Full Version",
-  ethicsBtn:"View Ethics Preview →",prefBtn:"Try Assessment →",
-  // Sidebar
   progLabel:"Demo Progress",modulesLabel:"modules",streakLabel:"Day 1 of studying",
-  // Urgency messages
   urgency3mo:"⚡ Your exam is coming up — every day counts.",urgency6mo:"📅 You have time, but the plan matters.",urgencyDefault:"📘 Build a solid foundation from the start.",
   studyingHrs:"Studying",hrsWeek:"hrs/week.",
-  // Onboarding
-  obStep:"Step",obOf:"of",obNext:"Next →",obStart:"Start Demo →"
+  obStep:"Step",obOf:"of",obNext:"Next →",obStart:"Start Demo →",
+  landEyebrow:"BCBA Exam Preparation · 6th Edition TCO",
+  landHeading:"Master the exam. Trust every answer.",
+  landSub:"Adaptive clinical questions, personalized domain paths, and progress analytics — designed to help you pass the BCBA the first time.",
+  landPositioning:"Designed for candidates who want to <strong>understand the material, not just memorize it</strong> — because the BCBA exam tests clinical reasoning, not recall.",
+  trust1:"📘 6th Edition TCO aligned",trust2:"🧩 Real clinical scenarios",trust3:"🎯 Adaptive mastery path",trust4:"🇺🇸🇪🇸 English + Academic Spanish",
+  ctaBtn:"▶ Start Free Demo",
+  check1:"Learn Mode",check2:"Clinical practice",check3:"Mock Exam preview",check4:"Detailed rationales",check5:"No card required"
 },es:{
   lang:"Idioma",dash:"Panel Demo Público",dashSub:"Explora el recorrido demo y visualiza el currículo completo.",
   startDemo:"Comenzar Ruta de Aprendizaje →",avail:"Disponible en Demo",mock:"Vista Previa del Examen",
@@ -612,76 +559,26 @@ const UI={en:{
   strengths:"Tus Fortalezas",focus:"Áreas de Enfoque",unlock:"Desbloquear Versión Completa →",
   confLabel:"¿Qué tan seguro/a estabas antes de responder?",confHigh:"Muy seguro/a",confMid:"Algo seguro/a",confLow:"No seguro / adiviné",
   emailHead:"Recibe tu plan de estudio personalizado",emailSub:"Basado en tus resultados del demo, te enviaremos una guía de estudio personalizada.",emailPlaceholder:"tu@email.com",emailBtn:"Enviar Mi Guía",emailThanks:"✓ Revisa tu correo — ¡tu guía está en camino!",
-  // Dashboard strings
   metricDomains:"dominios BCBA",metricConcepts:"conceptos objetivo",metricScenarios:"escenarios clínicos",
   guidedPath:"Ruta guiada: Positive Reinforcement → Negative Reinforcement → Escape → Avoidance → Mixed Review",
-  startPath:"Comenzar Ruta →",
-  mock4q:"4 preguntas clínicas · 3 dominios · timer real de 5 minutos",
+  startPath:"Comenzar Ruta →",mock4q:"4 preguntas clínicas · 3 dominios · timer real de 5 minutos",
   mockAvail:"DOM. B (Concepts), DOM. B (Escape/Avoidance), DOM. D (Experimental Design) — disponible tras completar la práctica demo.",
   curriculumTitle:"Currículo Completo — Preview",
-  pillDemo:"DISPONIBLE EN DEMO",pillTeaser:"PREVIEW DISPONIBLE",pillPref:"HERRAMIENTA INTERACTIVA",pillLocked:"VERSIÓN COMPLETA",
+  pillDemo:"DISPONIBLE EN DEMO",pillLocked:"VERSIÓN COMPLETA",
   conceptsLabel:"conceptos",scenariosLabel:"escenarios",includesLabel:"Incluye",
   startDemoBtn:"Comenzar Demo →",lockedBtn:"🔒 Versión Completa",
-  ethicsBtn:"Ver Preview de Ética →",prefBtn:"Probar Assessment →",
-  // Sidebar
   progLabel:"Progreso Demo",modulesLabel:"módulos",streakLabel:"Día 1 de estudio",
-  // Urgency messages
   urgency3mo:"⚡ Tu examen se acerca — cada día cuenta.",urgency6mo:"📅 Tienes tiempo, pero el plan importa.",urgencyDefault:"📘 Construye una base sólida desde ahora.",
   studyingHrs:"Estudiando",hrsWeek:"hrs/semana.",
-  // Onboarding
-  obStep:"Paso",obOf:"de",obNext:"Siguiente →",obStart:"Comenzar Demo →"
+  obStep:"Paso",obOf:"de",obNext:"Siguiente →",obStart:"Comenzar Demo →",
+  landEyebrow:"Preparación para el Examen BCBA · 6th Edition TCO",
+  landHeading:"Domina el examen. Confía en cada respuesta.",
+  landSub:"Preguntas clínicas adaptativas, rutas de dominio personalizadas y análisis de progreso — diseñado para que pases el BCBA la primera vez.",
+  landPositioning:"Diseñado para candidatos que quieren <strong>entender el material, no solo memorizarlo</strong> — porque el examen BCBA evalúa razonamiento clínico, no memorización.",
+  trust1:"📘 Alineado al 6th Edition TCO",trust2:"🧩 Escenarios clínicos reales",trust3:"🎯 Ruta de maestría adaptativa",trust4:"🇺🇸🇪🇸 Inglés + Español académico",
+  ctaBtn:"▶ Comenzar Demo Gratuito",
+  check1:"Learn Mode",check2:"Práctica clínica",check3:"Mock Exam preview",check4:"Rationales detallados",check5:"Sin tarjeta requerida"
 }};
-
-/* ─── DOMAIN DATA ─── */
-const DEMO_PATH_E=["Multiple Relationships","Confidentiality","Cultural Humility"];
-const DEMO_PATH_F=["Preference Assessments","Descriptive Assessment","Functional Analysis"];
-
-const LEARN_E={en:{
-  "Multiple Relationships":{definition:"A multiple relationship occurs when a BCBA is in a professional role with a person and simultaneously has another type of relationship with that same person, or with someone closely associated with that person.",example:"A BCBA provides ABA services to a child and later discovers the child's parent is also her landlord. Both a professional and personal relationship now exist simultaneously.",strategy:"Ask: does the secondary relationship risk impairing objectivity, effectiveness, or could it exploit the client? If yes — avoid it or manage it proactively with documentation.",difficulty:"Intermediate",icon:"⚖️"},
-  "Confidentiality":{definition:"BCBAs protect confidential information and disclose it only with written client consent, or as required or permitted by law (e.g., mandated reporting of abuse, harm to self or others).",example:"A parent calls requesting progress notes for their adult child's ABA program. The BCBA cannot share without the adult client's written authorization, regardless of who pays for services.",strategy:"Always require written consent before sharing. Exceptions are narrow and law-driven: mandated reporting, court order, imminent danger. Age matters — adults hold their own confidentiality rights.",difficulty:"Intermediate",icon:"🔐"},
-  "Cultural Humility":{definition:"BCBAs engage in ongoing self-reflection about how their own culture, biases, and power dynamics affect the therapeutic relationship, and actively seek to understand clients' cultural contexts.",example:"A BCBA implements eye contact as a reinforcer. The family later explains that direct eye contact is considered disrespectful in their culture. The BCBA revises the intervention collaboratively.",strategy:"Cultural humility is ONGOING, not a one-time training. On the exam, look for BCBAs who proactively seek understanding, involve families in goal-setting, and revise plans based on cultural input.",difficulty:"Advanced",icon:"🌍"}
-},es:{
-  "Multiple Relationships":{definition:"Una relación múltiple ocurre cuando un BCBA tiene un rol profesional con una persona y simultáneamente tiene otro tipo de relación con esa misma persona, o con alguien estrechamente asociado a ella.",example:"Un BCBA proporciona servicios ABA a un niño y luego descubre que el padre del niño también es su arrendador. Ahora existen simultáneamente una relación profesional y una personal.",strategy:"Pregunta: ¿la relación secundaria arriesga afectar la objetividad o podría explotar al cliente? Si es así — evítala o manéjala proactivamente con documentación.",difficulty:"Intermedio",icon:"⚖️"},
-  "Confidentiality":{definition:"Los BCBAs protegen la información confidencial y la divulgan solo con el consentimiento escrito del cliente, o según lo requiera la ley (ej. reporte obligatorio de abuso, daño a sí mismo u otros).",example:"Un padre llama solicitando notas de progreso del programa ABA de su hijo adulto. El BCBA no puede compartirlas sin la autorización escrita del cliente adulto, independientemente de quién pague.",strategy:"Siempre requiere consentimiento escrito antes de compartir. Las excepciones son específicas: reporte obligatorio, orden judicial, peligro inminente. La edad importa — los adultos tienen sus propios derechos de confidencialidad.",difficulty:"Intermedio",icon:"🔐"},
-  "Cultural Humility":{definition:"Los BCBAs se involucran en autorreflexión continua sobre cómo su propia cultura, sesgos y dinámicas de poder afectan la relación terapéutica, y buscan activamente comprender el contexto cultural de los clientes.",example:"Un BCBA implementa el contacto visual como reforzador. La familia explica que en su cultura el contacto visual directo es irrespetuoso. El BCBA revisa la intervención colaborativamente.",strategy:"La humildad cultural es CONTINUA, no un entrenamiento de una sola vez. En el examen, busca BCBAs que proactivamente busquen comprensión, involucren a las familias y revisen planes basados en aportes culturales.",difficulty:"Avanzado",icon:"🌍"}
-}};
-
-const LEARN_F={en:{
-  "Preference Assessments":{definition:"Systematic procedures used to identify stimuli with the highest reinforcing potential for a specific individual at a specific time. Results generate a preference hierarchy — not a confirmed reinforcer list.",example:"An MSWO assessment with 6 items shows the iPad selected 80% of trials. The BCBA uses iPad access tentatively as a reinforcer, then confirms it by measuring behavior increase.",strategy:"PREFERENCE ≠ REINFORCER. A preferred item must actually increase behavior to be a reinforcer. Reassess frequently — preferences change with satiation, deprivation, and context.",difficulty:"Beginner",icon:"🎯"},
-  "Descriptive Assessment":{definition:"Naturalistic observation methods (ABC recording, scatterplots, narrative recording) that document antecedents, behaviors, and consequences in the environment where behavior occurs — without experimental manipulation.",example:"A BCBA observes a student for 30 minutes and records that aggression consistently follows teacher demands and is followed by peer attention. This generates a hypothesis, not a conclusion.",strategy:"Descriptive assessments CANNOT establish functional relationships — they only generate hypotheses. Only a functional analysis (experimental method) can demonstrate function. This distinction is heavily tested.",difficulty:"Intermediate",icon:"🔍"},
-  "Functional Analysis":{definition:"An experimental procedure (Iwata et al., 1982) that systematically manipulates antecedents and consequences across controlled conditions to demonstrate the function maintaining a behavior.",example:"SIB occurs at high rates in the Escape condition and near-zero in all others, including Alone. This pattern directly demonstrates escape-maintained behavior — not automatic reinforcement.",strategy:"FA is the ONLY method that establishes experimental control over behavior. Know the 4 standard conditions: Attention, Escape, Alone (sensory/automatic), Control. High rates in ONE condition = that function. High in multiple = multiply-maintained.",difficulty:"Advanced",icon:"🧪"}
-},es:{
-  "Preference Assessments":{definition:"Procedimientos sistemáticos para identificar estímulos con mayor potencial reforzador para un individuo específico en un momento específico. Los resultados generan una jerarquía de preferencia — no una lista confirmada de reforzadores.",example:"Una evaluación MSWO con 6 ítems muestra que el iPad es seleccionado en el 80% de los ensayos. El BCBA usa acceso al iPad tentativamente como reforzador y luego confirma midiendo el aumento de la conducta.",strategy:"PREFERENCIA ≠ REFORZADOR. Un ítem preferido debe realmente aumentar la conducta para ser reforzador. Reevalúa frecuentemente — las preferencias cambian con saciación, privación y contexto.",difficulty:"Básico",icon:"🎯"},
-  "Descriptive Assessment":{definition:"Métodos de observación naturalista (registro ABC, dispersogramas, registro narrativo) que documentan antecedentes, conductas y consecuencias en el ambiente donde ocurre la conducta — sin manipulación experimental.",example:"Un BCBA observa a un estudiante por 30 minutos y registra que la agresión ocurre consistentemente después de demandas del maestro y es seguida por atención de compañeros. Esto genera una hipótesis, no una conclusión.",strategy:"Los assessments descriptivos NO pueden establecer relaciones funcionales — solo generan hipótesis. Solo un análisis funcional (método experimental) puede demostrar la función. Esta distinción es muy evaluada en el examen.",difficulty:"Intermedio",icon:"🔍"},
-  "Functional Analysis":{definition:"Procedimiento experimental (Iwata et al., 1982) que manipula sistemáticamente antecedentes y consecuencias en condiciones controladas para demostrar la función que mantiene una conducta.",example:"La autolesión ocurre en tasas altas en la condición de Escape y casi cero en todas las demás, incluyendo la condición Sola. Este patrón demuestra directamente conducta mantenida por escape — no reforzamiento automático.",strategy:"El FA es el ÚNICO método que establece control experimental sobre la conducta. Conoce las 4 condiciones estándar: Atención, Escape, Sola (sensorial/automático), Control. Tasas altas en UNA condición = esa función.",difficulty:"Avanzado",icon:"🧪"}
-}};
-
-const QUESTIONS_E={en:[
-  {concept:"Multiple Relationships",difficulty:"Intermediate",q:"A BCBA has provided ABA services to a client for 8 months. The client's parent then offers the BCBA a part-time job at their family business. According to the Ethics Code, what is the BCBA's best course of action?",options:{A:"Accept if it does not interfere with service hours",B:"Decline to prevent a multiple relationship that could impair professional objectivity",C:"Accept with written supervisor approval",D:"Accept only on weekends when services are not occurring"},correct:"B",hint:"Ask whether accepting would create a secondary relationship that risks impairing objectivity.",rationale:"Employment by a client's family creates a financial multiple relationship that risks compromising the BCBA's professional judgment. The Ethics Code requires avoiding relationships that could impair objectivity or exploit the client."},
-  {concept:"Confidentiality",difficulty:"Intermediate",q:"A teacher requests a copy of a student's behavior intervention plan from the BCBA, stating she needs it to support the student in class. No release of information has been signed by the guardians. What should the BCBA do?",options:{A:"Share a verbal summary since the purpose is educational",B:"Provide only the data graphs, not the written plan",C:"Decline to share any information without written guardian consent",D:"Ask the school principal to authorize the release"},correct:"C",hint:"Confidentiality requires written consent before sharing with any third party, regardless of intent.",rationale:"Without a signed release of information from the guardians, the BCBA cannot share client information with any third party — including educators. Good intentions do not override confidentiality requirements."},
-  {concept:"Cultural Humility",difficulty:"Advanced",q:"During a team meeting, a BCBA reviews a client's goals and realizes several target behaviors conflict with the family's stated cultural values from intake. What is the most ethically appropriate next step?",options:{A:"Maintain the original goals since they were clinically validated at intake",B:"Modify the goals independently to align with what the BCBA understands about the culture",C:"Engage the family in a collaborative conversation to revise goals in alignment with their values",D:"Document the conflict and consult BACB ethics resources before taking action"},correct:"C",hint:"Cultural humility requires active collaboration with families — not unilateral decision-making.",rationale:"Cultural humility is an ongoing process that requires collaboration, not assumption. The BCBA must engage the family directly to revise goals together. Unilaterally maintaining or changing goals — even with good intent — bypasses the family's voice."}
-],es:[
-  {concept:"Multiple Relationships",difficulty:"Intermedio",q:"Un BCBA ha proporcionado servicios ABA a un cliente por 8 meses. El padre del cliente le ofrece al BCBA un trabajo de medio tiempo en su negocio familiar. Según el Código de Ética, ¿cuál es la mejor acción del BCBA?",options:{A:"Aceptar si no interfiere con los horarios de servicio",B:"Declinar para evitar una relación múltiple que podría afectar la objetividad profesional",C:"Aceptar con aprobación escrita del supervisor",D:"Aceptar solo los fines de semana cuando no ocurren servicios"},correct:"B",hint:"Pregunta si aceptar crearía una relación secundaria que arriesga afectar la objetividad.",rationale:"El empleo por parte de la familia de un cliente crea una relación múltiple financiera que arriesga comprometer el juicio profesional del BCBA. El Código de Ética requiere evitar relaciones que puedan afectar la objetividad o explotar al cliente."},
-  {concept:"Confidentiality",difficulty:"Intermedio",q:"Una maestra solicita una copia del plan de intervención conductual de un estudiante al BCBA, indicando que lo necesita para apoyar al estudiante en clase. Los tutores no han firmado ninguna autorización de información. ¿Qué debe hacer el BCBA?",options:{A:"Compartir un resumen verbal ya que el propósito es educativo",B:"Proporcionar solo las gráficas de datos, no el plan escrito",C:"Negarse a compartir cualquier información sin el consentimiento escrito de los tutores",D:"Pedirle al director de la escuela que autorice la divulgación"},correct:"C",hint:"La confidencialidad requiere consentimiento escrito antes de compartir con cualquier tercero, independientemente de la intención.",rationale:"Sin una autorización firmada por los tutores, el BCBA no puede compartir información del cliente con ningún tercero — incluyendo educadores. Las buenas intenciones no anulan los requisitos de confidencialidad."},
-  {concept:"Cultural Humility",difficulty:"Avanzado",q:"Durante una reunión de equipo, un BCBA revisa las metas de un cliente y se da cuenta de que varios comportamientos objetivo entran en conflicto con los valores culturales declarados por la familia durante la evaluación inicial. ¿Cuál es el siguiente paso más ético?",options:{A:"Mantener las metas originales ya que fueron validadas clínicamente en la evaluación inicial",B:"Modificar las metas independientemente para alinearlas con lo que el BCBA entiende sobre la cultura",C:"Involucrar a la familia en una conversación colaborativa para revisar las metas en alineación con sus valores",D:"Documentar el conflicto y consultar los recursos de ética del BACB antes de actuar"},correct:"C",hint:"La humildad cultural requiere colaboración activa con las familias — no toma de decisiones unilateral.",rationale:"La humildad cultural es un proceso continuo que requiere colaboración, no suposición. El BCBA debe involucrar directamente a la familia para revisar las metas juntos. Mantener o cambiar metas unilateralmente — incluso con buena intención — omite la voz de la familia."}
-]};
-
-const QUESTIONS_F={en:[
-  {concept:"Preference Assessments",difficulty:"Beginner",q:"A BCBA conducts a paired stimulus preference assessment. The client consistently selects the iPad across trials. The BCBA uses iPad access as a reinforcer in a new program. After 3 sessions, the target behavior shows no increase. What does this most directly suggest?",options:{A:"The paired stimulus assessment was conducted incorrectly",B:"Preference does not guarantee reinforcer effectiveness",C:"The client experienced satiation before the assessment",D:"A free operant assessment should have been used instead"},correct:"B",hint:"Remember: reinforcers are defined by their effect on behavior, not by what the client selects.",rationale:"Preference assessments identify items a client selects — but selection does not guarantee the item will function as a reinforcer. Reinforcers are defined by their effect: a future increase in behavior. Always confirm with a reinforcer assessment after identifying preferences."},
-  {concept:"Descriptive Assessment",difficulty:"Intermediate",q:"After conducting 10 ABC observation sessions, a BCBA concludes that a student's aggression is maintained by escape from demands. What is the most important limitation of this conclusion?",options:{A:"ABC data requires a minimum of 20 sessions to be valid",B:"Descriptive assessments cannot establish a functional relationship",C:"The BCBA should have used a scatterplot instead of ABC recording",D:"Antecedent data is insufficient without consequence intervals"},correct:"B",hint:"Ask what type of evidence is needed to establish that escape actually CAUSES the behavior.",rationale:"Descriptive/ABC assessments identify patterns and generate hypotheses about function, but they cannot establish functional relationships. Only an experimental functional analysis — which manipulates variables systematically — can demonstrate that escape is the maintaining variable."},
-  {concept:"Functional Analysis",difficulty:"Advanced",q:"During a functional analysis, a client's self-injurious behavior (SIB) occurs at high rates in the Escape condition and near-zero rates in the Attention, Alone, and Control conditions. What does this pattern most directly indicate?",options:{A:"The behavior is maintained by automatic reinforcement",B:"The behavior is escape-maintained social negative reinforcement",C:"The Alone condition was conducted incorrectly",D:"The behavior has multiple maintaining functions"},correct:"B",hint:"Near-zero in the Alone condition rules out automatic reinforcement. High rates only in Escape points to one function.",rationale:"High rates exclusively in the Escape condition, with near-zero in Alone (which controls for automatic reinforcement), directly indicates escape-maintained social negative reinforcement. If automatic reinforcement were a factor, the Alone condition would show elevated rates."}
-],es:[
-  {concept:"Preference Assessments",difficulty:"Básico",q:"Un BCBA realiza una evaluación de preferencia de estímulo emparejado. El cliente selecciona consistentemente el iPad en los ensayos. El BCBA usa acceso al iPad como reforzador en un nuevo programa. Después de 3 sesiones, la conducta objetivo no muestra aumento. ¿Qué sugiere esto más directamente?",options:{A:"La evaluación de estímulo emparejado fue realizada incorrectamente",B:"La preferencia no garantiza la efectividad del reforzador",C:"El cliente experimentó saciación antes de la evaluación",D:"Se debería haber usado una evaluación de operante libre"},correct:"B",hint:"Recuerda: los reforzadores se definen por su efecto en la conducta, no por lo que el cliente selecciona.",rationale:"Las evaluaciones de preferencia identifican ítems que el cliente selecciona — pero la selección no garantiza que el ítem funcione como reforzador. Los reforzadores se definen por su efecto: un aumento futuro en la conducta. Siempre confirma con una evaluación de reforzadores."},
-  {concept:"Descriptive Assessment",difficulty:"Intermedio",q:"Después de realizar 10 sesiones de observación ABC, un BCBA concluye que la agresión de un estudiante es mantenida por escape de demandas. ¿Cuál es la limitación más importante de esta conclusión?",options:{A:"Los datos ABC requieren un mínimo de 20 sesiones para ser válidos",B:"Los assessments descriptivos no pueden establecer una relación funcional",C:"El BCBA debería haber usado un dispersograma en lugar de registro ABC",D:"Los datos de antecedentes son insuficientes sin intervalos de consecuencias"},correct:"B",hint:"Pregunta qué tipo de evidencia se necesita para establecer que el escape CAUSA la conducta.",rationale:"Los assessments descriptivos/ABC identifican patrones y generan hipótesis sobre la función, pero no pueden establecer relaciones funcionales. Solo un análisis funcional experimental — que manipula variables sistemáticamente — puede demostrar que el escape es la variable mantenedora."},
-  {concept:"Functional Analysis",difficulty:"Avanzado",q:"Durante un análisis funcional, la autolesión (SIB) de un cliente ocurre en tasas altas en la condición de Escape y tasas casi cero en las condiciones de Atención, Sola y Control. ¿Qué indica este patrón más directamente?",options:{A:"La conducta es mantenida por reforzamiento automático",B:"La conducta es reforzamiento negativo social mantenido por escape",C:"La condición Sola fue realizada incorrectamente",D:"La conducta tiene múltiples funciones mantenedoras"},correct:"B",hint:"Casi cero en la condición Sola descarta el reforzamiento automático. Tasas altas solo en Escape señala una función.",rationale:"Tasas altas exclusivamente en la condición de Escape, con casi cero en la condición Sola (que controla el reforzamiento automático), indica directamente reforzamiento negativo social mantenido por escape. Si el reforzamiento automático fuera un factor, la condición Sola mostraría tasas elevadas."}
-]};
-
-/* ─── DOMAIN REGISTRY ─── */
-const DOMAIN_DEMOS={
-  B:{path:null,learn:null,questions:null,label:"DOM. B — Concepts & Principles",color:"var(--green)",navId:"learn"},
-  E:{path:DEMO_PATH_E,learn:LEARN_E,questions:QUESTIONS_E,label:"DOM. E — Ethics",color:"#6D28D9",navId:"learn-e"},
-  F:{path:DEMO_PATH_F,learn:LEARN_F,questions:QUESTIONS_F,label:"DOM. F — Behavior Assessment",color:"#BE185D",navId:"learn-f"}
-};
 
 
 /* ─── STUDY PLAN COPY ─── */
@@ -809,6 +706,55 @@ function canAccessF(){return isDomComplete("E")}
 function canAccessMock(){return isDomComplete("F")}
 function allDomsComplete(){return isDomComplete("B")&&isDomComplete("E")&&isDomComplete("F")}
 
+
+/* ─── LANDING ─── */
+function renderLanding(){
+  const lc = document.getElementById('landCard');
+  if(!lc) return;
+  lc.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+      <div class="brand-row" style="margin-bottom:0">
+        <div class="brand-icon">🧠</div>
+        <div>
+          <div class="brand-name">BCBA Study Hub</div>
+          <div class="brand-tagline">Adaptive Mastery Learning System</div>
+        </div>
+      </div>
+      <div class="lang-switch">
+        <button type="button" class="lang-btn ${lang==="en"?"active":""}" data-lang="en">🇺🇸 EN</button>
+        <button type="button" class="lang-btn ${lang==="es"?"active":""}" data-lang="es">🇪🇸 ES</button>
+      </div>
+    </div>
+    <div class="hero-box">
+      <div class="hero-eyebrow">${L("landEyebrow")}</div>
+      <div class="hero-heading">${L("landHeading")}</div>
+      <div class="hero-sub">${L("landSub")}</div>
+    </div>
+    <div class="social-proof">
+      <div class="proof-text" style="font-size:13px;color:var(--green-dark);font-weight:500;line-height:1.6">${L("landPositioning")}</div>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-item">${L("trust1")}</div>
+      <div class="trust-item">${L("trust2")}</div>
+      <div class="trust-item">${L("trust3")}</div>
+      <div class="trust-item">${L("trust4")}</div>
+    </div>
+    <button type="button" class="cta-btn" id="startDemoBtn">${L("ctaBtn")}</button>
+    <div class="checklist">
+      <div class="check-item"><div class="check-dot">✓</div> ${L("check1")}</div>
+      <div class="check-item"><div class="check-dot">✓</div> ${L("check2")}</div>
+      <div class="check-item"><div class="check-dot">✓</div> ${L("check3")}</div>
+      <div class="check-item"><div class="check-dot">✓</div> ${L("check4")}</div>
+      <div class="check-item"><div class="check-dot">✓</div> ${L("check5")}</div>
+    </div>`;
+  // Bind lang switcher on landing
+  lc.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>{
+    lang=b.dataset.lang;
+    localStorage.setItem('bcba_lang',lang);
+    renderLanding();
+  }));
+  document.getElementById('startDemoBtn').addEventListener('click', launchDemo);
+}
 
 /* ─── LAUNCH ─── */
 function launchDemo(){qs("landing").classList.remove("active");qs("onboarding").classList.add("active");renderOnboard()}
@@ -1104,56 +1050,6 @@ function answerPractice(letter){
   renderPractice();
 }
 
-/* ─── DOMAIN COMPLETE (E and F) ─── */
-function renderDomainComplete(dk){
-  currentScreen="complete";setNav("dashboard");
-  const state=DS[dk];
-  const qArr=dk==="E"?QUESTIONS_E[lang]:QUESTIONS_F[lang];
-  const total=qArr.length;
-  const accentColor=dk==="E"?"#6D28D9":"#BE185D";
-  const domLabel=dk==="E"?"DOM. E — Ethical Issues":"DOM. F — Behavior Assessment";
-  const missed=[...new Set(state.answeredData.filter(x=>!x.ok).map(x=>x.concept))];
-  const confWrong=state.answeredData.filter(x=>!x.ok&&x.confidence==="high");
-  let insightText="";
-  if(confWrong.length){insightText=lang==="es"?`Respondiste con <strong>alta confianza pero incorrectamente</strong> en ${confWrong.length} pregunta(s). La versión completa detecta y corrige estos patrones.`:`You answered with <strong>high confidence but incorrectly</strong> on ${confWrong.length} question(s). The full version detects and corrects these patterns.`;}
-  else if(missed.length){insightText=lang==="es"?`Tu área de oportunidad en ${domLabel} es <strong>${missed.join(", ")}</strong>. La versión completa incluye rutas de remediation adaptativas.`:`Your opportunity area in ${domLabel} is <strong>${missed.join(", ")}</strong>. The full version includes adaptive remediation paths.`;}
-  else{insightText=lang==="es"?`Excelente — ${state.score}/${total} correctas en ${domLabel}. La versión completa cubre los ${dk==="E"?"22":"23"} conceptos con el mismo nivel de profundidad.`:`Excellent — ${state.score}/${total} correct in ${domLabel}. The full version covers all ${dk==="E"?"22":"23"} concepts with the same clinical depth.`;}
-  qs("main").innerHTML=`
-  <div class="topbar"><div></div><div class="topbar-right">${langSwitch()}</div></div>
-  <div class="complete-card animate-scale">
-    <div style="text-align:center;margin-bottom:6px">
-      <div style="font-size:42px">🎯</div>
-      <div class="page-title" style="margin-top:8px">${lang==="es"?"Demo Completado":"Demo Complete"} — ${domLabel}</div>
-      <div class="page-sub">${lang==="es"?"Completaste la ruta de aprendizaje y práctica de este dominio.":"You finished the learn path and practice for this domain."}</div>
-    </div>
-    <div class="score-display">
-      <div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:8px">${lang==="es"?"Práctica":"Practice"}</div>
-        <div class="score-ring" style="border-color:${accentColor};background:${accentColor}15"><div class="score-num" style="color:${accentColor}">${state.score}</div><div class="score-denom">${lang==="es"?"de":"of"} ${total}</div></div>
-      </div>
-    </div>
-    <div class="insight-box" style="background:linear-gradient(135deg,${accentColor},${accentColor}bb)">
-      <div class="insight-label">📊 ${lang==="es"?"TU ANÁLISIS":"YOUR INSIGHT"}</div>
-      <div class="insight-text">${insightText}</div>
-    </div>
-    <div class="email-capture">
-      <div class="ec-label">${lang==="es"?"PRÓXIMO PASO":"NEXT STEP"}</div>
-      <div class="ec-heading">${L("emailHead")}</div>
-      <div class="ec-sub">${L("emailSub")}</div>
-      <div class="ec-form" id="ecForm"><input type="email" class="ec-input" id="ecEmail" placeholder="${L("emailPlaceholder")}"/><button type="button" class="ec-btn" id="ecBtn">${L("emailBtn")}</button></div>
-      <div class="ec-success" id="ecSuccess">${L("emailThanks")}</div>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px">
-      <button type="button" class="btn btn-gold" id="unlockBtn" style="font-size:14px;padding:12px 24px">${L("unlock")}</button>
-      <button type="button" class="btn btn-secondary" id="completeBack">${L("back")}</button>
-    </div>
-  </div>`;
-  bindLang();
-  const eb=qs("ecBtn");
-  if(eb)eb.addEventListener("click",()=>{const email=qs("ecEmail").value;if(email&&email.includes("@")){qs("ecForm").style.display="none";qs("ecSuccess").style.display="block";}else{qs("ecEmail").style.borderColor="rgba(255,100,100,.6)";}});
-  qs("unlockBtn").addEventListener("click",()=>showPremium("exams"));
-  qs("completeBack").addEventListener("click",renderDash);
-}
 
 /* ─── MOCK INTRO ─── */
 function renderMockIntro(){
@@ -1310,157 +1206,7 @@ function renderFinalComplete(){
   qs("finalBack").addEventListener("click",renderDash);
 }
 
-/* ─── COMPLETE ─── */
-function renderComplete(){
-  currentScreen="complete";setNav("dashboard");
-  clearInterval(mockTimerInterval);
-  const state=DS["B"];
-  const total=QUESTIONS[lang].length;
-  const missed=state.answeredData.filter(x=>!x.ok).map(x=>x.concept);
-  const confident_wrong=state.answeredData.filter(x=>!x.ok&&x.confidence==="high");
-  const needsFocus=missed.length?[...new Set(missed)].join(", "):(lang==="es"?"Discriminación avanzada bajo tiempo":"Advanced discrimination under exam timing");
-  const pct=Math.round((state.score/total)*100);
-  let insightText="";
-  if(missed.includes("Avoidance")||missed.includes("Mixed Review")){insightText=lang==="es"?`Respondiste ${score}/${total} correctamente. Tu mayor oportunidad de mejora es <strong>Escape vs. Avoidance</strong> — uno de los conceptos más frecuentes en el BCBA real. La versión completa tiene 23 preguntas específicas con remediation adaptativa.`:`You got ${score}/${total} correct. Your biggest opportunity is <strong>Escape vs. Avoidance</strong> — one of the most frequently tested distinctions on the real BCBA. The full version has 23 targeted questions with adaptive remediation.`;}
-  else if(confident_wrong.length){insightText=lang==="es"?`Importante: respondiste con <strong>alta confianza pero incorrectamente</strong> en ${confident_wrong.length} pregunta(s). Eso es más peligroso en el examen real que simplemente adivinar. La versión completa detecta y corrige estos patrones.`:`Important: you answered with <strong>high confidence but incorrectly</strong> on ${confident_wrong.length} question(s). That's more dangerous on the real exam than guessing. The full version detects and corrects these patterns.`;}
-  else{insightText=lang==="es"?`Excelente rendimiento en el demo — ${score}/${total} correctas. El currículo completo cubre los 9 dominios con el mismo nivel de detalle clínico, más analytics de progreso y mock exams completos.`:`Strong demo performance — ${score}/${total} correct. The full curriculum covers all 9 domains with the same clinical depth, plus progress analytics and full mock exams.`;}
 
-  qs("main").innerHTML=`
-  <div class="topbar"><div></div><div class="topbar-right">${langSwitch()}</div></div>
-  <div class="complete-card animate-scale">
-    <div style="text-align:center;margin-bottom:6px">
-      <div style="font-size:42px">🎯</div>
-      <div class="page-title" style="margin-top:8px">${L("complete")}</div>
-      <div class="page-sub">${L("completeSub")}</div>
-    </div>
-    <div class="score-display">
-      <div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:8px">Practice</div>
-        <div class="score-ring"><div class="score-num">${score}</div><div class="score-denom">de ${total}</div></div>
-      </div>
-      <div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px">Mock Exam</div>
-        <div class="score-ring" style="border-color:var(--gold);background:var(--gold-light)"><div class="score-num" style="color:var(--gold)">${mockScore}</div><div class="score-denom">de ${MOCK[lang].length}</div></div>      </div>
-    </div>
-    <div class="insight-box">
-      <div class="insight-label">${lang==="es"?"📊 TU ANÁLISIS PERSONALIZADO":"📊 YOUR PERSONALIZED INSIGHT"}</div>
-      <div class="insight-text">${insightText}</div>
-    </div>
-    <div class="summary-cols">
-      <div class="sum-box sum-good">
-        <strong>✓ ${L("strengths")}</strong><br>
-        • ${lang==="es"?"Contingencias de reforzamiento":"Reinforcement contingencies"}<br>
-        • ${lang==="es"?"Ruta de aprendizaje basada en conceptos":"Concept-based learning path"}<br>
-        • ${lang==="es"?"Interpretación de escenarios clínicos":"Clinical scenario interpretation"}
-      </div>
-      <div class="sum-box sum-improve">
-        <strong>📌 ${L("focus")}</strong><br>
-        • ${needsFocus}<br>
-        • ${lang==="es"?"Discriminación bajo presión de tiempo":"Discrimination under time pressure"}
-      </div>
-    </div>
-    <div class="email-capture">
-      <div class="ec-label">${lang==="es"?"PRÓXIMO PASO":"NEXT STEP"}</div>
-      <div class="ec-heading">${L("emailHead")}</div>
-      <div class="ec-sub">${L("emailSub")}</div>
-      <div class="ec-form" id="ecForm">
-        <input type="email" class="ec-input" id="ecEmail" placeholder="${L("emailPlaceholder")}"/>
-        <button type="button" class="ec-btn" id="ecBtn">${L("emailBtn")}</button>
-      </div>
-      <div class="ec-success" id="ecSuccess">${L("emailThanks")}</div>
-    </div>
-    <div style="font-size:13px;font-weight:700;color:var(--ink-mid);margin-bottom:10px">${lang==="es"?"¿Qué incluye la versión completa?":"What's included in the full version?"}</div>
-    <div class="feature-chips">
-      <div class="chip active">✓ 9 ${lang==="es"?"dominios BCBA":"BCBA domains"}</div>
-      <div class="chip active">✓ ${lang==="es"?"Práctica ilimitada":"Unlimited practice"}</div>
-      <div class="chip active">✓ ${lang==="es"?"Mock exams cronometrados":"Timed mock exams"}</div>
-      <div class="chip active">✓ Weakness Detection AI</div>
-      <div class="chip">📅 ${lang==="es"?"Study Plan personalizado":"Personalized Study Plan"}</div>
-      <div class="chip">📊 Mastery Analytics</div>
-      <div class="chip">🇺🇸🇪🇸 EN + ES</div>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px">
-      <button type="button" class="btn btn-gold" id="unlockBtn" style="font-size:14px;padding:12px 24px">${L("unlock")}</button>
-      <button type="button" class="btn btn-secondary" id="completeBack">${L("back")}</button>
-    </div>
-  </div>`;
-  bindLang();
-  const eb=qs("ecBtn");
-  if(eb)eb.addEventListener("click",()=>{
-    const email=qs("ecEmail").value;
-    if(email&&email.includes("@")){qs("ecForm").style.display="none";qs("ecSuccess").style.display="block";}
-    else{qs("ecEmail").style.borderColor="rgba(255,100,100,.6)";}
-  });
-  qs("unlockBtn").addEventListener("click",()=>showPremium("exams"));
-  qs("completeBack").addEventListener("click",renderDash);
-}
-
-/* ─── ETHICS TEASER ─── */
-function startEthicsTeaser(){
-  ethicsPractAnswered=false;
-  ethicsPractSelected=null;
-  renderEthicsTeaser();
-}
-function renderEthicsTeaser(){
-  currentScreen="ethicsTeaser";
-  const m=ETHICS_TEASER[lang];
-  const pq=m.pract_teaser;
-  qs("main").innerHTML=`
-  <div class="topbar animate-in">
-    <div>
-      <div class="page-title" style="color:#5B21B6">⚖️ DOM. E — Ethics Preview</div>
-      <div class="page-sub">${lang==="es"?"1 concepto desbloqueado · Práctica bloqueada · 22 conceptos en versión completa":"1 concept unlocked · Practice locked · 22 concepts in full version"}</div>
-    </div>
-    <div class="topbar-right">${langSwitch()}<button type="button" class="btn btn-secondary" id="ethicsBack">${L("back")}</button></div>
-  </div>
-  <div class="learn-wrap">
-    <div class="ethics-banner">
-      <div>
-        <div class="ethics-pct">${m.why.match(/\d+%/)?.[0]||"12%"}</div>
-        <div class="ethics-pct-label">${lang==="es"?"del examen BCBA":"of the BCBA exam"}</div>
-      </div>
-      <div style="font-size:13px;line-height:1.6;opacity:.9">${m.why}</div>
-    </div>
-    <div class="ethics-teaser-card animate-in">
-      <div class="module-label" style="color:#6D28D9">DOM. E · ${lang==="es"?"Vista Previa Desbloqueada":"Unlocked Preview"}</div>
-      <div class="module-title">${m.icon} ${m.concept}</div>
-      <div class="difficulty-badge ${diffClass(m.difficulty)}">${m.difficulty}</div>
-      <div class="section-label">${L("definition")}</div>
-      <div class="definition" style="border-left-color:#7C3AED">${m.definition}</div>
-      <div class="section-label">${L("example")}</div>
-      <div style="font-size:14px;line-height:1.8;color:var(--ink-mid);background:var(--surface);border-radius:var(--radius-sm);padding:14px">${m.example}</div>
-      <div class="note-box" style="background:#F3EEFF;border-color:#C4B5FD;color:#4C1D95"><strong>💡 ${L("strategy")}:</strong> ${m.strategy}</div>
-
-      <div class="section-label" style="margin-top:20px">${lang==="es"?"Práctica — 1 Pregunta Preview":"Practice — 1 Preview Question"}</div>
-      <div class="question-card" style="border-color:#C4B5FD;margin-top:8px">
-        <div class="question-text" style="border-left-color:#7C3AED">${pq.q}</div>
-        ${Object.keys(pq.options).map(letter=>{
-          let cls="";
-          if(ethicsPractAnswered&&letter===pq.correct)cls="correct";
-          if(ethicsPractAnswered&&letter===ethicsPractSelected&&letter!==pq.correct)cls="wrong";
-          return`<button type="button" class="option ${cls} ethics-pq-opt" data-letter="${letter}" ${ethicsPractAnswered?"disabled":""}><span class="option-letter">${letter}</span>${pq.options[letter]}</button>`;
-        }).join("")}
-        ${ethicsPractAnswered?`<div class="feedback ${ethicsPractSelected===pq.correct?"good":"bad"}"><div class="feedback-title">${ethicsPractSelected===pq.correct?L("correct"):L("incorrect")}</div>${pq.rationale}</div>`:""}
-      </div>
-
-      <div style="background:linear-gradient(135deg,#EDE9FE,#F3EEFF);border:1.5px dashed #A78BFA;border-radius:var(--radius-md);padding:18px;margin-top:16px;text-align:center">
-        <div style="font-size:14px;font-weight:700;color:#5B21B6;margin-bottom:6px">🔒 ${lang==="es"?"21 conceptos más bloqueados":"21 more concepts locked"}</div>
-        <div style="font-size:12px;color:#6D28D9;margin-bottom:12px;line-height:1.6">${lang==="es"?"La versión completa incluye:":"The full version includes:"} ${m.locked_concepts.join(" · ")}</div>
-        <button type="button" class="btn" style="background:linear-gradient(135deg,#4C1D95,#6D28D9);color:white" id="ethicsUnlockBtn">${lang==="es"?"Desbloquear DOM. E Completo →":"Unlock Full DOM. E →"}</button>
-      </div>
-    </div>
-  </div>`;
-  bindLang();
-  qs("ethicsBack").addEventListener("click",renderDash);
-  document.querySelectorAll(".ethics-pq-opt").forEach(b=>b.addEventListener("click",()=>{
-    if(ethicsPractAnswered)return;
-    ethicsPractSelected=b.dataset.letter;
-    ethicsPractAnswered=true;
-    renderEthicsTeaser();
-  }));
-  const eu=qs("ethicsUnlockBtn");
-  if(eu)eu.addEventListener("click",()=>showPremium("exams"));
-}
 
 /* ─── PREFERENCE ASSESSMENT ─── */
 function renderPrefAssessment(){
@@ -1584,7 +1330,7 @@ function renderPrefResults(){
 
 /* ─── INIT ─── */
 document.addEventListener("DOMContentLoaded",function(){
-  qs("startDemoBtn").addEventListener("click",launchDemo);
+  renderLanding();
   qs("nav-dashboard").addEventListener("click",renderDash);
   qs("nav-learn").addEventListener("click",()=>startLearn("B"));
   qs("nav-practice").addEventListener("click",()=>startPractice("B"));
